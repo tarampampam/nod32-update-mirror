@@ -62,4 +62,4 @@ foreach ($bases_urls_array as $baseUrl)
 
 **Make love, not war!**
 
-[Пост в блоге]:http://blog.kplus.pro/post/82498184336/make-nod32-mirror-by-php
+[Пост в блоге]:http://tmblr.co/ZYW79o1CrHcIG
