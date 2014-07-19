@@ -1,0 +1,68 @@
+## Clients disable by ip
+## http://tools.dynamicdrive.com/userban/
+<Limit GET POST>
+  order allow,deny
+  #deny from 10.10.10.
+  #deny from 11.11.11.
+  allow from all
+</Limit>
+
+## Speed limit module
+## http://www.lissyara.su/articles/freebsd/www/mod_bandwidth/
+#<ifModule mod_bandwidth.c>
+#  BandwidthModule On
+#  BandWidthPulse 10000
+### limit to 500kB/s
+#  BandWidth all 504800
+#  MaxConnection 100
+#</ifModule>
+
+RewriteEngine On
+RewriteBase /
+
+## Disable by refferal
+# If empty refferal
+#SetEnvIfNoCase Referer "^$" bad_user
+SetEnvIfNoCase Referer "^(http?://)?(www\.)?vk.com" bad_user
+SetEnvIfNoCase Referer "^(http?://)?(www\.)?odnoklassniki.ru" bad_user
+SetEnvIfNoCase Referer "^(http?://)?(www\.)?ok.ru" bad_user
+SetEnvIfNoCase Referer "^(http?://)?(www\.)?qip.ru" bad_user
+SetEnvIfNoCase Referer "^(http?://)?(www\.)?google." bad_user
+SetEnvIfNoCase Referer "^(http?://)?(www\.)?yandex.ru" bad_user
+SetEnvIfNoCase Referer "^(http?://)?(www\.)?yahoo.com" bad_user
+SetEnvIfNoCase Referer "^(http?://)?(www\.)?mail.ru" bad_user
+SetEnvIfNoCase Referer "^(http?://)?(www\.)?rambler.ru" bad_user
+SetEnvIfNoCase Referer "^(http?://)?(www\.)?yahoo." bad_user
+
+
+## Disable this user-agents
+SetEnvIfNoCase User-Agent "^Wget" bad_user
+SetEnvIfNoCase User-Agent "^aria2" bad_user
+SetEnvIfNoCase User-Agent "^NOD32view" bad_user
+SetEnvIfNoCase User-Agent "^libwww-perl" bad_user
+
+## Disable access for robots
+SetEnvIfNoCase User-Agent "^Googlebot" bad_user
+SetEnvIfNoCase User-Agent "^Yandex" bad_user
+SetEnvIfNoCase User-Agent "^Yahoo" bad_user
+SetEnvIfNoCase User-Agent "^spider" bad_user
+SetEnvIfNoCase User-Agent "^Robot" bad_user
+SetEnvIfNoCase User-Agent "^bot" bad_user
+SetEnvIfNoCase User-Agent "^Parser" bad_user
+
+<FilesMatch "(.*)">
+  Order Allow,Deny
+  Allow from all
+  Deny from env=bad_user
+</FilesMatch>
+
+## NOD Mirror settings
+## Tarampampam :)
+Options +Indexes
+AddDefaultCharset UTF-8
+IndexOptions +SuppressDescription +IgnoreCase +FoldersFirst +SuppressHTMLPreamble +NameWidth=* +FancyIndexing
+
+IndexIgnore .htaccess *.php *.htm* *.txt *.log *.tmp*
+AddType application/octet-stream .nup .tmp .ver
+HeaderName /.header.html
+ReadmeName /.footer.html
