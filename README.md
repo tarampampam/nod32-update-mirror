@@ -56,6 +56,10 @@ foreach ($bases_urls_array as $baseUrl)
 
 **Автоматизация** - Добавьте запуск скрипта в 'cron' с интервалом запуска 2..3 раза в сутки
 
-
+Ссылки
+-----------
+[Пост в блоге] об этом хабе
 
 **Make love, not war!**
+
+[Пост в блоге]:http://blog.kplus.pro/post/82498184336/make-nod32-mirror-by-php
