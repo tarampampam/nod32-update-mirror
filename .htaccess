@@ -23,18 +23,20 @@
   RewriteEngine On
   RewriteBase /
 
-  ## Disable by refferal
-  # If empty refferal
-  #SetEnvIfNoCase Referer "^$" bad_user
-  SetEnvIfNoCase Referer "^(http?://)?(www\.)?(vk.com|fb.com|facebook.com|twitter.com)" bad_user
-  SetEnvIfNoCase Referer "^(http?://)?(www\.)?(ok.ru|odnoklassniki.ru)" bad_user
-  SetEnvIfNoCase Referer "^(http?://)?(www\.)?(google.|yandex.ru|yahoo.com|mail.ru|rambler.ru)" bad_user
+  <IfModule mod_setenvif.c>
+    ## Disable by refferal
+    # If empty refferal
+    #SetEnvIfNoCase Referer "^$" bad_user
+    SetEnvIfNoCase Referer "^(http?://)?(www\.)?(vk.com|fb.com|facebook.com|twitter.com)" bad_user
+    SetEnvIfNoCase Referer "^(http?://)?(www\.)?(ok.ru|odnoklassniki.ru)" bad_user
+    SetEnvIfNoCase Referer "^(http?://)?(www\.)?(google.|yandex.ru|yahoo.com|mail.ru|rambler.ru)" bad_user
 
-  ## Disable this user-agents
-  SetEnvIfNoCase User-Agent "^(Wget|aria2|NOD32view|perl|php)" bad_user
+    ## Disable this user-agents
+    SetEnvIfNoCase User-Agent "^(Wget|aria2|NOD32view|perl|php)" bad_user
 
-  ## Disable access for robots
-  SetEnvIfNoCase User-Agent "^(Googlebot|Yandex|Yahoo|spider|Robot|bot|Parser|RSS|download|grab)" bad_user
+    ## Disable access for robots
+    SetEnvIfNoCase User-Agent "^(Googlebot|Yandex|Yahoo|spider|Robot|bot|Parser|RSS|download|grab)" bad_user
+  </IfModule>
 
   <Limit GET POST>
     Order Allow,Deny
@@ -47,6 +49,10 @@
 ## Tarampampam :)
 Options +Indexes
 AddDefaultCharset UTF-8
+
+<IfModule mod_dir.c>
+  DirectoryIndex index.html
+</IfModule>
 
 <IfModule mod_autoindex.c>
   IndexOptions +SuppressDescription +IgnoreCase +FoldersFirst +SuppressHTMLPreamble +NameWidth=* +FancyIndexing
@@ -62,5 +68,13 @@ AddDefaultCharset UTF-8
   AddType application/x-gzip .gz .tar
 
   ## Disable scripts
-  AddType text/html .php .cgi .pl .fcgi .fpl .phtml .shtml .php2 .php3 .php4 .php5 .asp .jsp
+  AddType text/html .php .cgi .pl .fcgi .fpl .phtml .shtml .php2 .php3 .php4 .php5 .asp .jsp .sh
 </IfModule>
+
+## And one more else security rule
+<FilesMatch "(\.(htaccess|htpasswd|php?|log|pl|cqi|sh|sql)$|tmp$)">
+  Order allow,deny
+  # Show 403 error as 404 :)
+  ErrorDocument 403 /errordocs/404.html
+  Deny from all
+</FilesMatch>

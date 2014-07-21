@@ -4,6 +4,7 @@
  * @author    Samoylov Nikolay
  * @project   KPlus
  * @copyright 2014 <samoylovnn@gmail.com>
+ * @github    https://github.com/tarampampam/nod32-update-mirror/
  * @version   0.2.5
  */
 
