@@ -1,68 +1,66 @@
-## Clients disable by ip
+## USER IP BANNING
 ## http://tools.dynamicdrive.com/userban/
-<Limit GET POST>
-  order allow,deny
-  #deny from 10.10.10.
-  #deny from 11.11.11.
-  allow from all
-</Limit>
+#<Limit GET POST>
+# order allow,deny
+# deny from 8.8.8.
+# allow from all
+#</Limit>
 
 ## Speed limit module
 ## http://www.lissyara.su/articles/freebsd/www/mod_bandwidth/
-#<ifModule mod_bandwidth.c>
-#  BandwidthModule On
-#  BandWidthPulse 10000
-### limit to 500kB/s
-#  BandWidth all 504800
-#  MaxConnection 100
-#</ifModule>
+<ifModule mod_bandwidth.c>
+  BandwidthModule On
+  BandWidthPulse 50000
+## limit to 512 kB/s
+  BandWidth all 524288
+## Large Files (more then size in 1st param [Kb]) limit to 2nd param [Kb\sec]
+## 1.5Mb / 384Kb
+  LargeFileLimit 1536 393216
+  MaxConnection 100
+</ifModule>
 
-RewriteEngine On
-RewriteBase /
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
 
-## Disable by refferal
-# If empty refferal
-#SetEnvIfNoCase Referer "^$" bad_user
-SetEnvIfNoCase Referer "^(http?://)?(www\.)?vk.com" bad_user
-SetEnvIfNoCase Referer "^(http?://)?(www\.)?odnoklassniki.ru" bad_user
-SetEnvIfNoCase Referer "^(http?://)?(www\.)?ok.ru" bad_user
-SetEnvIfNoCase Referer "^(http?://)?(www\.)?qip.ru" bad_user
-SetEnvIfNoCase Referer "^(http?://)?(www\.)?google." bad_user
-SetEnvIfNoCase Referer "^(http?://)?(www\.)?yandex.ru" bad_user
-SetEnvIfNoCase Referer "^(http?://)?(www\.)?yahoo.com" bad_user
-SetEnvIfNoCase Referer "^(http?://)?(www\.)?mail.ru" bad_user
-SetEnvIfNoCase Referer "^(http?://)?(www\.)?rambler.ru" bad_user
-SetEnvIfNoCase Referer "^(http?://)?(www\.)?yahoo." bad_user
+  ## Disable by refferal
+  # If empty refferal
+  #SetEnvIfNoCase Referer "^$" bad_user
+  SetEnvIfNoCase Referer "^(http?://)?(www\.)?(vk.com|fb.com|facebook.com|twitter.com)" bad_user
+  SetEnvIfNoCase Referer "^(http?://)?(www\.)?(ok.ru|odnoklassniki.ru)" bad_user
+  SetEnvIfNoCase Referer "^(http?://)?(www\.)?(google.|yandex.ru|yahoo.com|mail.ru|rambler.ru)" bad_user
 
+  ## Disable this user-agents
+  SetEnvIfNoCase User-Agent "^(Wget|aria2|NOD32view|perl|php)" bad_user
 
-## Disable this user-agents
-SetEnvIfNoCase User-Agent "^Wget" bad_user
-SetEnvIfNoCase User-Agent "^aria2" bad_user
-SetEnvIfNoCase User-Agent "^NOD32view" bad_user
-SetEnvIfNoCase User-Agent "^libwww-perl" bad_user
+  ## Disable access for robots
+  SetEnvIfNoCase User-Agent "^(Googlebot|Yandex|Yahoo|spider|Robot|bot|Parser|RSS|download|grab)" bad_user
 
-## Disable access for robots
-SetEnvIfNoCase User-Agent "^Googlebot" bad_user
-SetEnvIfNoCase User-Agent "^Yandex" bad_user
-SetEnvIfNoCase User-Agent "^Yahoo" bad_user
-SetEnvIfNoCase User-Agent "^spider" bad_user
-SetEnvIfNoCase User-Agent "^Robot" bad_user
-SetEnvIfNoCase User-Agent "^bot" bad_user
-SetEnvIfNoCase User-Agent "^Parser" bad_user
-
-<FilesMatch "(.*)">
-  Order Allow,Deny
-  Allow from all
-  Deny from env=bad_user
-</FilesMatch>
+  <Limit GET POST>
+    Order Allow,Deny
+    Allow from all
+    Deny from env=bad_user
+  </Limit>
+</IfModule>
 
 ## NOD Mirror settings
 ## Tarampampam :)
 Options +Indexes
 AddDefaultCharset UTF-8
-IndexOptions +SuppressDescription +IgnoreCase +FoldersFirst +SuppressHTMLPreamble +NameWidth=* +FancyIndexing
 
-IndexIgnore .htaccess *.php *.htm* *.txt *.log *.tmp*
-AddType application/octet-stream .nup .tmp .ver
-HeaderName /.header.html
-ReadmeName /.footer.html
+<IfModule mod_autoindex.c>
+  IndexOptions +SuppressDescription +IgnoreCase +FoldersFirst +SuppressHTMLPreamble +NameWidth=* +FancyIndexing
+  IndexIgnore .htaccess *.php *.htm* *.txt *.log *.tmp*
+  HeaderName /.header.html
+  ReadmeName /.footer.html
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType application/octet-stream .nup .tmp .ver
+  AddType application/x-msdownloa .msi .exe .rar
+  AddType application/zip .zip
+  AddType application/x-gzip .gz .tar
+
+  ## Disable scripts
+  AddType text/html .php .cgi .pl .fcgi .fpl .phtml .shtml .php2 .php3 .php4 .php5 .asp .jsp
+</IfModule>

@@ -4,30 +4,35 @@
     <meta name="robots" content="noindex, nofollow" />
     <meta name="description" content="ESET NOD32 Updates server" />
     <title>ESET NOD32 Updates Mirror</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <style type="text/css">
         html,body{margin:0;padding:0;text-align:center}
         body {overflow: hidden;}
-        *{background:#1a1a1a;color:#eee;font-weight:normal}
-        a{text-decoration:none}
+        *{background:#1a1a1a;color:#eee;font-weight:normal;cursor:default}
+        a{text-decoration:none;cursor:pointer}
         a:hover{text-decoration:underline}
         h1,h2,h3,h4,h5{font-family:Tahoma,Verdana,Arial;font-weight:400;text-transform:uppercase; margin: 20px 0;}
         table{width:100%}
         tr td, tr th{text-align:left !important;}
         hr{background:#444;border:none;height:3px; width: 400px;}
         #splash{position:fixed;top:0;left:0;width:100%;height:100%;background:#1a1a1a}
-        #splash div{height:265px;position:relative;top:50%;margin-top:-253px;font-family:Tahoma,Verdana,Arial;font-size:33px}
+        #splash div{height:265px;position:relative;top:50%;margin-top:-263px;font-family:Tahoma,Verdana,Arial;font-size:33px}
         #splash div p{margin:0;text-shadow:0px 2px 1px rgba(0,2,0,1)}
         #splash div p small{font-size:60%;display:block}
         #splash div p span{display:none}
-        #splash div p input{border:none;font-size:15px;outline:none;padding:5px;text-align:center}
-        #splash div p a{font-size:9px;color:#008bff;position:relative;top:-13px}
-        #splash div ul{list-style:none;margin:0;padding:0 0 0 0;font-size:12px}
+        #splash div p input{border:none;font-size:15px;outline:none;font-weight:bold;padding:0 0 18px 0;text-align:center}
+        #splash div ul{list-style:none;margin:0;padding:0;font-size:12px}
         #splash div ul li{padding:2px 0}
         #splash div ul li a{color:#76c1ff}
         #splash div ul li a.dl{background:url('http://oi58.tinypic.com/2dr9bpw.jpg') no-repeat left center;padding-left:20px}
+        #splash div > a{display:block;font-size:9px;padding:0;color:#666}
+        #splash div a.howchange{margin:3px 0 0 0}
         #lastupdate{font-size:9px;color:#444;padding:15px 0 0 0}
+        #content{display:none;overflow:hidden;}
         #monitoring * {opacity: 0.1;-webkit-transition: opacity 0.5s;-moz-transition:opacity 0.5s;-o-transition:opacity 0.5s}
         #monitoring *:hover {opacity: 0.9}
+        @media only screen and (max-width: 321px){#content{zoom:0.8}}
+        @media only screen and (max-width: 385px){#content{zoom:0.9}}
     </style>
     <link rel="shortcut icon" href="//static1.esetstatic.com/fileadmin/templates/favicon.ico" type="image/x-ico; charset=binary" />
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
@@ -36,25 +41,35 @@
     <div>
         <img id="nod-logo" src="http://oi57.tinypic.com/2ebgye1.jpg" alt="Nod32 logo" width="256" height="256" />
         <p>ESET NOD32<br />
-          <small>Updates Mirror</small>
-          <input id="srvadr" type="text" value="http://s.kplus.pro/" /><br />
-          <a href="http://youtu.be/JuhcUsXIawo?t=7s" target="_blank">How change updates server?</a>
+          <small>Сервер  обновлений</small>
+          <input id="srvadr" type="text" value="http://this.site.url/" />
         </p>
         <ul>
-            <li><a href="http://goo.gl/j5bl0J" class="dl">ESET NOD32 4.2.71.3 (32-bit)</a></li>
-            <li><a href="http://goo.gl/zUWWqt" class="dl">ESET NOD32 4.2.71.3 (64-bit)</a></li>
+            <li><a href="http://url_to.distr/32bit" rel="nofollow" class="dl">ESET NOD32 4.2.71.3 (32-bit)</a></li>
+            <li><a href="http://url_to.distr/64bit" rel="nofollow" class="dl">ESET NOD32 4.2.71.3 (64-bit)</a></li>
         </ul>
+        <a class="howchange" href="http://youtube.com/embed/-lgmuhejO2o?autoplay=1&amp;vq=hd720" rel="nofollow" target="_blank">Как 
+изменить сервер обновлений?</a>
         <p id="lastupdate"></p>
-        <p id="monitoring"><!--img width="80" height="15" src="https://i.h-t.co:8089//web%20site%20monitoring%20down.png" /--></p>
+        <p id="monitoring">
+            <img alt="Uptume counter" width="80" height="15" src="https://i.h-t.co:8089//web%20site%20monitoring%20down.png" />
+        </p>
     </div>
 </div>
 <script type="text/javascript">
     $(document).ready(function(){
-        $('#nod-logo').on('click', function(e){$('body').css({'overflow': 'auto'});$('#splash').stop().slideUp('normal');})
-        $('#srvadr').hover(function(){this.select();})
+        function hideSplash(){
+            $('body').css({'overflow': 'auto'});
+            $('#content').css({'display': 'block'});
+            $('#splash').stop().slideUp('normal');
+        }
+        if (document.location.pathname.length > 1) {hideSplash()}
+        $('#nod-logo').on('click', function(e){hideSplash()});
+        $('#srvadr').hover(function(){this.select()}).select();
         $.get("/lastevent.txt", function(data){
-            $("#lastupdate").text('Last update: ').append(document.createTextNode(data));
+            $("#lastupdate").text('Updated: ').append(document.createTextNode(data));
         });
     });
 </script>
+<div id="content">
 <h3>Make love, not war!</h3>

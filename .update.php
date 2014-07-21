@@ -2,8 +2,9 @@
 
 /**
  * @author    Samoylov Nikolay
+ * @project   KPlus
  * @copyright 2014 <samoylovnn@gmail.com>
- * @version   0.2.4
+ * @version   0.2.5
  */
 
 
@@ -25,8 +26,8 @@ $bases_urls_array = array(
     'http://itsupp.com/downloads/nod_update/'
 );
 
-$path_do_save_tmp = '/home/kplus/s.kplus.pro/docs/.tmp';
-$path_do_save_base = '/home/kplus/s.kplus.pro/docs';
+$path_do_save_tmp = '/path/to/www/docs/.tmp';
+$path_do_save_base = '/path/to/www/docs';
 
 $wget_wait_sec = 3;
 
