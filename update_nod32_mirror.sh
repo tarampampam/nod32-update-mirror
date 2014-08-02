@@ -4,23 +4,24 @@
 ## @project   KPlus
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @github    https://github.com/tarampampam/nod32-update-mirror/
-## @version   0.2.5-sh
+## @version   0.2.6
 
 # **********************************************************************
 # ***                           Config                                **
 # **********************************************************************
 
-# slash at end url
+# slash at the end of url
 bases_urls_array=(
   'http://traxxus.ch.cicero.ch-meta.net/nod32/'
   'http://eset.mega.kg/3/'
+  'http://109.120.165.199/nod32/'
   'http://antivir.lanexpress.ru/nod32_3'
   'http://itsupp.com/downloads/nod_update/'
 )
 
 wget_user_agent='ESS Update (Windows; U; 32bit; VDB 19272; BPC 4.0.474.0; OS: 5.1.2600 SP 3.0 NT; CH 1.1; LNG 1049; x32c; APP eavbe; BEO 1; ASP 0.10; FW 0.0; PX 0; PUA 0; RA 0)';
 
-path_do_save_base='/home/reKot/nod/'
+path_do_save_base='/home/nod32mirror.com/docs/'
 path_do_save_tmp=$path_do_save_base'.tmp/'
 
 wget_wait_sec='3'
@@ -38,6 +39,7 @@ logmessage() {
 
 checkAvailability() {
   headers=$(curl -Is $1'update.ver' --user $2:$3);
+  echo $headers;
   if [ $(echo \"$headers\" | head -n 1 | cut -d' ' -f 2) == '200' ]
   then
     return 0
@@ -82,7 +84,7 @@ mkdir -p $path_do_save_tmp; mkdir -p $path_do_save_base
 ## -U          Identify as agent-string to the HTTP server
 ## -R html,htm,txt,php Specify comma-separated lists of file name suffixes or patterns to accept or reject
 ## --limit-rate Limit the download speed to amount bytes per second
-## -e robots=off \  Do not get robots file
+## -e robots=off \
 ## -w          Wait the specified number of seconds between the retrievals
 ## --random-wait This option causes the time between requests to vary between 0 and 2 * wait seconds
 ## -nH         Disable generation of host-prefixed directories
@@ -96,7 +98,7 @@ wget \
   --cache=off \
   -nv \
   -U "$wget_user_agent" \
-  -R html,htm,txt,php \
+  --reject "*.htm*,*.txt,*.php,setup*,install*,distrib*,*.msi,*.exe" \
   --limit-rate=$wget_limit_rate \
   -e robots=off \
   -w $wget_wait_sec \
