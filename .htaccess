@@ -1,20 +1,20 @@
-## USER IP BANNING
-## http://tools.dynamicdrive.com/userban/
-#<Limit GET POST>
-# order allow,deny
-# deny from 8.8.8.
-# allow from all
-#</Limit>
+## Disable access for some IP and Hosta
+## (Apache module 'realip_module' must be enabled!)
+<Limit GET POST HEAD>
+  #order allow,deny
+  #deny from 8.8.8.8
+  #allow from all
+</Limit>
 
 ## Speed limit module
 ## http://www.lissyara.su/articles/freebsd/www/mod_bandwidth/
 <ifModule mod_bandwidth.c>
   BandwidthModule On
   BandWidthPulse 50000
-## limit to 512 kB/s
+  ## limit to 512 kB/s
   BandWidth all 524288
-## Large Files (more then size in 1st param [Kb]) limit to 2nd param [Kb\sec]
-## 1.5Mb / 384Kb
+  ## Large Files (more then size in 1st param [Kb]) limit to 2nd param [Kb\sec]
+  ## 1.5Mb / 384Kb
   LargeFileLimit 1536 393216
   MaxConnection 100
 </ifModule>
@@ -32,13 +32,16 @@
     SetEnvIfNoCase Referer "^(http?://)?(www\.)?(google.|yandex.ru|yahoo.com|mail.ru|rambler.ru)" bad_user
 
     ## Disable this user-agents
-    SetEnvIfNoCase User-Agent "^(Wget|aria2|NOD32view|perl|php)" bad_user
+    SetEnvIfNoCase User-Agent "^(Wget|aria2|NOD32view|perl|php|curl)" bad_user
 
     ## Disable access for robots
-    SetEnvIfNoCase User-Agent "^(Googlebot|Yandex|Yahoo|spider|Robot|bot|Parser|RSS|download|grab)" bad_user
+    SetEnvIfNoCase User-Agent "^(Google|Yandex|Yahoo|spider|Robot|bot|Parser|RSS|download|grab)" bad_user
+
+    ## Also we can disable access here for some IP adresses ('realip_module' needed)
+    #SetEnvIf Remote_Addr 8.8.8.8 bad_user
   </IfModule>
 
-  <Limit GET POST>
+  <Limit GET POST HEAD>
     Order Allow,Deny
     Allow from all
     Deny from env=bad_user
@@ -74,7 +77,8 @@ AddDefaultCharset UTF-8
 ## And one more else security rule
 <FilesMatch "(\.(htaccess|htpasswd|php?|log|pl|cqi|sh|sql)$|tmp$)">
   Order allow,deny
-  # Show 403 error as 404 :)
+  ## Show 403 error as 404 :)
+  ## !!! Change path to your !!!
   ErrorDocument 403 /errordocs/404.html
   Deny from all
 </FilesMatch>
