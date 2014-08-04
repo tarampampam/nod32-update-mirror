@@ -4,7 +4,7 @@
 ## @project   NOD32 Update Script
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @github    https://github.com/tarampampam/nod32-update-mirror/
-## @version   0.3.1
+## @version   0.3.2
 ##
 ## @depends   curl, wget, grep, cut, cat, unrar (if use official mirrors)
 
@@ -22,7 +22,7 @@ updServer0=('http://38.90.226.39/eset_eval/v4/' 'TRIAL-0117918823' 'nvm8v57sch')
 updServer1=('http://traxxus.ch.cicero.ch-meta.net/nod32/');
 updServer2=('http://eset.mega.kg/3/');
 updServer3=('http://109.120.165.199/nod32/');
-updServer4=('http://antivir.lanexpress.ru/nod32_3');
+updServer4=('http://antivir.lanexpress.ru/nod32_3/');
 updServer5=('http://itsupp.com/downloads/nod_update/');
 
 ## Check not only server URL, also - this included sub-dirs (without
@@ -49,6 +49,8 @@ PathToSaveBase='/var/www/nod32upd/';
 PathToTempDir=$PathToSaveBase'.tmp/';
 
 ## 'wget' limits (required). 
+#wget_wait_sec='0';
+#wget_limit_rate='51200k';
 wget_wait_sec='3';
 wget_limit_rate='512k';
 
@@ -158,7 +160,6 @@ downloadFile() {
   fi
 
   ## if no one substring founded - maybe error?
-  echo "";
   echo -e $flag "${cRed}Error =(${cNone}\nWget debug info: \
     \n\n${cYel}$wgetResult${cNone}\n\n";
   return 0;
@@ -281,6 +282,7 @@ function makeMirror() {
         rm -f 'update.rar';
       else
         echo -e "${cRed}Error, exit${cNone}";
+        exit 1;
       fi
     fi
   fi
