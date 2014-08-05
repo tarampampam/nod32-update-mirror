@@ -4,7 +4,7 @@
 ## @project   NOD32 Update Script
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @github    https://github.com/tarampampam/nod32-update-mirror/
-## @version   0.3.2
+## @version   0.3.3
 ##
 ## @depends   curl, wget, grep, cut, cat, unrar (if use official mirrors)
 
@@ -367,11 +367,19 @@ done;
 
 ## Finish work ################################################################
 
-logmessage "Remove $PathToTempDir";
-rm -R -f $PathToTempDir;
+## Remove temp directory
+if [ -d "$PathToTempDir" ]; then
+  logmessage -n "Remove $PathToTempDir.. ";
+  rm -R -f $PathToTempDir;
+  echo -e "${cGreen}Ok${cNone}";
+fi
 
-logmessage "Create timestamp file";
-echo $(date "+%Y-%m-%d %H:%M:%S") > $PathToSaveBase'lastevent.txt';
+logmessage -n "Create timestamp file.. ";
+echo $(date "+%Y-%m-%d %H:%M:%S") > $PathToSaveBase'lastevent.txt'; echo -e "${cGreen}Ok${cNone}";
 
-logmessage "Create 'robots.txt'";
-printf "User-agent: *\r\nDisallow: /\r\n" > $PathToSaveBase'robots.txt';
+robotsTxtFile=$PathToSaveBase'robots.txt';
+if [ ! -f $robotsTxtFile ]; then
+  logmessage -n "Create 'robots.txt'";
+  printf "User-agent: *\r\nDisallow: /\r\n" > $robotsTxtFile;
+  echo -e " ${cGreen}Ok${cNone}";
+fi
