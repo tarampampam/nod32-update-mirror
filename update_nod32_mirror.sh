@@ -4,7 +4,7 @@
 ## @project   NOD32 Update Script
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @github    https://github.com/tarampampam/nod32-update-mirror/
-## @version   0.3.3
+## @version   0.3.4
 ##
 ## @depends   curl, wget, grep, cut, cat, unrar (if use official mirrors)
 

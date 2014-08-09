@@ -10,10 +10,10 @@
         body {overflow: hidden;}
         *{background:#1a1a1a;color:#eee;font-weight:normal;cursor:default}
         a{text-decoration:none;cursor:pointer}
-        a:hover{text-decoration:underline}
+        a:hover{text-decoration:underline; opacity: 1 !important; -webkit-transition: all 0.3s;-moz-transition:all 0.3s;-o-transition:all 0.3s}
         h1,h2,h3,h4,h5{font-family:Tahoma,Verdana,Arial;font-weight:400;text-transform:uppercase; margin: 20px 0;}
-        table{width:100%}
-        tr td, tr th{text-align:left !important;}
+        table{width:400px; margin: 0 auto;}
+        tr td, tr th{text-align:left !important; font-family:Consolas,monospace,Tahoma,Verdana,Arial; font-size: 12px;}
         hr{background:#444;border:none;height:3px; width: 400px;}
         #splash{position:fixed;top:0;left:0;width:100%;height:100%;background:#1a1a1a}
         #splash div{height:265px;position:relative;top:50%;margin-top:-263px;font-family:Tahoma,Verdana,Arial;font-size:33px}
@@ -42,17 +42,19 @@
         <img id="nod-logo" src="http://oi57.tinypic.com/2ebgye1.jpg" alt="Nod32 logo" width="256" height="256" />
         <p>ESET NOD32<br />
           <small>Сервер  обновлений</small>
-          <input id="srvadr" type="text" value="http://this.site.url/" />
+          <input id="srvadr" type="text" value="http://yourserver.here/" />
         </p>
         <ul>
-            <li><a href="http://url_to.distr/32bit" rel="nofollow" class="dl">ESET NOD32 4.2.71.3 (32-bit)</a></li>
-            <li><a href="http://url_to.distr/64bit" rel="nofollow" class="dl">ESET NOD32 4.2.71.3 (64-bit)</a></li>
+            <li><a href="http://link.to/distrib32bit" rel="nofollow" class="dl 32bit">ESET NOD32 4.x (32-bit)</a></li>
+            <li><a href="http://link.to/distrib64bit" rel="nofollow" class="dl 64bit">ESET NOD32 4.x (64-bit)</a></li>
         </ul>
-        <a class="howchange" href="http://youtube.com/embed/-lgmuhejO2o?autoplay=1&amp;vq=hd720" rel="nofollow" target="_blank">Как 
-изменить сервер обновлений?</a>
+        <a class="howchange" href="http://goo.gl/sFiUzq" rel="nofollow" 
+            target="_blank">Как изменить сервер обновлений?</a>
+
         <p id="lastupdate"></p>
         <p id="monitoring">
-            <img alt="Uptume counter" width="80" height="15" src="https://i.h-t.co:8089//web%20site%20monitoring%20down.png" />
+            <img alt="Uptume counter" width="80" height="15" 
+                src="https://i.h-t.co:8089//web%20site%20monitoring%20down.png" />
         </p>
     </div>
 </div>
@@ -63,6 +65,11 @@
             $('#content').css({'display': 'block'});
             $('#splash').stop().slideUp('normal');
         }
+        function isWin64bit() {
+            return navigator.userAgent.indexOf('WOW64') != -1 || navigator.userAgent.indexOf('Win64') != -1;
+        };
+        $(isWin64bit() ? '.32bit' : '.64bit').css({'opacity': '0.6'});
+        
         if (document.location.pathname.length > 1) {hideSplash()}
         $('#nod-logo').on('click', function(e){hideSplash()});
         $('#srvadr').hover(function(){this.select()}).select();
@@ -72,4 +79,4 @@
     });
 </script>
 <div id="content">
-<h3>Make love, not war!</h3>
+<h3>Eset NOD32 Updates files</h3>

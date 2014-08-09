@@ -1,10 +1,41 @@
-## Disable access for some IP and Hosta
+## Disable access for some IP and Hosts
 ## (Apache module 'realip_module' must be enabled!)
-<Limit GET POST HEAD>
-  #order allow,deny
-  #deny from 8.8.8.8
-  #allow from all
-</Limit>
+<IfModule mod_realip.c>
+  <Limit GET POST HEAD>
+    order allow,deny
+    ## Disable for (countries) domains
+    deny from uz us ae ua md lv kg kp kz ge cz ca bg by az am
+
+    ## Disable some providers
+    ## By domain name
+    deny from velton.ua dsl.utg.ge infonet.by
+    # ...
+    
+    ## By IP pool
+    ## http://ip2cidr.com/bulk-ip-to-cidr-converter.php
+    # Republican Unitary Enterprise BELTELECOM MOGILEV branch
+    deny from 178.124.232.0/21
+    # ...
+
+    ## Disable some sites (dimains)
+    deny from ostfresh.ru siberenergy.ru h-service.ru 10.12.11.254
+    # ...
+    
+    allow from all
+  </Limit>
+</IfModule>
+
+## Disable access for countries
+## https://www.maxmind.com/ru/home
+<IfModule mod_geoip.c>
+  <IfModule mod_realip.c>
+    GeoIPEnable On
+    SetEnvIf GEOIP_COUNTRY_CODE (UZ|US|AE|UA|MD|LV|KG|KP|KZ|GE|CZ|CA|BG|BY|AZ|AM) DenyCountry
+    Order allow,deny
+    Deny from env=DenyCountry
+    Allow from all
+  </IfModule>
+</IfModule>
 
 ## Speed limit module
 ## http://www.lissyara.su/articles/freebsd/www/mod_bandwidth/
@@ -19,6 +50,7 @@
   MaxConnection 100
 </ifModule>
 
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
@@ -32,13 +64,13 @@
     SetEnvIfNoCase Referer "^(http?://)?(www\.)?(google.|yandex.ru|yahoo.com|mail.ru|rambler.ru)" bad_user
 
     ## Disable this user-agents
-    SetEnvIfNoCase User-Agent "^(Wget|aria2|NOD32view|perl|php|curl)" bad_user
+    SetEnvIfNoCase User-Agent "^(Wget|aria2|NOD32view|perl|php|curl|Mirror)" bad_user
 
     ## Disable access for robots
     SetEnvIfNoCase User-Agent "^(Google|Yandex|Yahoo|spider|Robot|bot|Parser|RSS|download|grab)" bad_user
 
-    ## Also we can disable access here for some IP adresses ('realip_module' needed)
-    #SetEnvIf Remote_Addr 8.8.8.8 bad_user
+    ## Also we can disable access for some IP adresses ('realip_module' needed)
+    #SetEnvIf Remote_Addr 8.8.8.8
   </IfModule>
 
   <Limit GET POST HEAD>
@@ -58,27 +90,30 @@ AddDefaultCharset UTF-8
 </IfModule>
 
 <IfModule mod_autoindex.c>
+  ## http://httpd.apache.org/docs/current/mod/mod_autoindex.html#indexoptions
   IndexOptions +SuppressDescription +IgnoreCase +FoldersFirst +SuppressHTMLPreamble +NameWidth=* +FancyIndexing
-  IndexIgnore .htaccess *.php *.htm* *.txt *.log *.tmp*
-  HeaderName /.header.html
-  ReadmeName /.footer.html
+  ## Next line for Apache2.x
+  #  IndexOptions -HTMLTable -IconsAreLinks +IgnoreClient +IconHeight=1 +IconWidth=1
+  ## Hide some files types from listing
+  IndexIgnore .htaccess .htpasswd .webface *.php* *.htm* *.txt *.log *.tmp*
+  HeaderName /.webface/header.html
+  ReadmeName /.webface/footer.html
 </IfModule>
 
 <IfModule mod_mime.c>
   AddType application/octet-stream .nup .tmp .ver
-  AddType application/x-msdownloa .msi .exe .rar
+  AddType application/x-msdownload .msi .exe .rar
   AddType application/zip .zip
   AddType application/x-gzip .gz .tar
 
   ## Disable scripts
-  AddType text/html .php .cgi .pl .fcgi .fpl .phtml .shtml .php2 .php3 .php4 .php5 .asp .jsp .sh
+  AddType text/html .cgi .pl .fcgi .fpl .shtml .asp .jsp .sh
 </IfModule>
 
 ## And one more else security rule
-<FilesMatch "(\.(htaccess|htpasswd|php?|log|pl|cqi|sh|sql)$|tmp$)">
+<FilesMatch "(\.(htaccess|htpasswd|pl|cqi|sh|sql)$|tmp$)">
   Order allow,deny
-  ## Show 403 error as 404 :)
-  ## !!! Change path to your !!!
+  # Show 403 error as 404 :)
   ErrorDocument 403 /errordocs/404.html
   Deny from all
 </FilesMatch>
