@@ -4,7 +4,7 @@
 ## @project   NOD32 Update Script
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @github    https://github.com/tarampampam/nod32-update-mirror/
-## @version   0.3.4
+## @version   0.3.6
 ##
 ## @depends   curl, wget, grep, cut, cat, unrar (if use official mirrors)
 
@@ -18,7 +18,7 @@
 ##   'http://mirror.url/path/' - Server URL (with '/' at the end)
 ##   'username' - (not required) Login for auth
 ##   'password' - (not required) Password for auth
-updServer0=('http://38.90.226.39/eset_eval/v4/' 'TRIAL-0117918823' 'nvm8v57sch');
+updServer0=('http://update.eset.com/eset_upd/' 'TRIAL-0117918823' 'nvm8v57sch');
 updServer1=('http://traxxus.ch.cicero.ch-meta.net/nod32/');
 updServer2=('http://eset.mega.kg/3/');
 updServer3=('http://109.120.165.199/nod32/');
@@ -42,9 +42,9 @@ BPC $((RD%2+6)).0.$((RD%100+500)).0; OS: 5.1.2600 SP 3.0 NT; CH 1.1; \
 LNG 1049; x32c; APP eavbe; BEO 1; ASP 0.10; FW 0.0; PX 0; PUA 0; RA 0)";
 
 ## Path where we store mirror files. With '/' at the end
-PathToSaveBase='/var/www/nod32upd/';
+PathToSaveBase="$HOME/nod32upd/";
 
-## Path to temp work directory (will created automaticly and removed
+## Path to temp work directory (will created automatically and removed
 ##   after update finish)
 PathToTempDir=$PathToSaveBase'.tmp/';
 
@@ -190,6 +190,33 @@ fi
 echo -e "${cYel}Hint${cNone}: For remove all files (except .hidden) \
 in $PathToSaveBase you can use flag '${cYel}--flush${cNone}'";
 
+
+###############################################################################
+## If you want get updates from official servers using 'get-nod32-key.sh' #####
+## (freeware keys), leave this code (else - comment|remove). ##################
+## Use it for educational or information purposes only! #######################
+
+PathToGetNodKey=$(pwd)'/get-nod32-key.sh';
+if [ -f "$PathToGetNodKey" ]; then
+  logmessage -n "Getting valid key from '$PathToGetNodKey'.. "
+  nodKey=$(bash "$PathToGetNodKey" | tail -n 1);
+  if [ ! "$nodKey" == "error" ]; then
+    nodUsername=${nodKey%%:*} nodPassword=${nodKey#*:};
+    if [ ! -z $nodUsername ] && [ ! -z $nodPassword ]; then
+      updServer0=('http://update.eset.com/eset_upd/' $nodUsername $nodPassword);
+      echo -e "${cGreen}Ok${cNone} ($nodUsername:$nodPassword)";
+    else
+      echo -e "${cRed}Error${cNone}";
+    fi
+  else
+    echo -e "${cRed}Error${cNone}";
+  fi
+fi
+
+## End of code for 'get-nod32-key.sh' #########################################
+###############################################################################
+
+
 ## Check URL in 'updServer{N}[0]' for availability
 ##   Limit of servers in settings = {0..N}
 for i in {0..10}; do
@@ -257,7 +284,7 @@ function makeMirror() {
   fi
 
   ## Here we will store all parsed filenames from 'update.ver'
-  filesArray=();
+  local filesArray=() isOfficialUpdate=false;
 
 
   ## Delete old file, if exists
@@ -279,6 +306,7 @@ function makeMirror() {
       cd $PathToTempDir; unrar x -y -inul 'update.rar' $PathToTempDir;
       if [ -f $PathToTempDir'update.ver' ]; then
         echo -e "${cGreen}Ok${cNone}";
+        isOfficialUpdate=true;
         rm -f 'update.rar';
       else
         echo -e "${cRed}Error, exit${cNone}";
@@ -306,12 +334,13 @@ function makeMirror() {
           ## Save value 'as is' - with full path
           filesArray+=($tempFileName);
         else
-          if [[ $tempFileName == *\/* ]]; then
+          if [[ $tempFileName == \/* ]]; then
             ## IF path with some 'parent directory' (is slash in path)
             ## (ex.: /nod_upd/em002_32_l0.nup)
             ## Write at begin server name
-            protocol=$(echo $WORKURL | awk -F/ '{print $1}');
-            host=$(echo $WORKURL | awk -F/ '{print $3}');
+            ## Anyone know how faster trin string to parts?!
+            local protocol=$(echo $WORKURL | awk -F/ '{print $1}');
+            local host=$(echo $WORKURL | awk -F/ '{print $3}');
             filesArray+=($protocol'//'$host''$tempFileName);
           else
             ## IF filename ONLY
@@ -320,11 +349,23 @@ function makeMirror() {
             filesArray+=($1''$tempFileName);
           fi
         fi
-        
+
         ## Replace line
         if [ "$createLinksOnly" = true ] ; then
-          ## gwt full path to file (pushed in $filesArray)
-          line='file='${filesArray[@]:(-1)};
+          ## get full path to file (pushed in $filesArray)
+          if [ "$isOfficialUpdate" = true ]; then
+            ## If is official update - add user:pass to url string
+            ##   (ex.: http://someurl.com/path/file.nup -> 
+            ##   -> http://user:pass@someurl.com/path/file.nup)
+            local inputUrl=${filesArray[@]:(-1)};
+            ## Anyone know how faster trin string to parts?!
+            local protocol=$(echo $inputUrl | awk -F/ '{print $1}');
+            local host=$(echo $inputUrl | awk -F/ '{print $3}');
+            line='file='$protocol'//'$USERNAME':'$PASSWD'@'$host''$tempFileName;
+          else
+            ## Else - return full url (ex.: http://someurl.com/path/file.nup)
+            line='file='${filesArray[@]:(-1)};
+          fi
         else
           line='file='$lineToNewVerFile;
         fi
