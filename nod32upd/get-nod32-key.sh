@@ -3,23 +3,28 @@
 ## @author    Samoylov Nikolay
 ## @project   Get NOD32 key
 ## @copyright 2014 <samoylovnn@gmail.com>
+## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/nod32-update-mirror/
-## @version   0.1.1
+## @version   0.1.2
 ##
 ## @depends   curl, sed, awk, tr, wc, head, basename
+
 
 # *****************************************************************************
 # ***                               Config                                   **
 # *****************************************************************************
 
-WORK_DIR="$HOME/.nod32keys/";
-VALID_KEYS=$WORK_DIR"validkeys.txt";
-INVALID_KEYS=$WORK_DIR"invalidkeys.txt";
-LOGFILE=$WORK_DIR"nod32keys.log";
+## Path to settings file
+PathToSettingsFile=$(pwd)'/settings.cfg';
 
 # *****************************************************************************
 # ***                            END Config                                  **
 # *****************************************************************************
+
+## Load setting from file
+if [ -f "$PathToSettingsFile" ]; then source $PathToSettingsFile; else
+  echo -e "\e[1;31mCannot load settings ('$PathToSettingsFile') file. Exit\e[0m"; exit 1;
+fi
 
 ## Switch output language to English (DO NOT CHANGE THIS)
 export LC_ALL=C;
@@ -50,7 +55,7 @@ logmessage() {
 ## Write log file (if filename setted)
 writeLog() {
   if [ ! -z "$LOGFILE" ]; then
-    echo [$(date +%Y-%m-%d/%H:%M:%S)] "$1" >> "$LOGFILE";
+    echo "[$(date +%Y-%m-%d/%H:%M:%S)] [$(basename $0)] - $1" >> "$LOGFILE";
   fi
 }
 
@@ -129,6 +134,7 @@ removeKeyFromFile() {
     fi
     local result=$(sed "/$1/d" $2);
     echo "$result" > $2;
+    writeLog "Remove key \"$1\" from \"$2\"";
   fi
 }
 
@@ -220,6 +226,14 @@ testRandomKey() {
   fi
 }
 
+createDirByFilePath() {
+  ## $1 = file path
+  local CreatePath=${1%/*};
+  if [ ! -z "$CreatePath" ] && [ ! -d "$CreatePath" ]; then
+    mkdir -p "$CreatePath";
+  fi
+}
+
 ## Run script with params #####################################################
 
 ## --help
@@ -229,9 +243,10 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ] || [ "$1" == "-H" ]; then
   echo -e "  ${cYel}http://nod325.com/${cNone}";
   echo -e "  ${cYel}http://www.nod327.net/${cNone}\n";
   echo -e "You can run with parameters:";
-  echo -e "  ${cYel}-u, --update${cNone}        Get new valid keys and write to $VALID_KEYS";
-  echo -e "  ${cYel}-r, --remove${cNone}        Remove invalid keys from $VALID_KEYS";
-  echo -e "  ${cYel}-h, --help${cNone}          Show this help\n\n";
+  echo -e "  ${cYel}-u, --update${cNone}     Get new valid keys and write to $VALID_KEYS";
+  echo -e "  ${cYel}-r, --remove${cNone}     Remove invalid keys from $VALID_KEYS";
+  echo -e "  ${cYel}-s, -p, --show${cNone}   Print keys from $VALID_KEYS";
+  echo -e "  ${cYel}-h, --help${cNone}       Show this help\n\n";
   echo -e "Valid key (or \"error\") will printed in ${cYel}LAST OUTPUT LINE${cNone} (format 'user:password')";
   echo -e "                                       ${cBlue}^^^^^^^^^^^^^^^^${cNone}";
   echo -e "You can use: \"${cYel}$(basename $0) | tail -n 1${cNone}\" for getting key only\n\n";
@@ -243,16 +258,17 @@ fi
 if [ "$1" == "-u" ] || [ "$1" == "--update" ]; then getNewKeysAndSave; exit 0; fi
 ## --remove
 if [ "$1" == "-r" ] || [ "$1" == "--remove" ]; then removeInvalidKeys; exit 0; fi
+## --show --print
+if [ "$1" == "-s" ] || [ "$1" == "--show" ] || [ "$1" == "-p" ] || [ "$1" == "--print" ]; then
+  if [ -f "$VALID_KEYS" ]; then cat "$VALID_KEYS"; fi; exit 0;
+fi
 
 ## Begin work #################################################################
 
 ## Create patches
-validKeysPath=${VALID_KEYS%/*};
-if [ ! -z "$validKeysPath" ] && [ ! -d "$validKeysPath" ]; then mkdir -p "$validKeysPath"; fi
-invalidKeysPath=${INVALID_KEYS%/*};
-if [ ! -z "$invalidKeysPath" ] && [ ! -d "$invalidKeysPath" ]; then mkdir -p "$invalidKeysPath"; fi
-logfilePath=${LOGFILE%/*};
-if [ ! -z "$logfilePath" ] && [ ! -d "$logfilePath" ]; then mkdir -p "$logfilePath"; fi
+createDirByFilePath $VALID_KEYS;
+createDirByFilePath $INVALID_KEYS;
+createDirByFilePath $LOGFILE;
 
 ## If keys file not exists - get new keys and save them
 if [ ! -f "$VALID_KEYS" ]; then
@@ -261,7 +277,9 @@ fi
 
 ## Double file exists check (if getNewKeysAndSave() failed)
 if [ ! -f "$VALID_KEYS" ]; then
-  logmessage 'File ${cRed}$VALID_KEYS${cNone} not created. Exit';
+  logmessage "File ${cRed}$VALID_KEYS${cNone} not created. Exit";
+  echoKey "error";
+  writeLog "File \"$VALID_KEYS\" not created. Exit";
   exit 1;
 fi
 
@@ -289,24 +307,24 @@ if [ -z "$randomKey" ]; then
     else
       ## After getNewKeysAndSave()
       echoKey $randomKey;
-      writeLog "Return key "$randomKey" from from web";
+      writeLog "Return key \"$randomKey\" from from web";
     fi
   else
     ## After removeInvalidKeys()
     echoKey $randomKey;
-    writeLog "Return key "$randomKey" from local file after remove all invalid keys";
+    writeLog "Return key \"$randomKey\" from local file after remove all invalid keys";
   fi
 else
   ## After 1st randomKey()
   echoKey $randomKey;
-  writeLog "Return key "$randomKey" from local file";
+  writeLog "Return key \"$randomKey\" from local file";
 fi
 
 
 # If key not found (not setted ) - write 'error'
 if [ ! "$KEY_FOUND" = true ] ; then
   echoKey "error";
-  writeLog "Fatal error - key not returned";
+  writeLog "FATAL error - key not returned";
   exit 1;
 fi
 exit 0;

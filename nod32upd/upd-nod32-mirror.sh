@@ -3,60 +3,28 @@
 ## @author    Samoylov Nikolay
 ## @project   NOD32 Update Script
 ## @copyright 2014 <samoylovnn@gmail.com>
+## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/nod32-update-mirror/
-## @version   0.3.6
+## @version   0.3.7
 ##
-## @depends   curl, wget, grep, cut, cat, unrar (if use official mirrors)
+## @depends   curl, wget, grep, cut, cat, basename, 
+##            unrar (if use official mirrors)
 
 # *****************************************************************************
 # ***                               Config                                   **
 # *****************************************************************************
 
-## Servers list. Format:
-##   updServer{N}=('http://mirror.url/path/' 'username' 'password');
-##   {N} - is numeric value 0..N (N declared in ~185 line, default '10')
-##   'http://mirror.url/path/' - Server URL (with '/' at the end)
-##   'username' - (not required) Login for auth
-##   'password' - (not required) Password for auth
-updServer0=('http://update.eset.com/eset_upd/' 'TRIAL-0117918823' 'nvm8v57sch');
-updServer1=('http://traxxus.ch.cicero.ch-meta.net/nod32/');
-updServer2=('http://eset.mega.kg/3/');
-updServer3=('http://109.120.165.199/nod32/');
-updServer4=('http://antivir.lanexpress.ru/nod32_3/');
-updServer5=('http://itsupp.com/downloads/nod_update/');
-
-## Check not only server URL, also - this included sub-dirs (without
-##   slash at the end)
-also_chek_this_subdirs=('v3' 'v4' 'v5' 'v6' 'v7' 'nod');
-
-## If 'createLinksOnly' = true - we create ONLY 'update.ver' with full
-##   links to original update files. Do NOT download updates files.
-## If 'createLinksOnly' = false - we write to new 'update.ver' local
-##   links (files names only), and DOWNLOAD all updates files.
-createLinksOnly=false;
-
-## User-agent for 'wget'. Make some random values in it.
-RD=$RANDOM;
-USERAGENT="ESS Update (Windows; U; 32bit; VDB $((RD%15000+10000)); \
-BPC $((RD%2+6)).0.$((RD%100+500)).0; OS: 5.1.2600 SP 3.0 NT; CH 1.1; \
-LNG 1049; x32c; APP eavbe; BEO 1; ASP 0.10; FW 0.0; PX 0; PUA 0; RA 0)";
-
-## Path where we store mirror files. With '/' at the end
-PathToSaveBase="$HOME/nod32upd/";
-
-## Path to temp work directory (will created automatically and removed
-##   after update finish)
-PathToTempDir=$PathToSaveBase'.tmp/';
-
-## 'wget' limits (required). 
-#wget_wait_sec='0';
-#wget_limit_rate='51200k';
-wget_wait_sec='3';
-wget_limit_rate='512k';
+## Path to settings file
+PathToSettingsFile=$(pwd)'/settings.cfg';
 
 # *****************************************************************************
 # ***                            END Config                                  **
 # *****************************************************************************
+
+## Load setting from file
+if [ -f "$PathToSettingsFile" ]; then source $PathToSettingsFile; else
+  echo -e "\e[1;31mCannot load settings ('$PathToSettingsFile') file. Exit\e[0m"; exit 1;
+fi
 
 ## Switch output language to English (DO NOT CHANGE THIS)
 export LC_ALL=C;
@@ -69,6 +37,7 @@ cBlue='\e[1;34m'; cGray='\e[1;30m';
 
 ## Helpers Functions ##########################################################
 
+## Show log message in console
 logmessage() {
   ## $1 = (not required) '-n' flag for echo output
   ## $2 = message to output
@@ -81,6 +50,13 @@ logmessage() {
   fi
 
   echo -e $flag[$(date +%H:%M:%S)] "$outtext";
+}
+
+## Write log file (if filename setted)
+writeLog() {
+  if [ ! -z "$LOGFILE" ]; then
+    echo "[$(date +%Y-%m-%d/%H:%M:%S)] [$(basename $0)] - $1" >> "$LOGFILE";
+  fi
 }
 
 checkAvailability() {
@@ -158,6 +134,12 @@ downloadFile() {
     echo -e $flag "${cGreen}Downloaded${cNone}";
     return 1;
   fi
+  
+  ## ..or resource not found
+  if [[ $wgetResult == *ERROR\ \4\0\4* ]]; then
+    echo -e $flag "${cRed}Not found${cNone}";
+    return 1;
+  fi
 
   ## if no one substring founded - maybe error?
   echo -e $flag "${cRed}Error =(${cNone}\nWget debug info: \
@@ -182,6 +164,7 @@ if [ "$1" == "--flush" ]; then
     rm -R -f $PathToSaveBase*;
     echo -e "${cGreen}Ok${cNone}";
   fi
+  writeLog "Files storage erased";
   exit 0;
 fi
 
@@ -196,8 +179,7 @@ in $PathToSaveBase you can use flag '${cYel}--flush${cNone}'";
 ## (freeware keys), leave this code (else - comment|remove). ##################
 ## Use it for educational or information purposes only! #######################
 
-PathToGetNodKey=$(pwd)'/get-nod32-key.sh';
-if [ -f "$PathToGetNodKey" ]; then
+if [ "$UseGetKeysScript" = true ] && [ -f "$PathToGetNodKey" ]; then
   logmessage -n "Getting valid key from '$PathToGetNodKey'.. "
   nodKey=$(bash "$PathToGetNodKey" | tail -n 1);
   if [ ! "$nodKey" == "error" ]; then
@@ -241,6 +223,7 @@ done
 ## If no one is available
 if [ "$WORKURL" == "" ]; then
   logmessage "${cRed}No available server, exit${cNone}"
+  writeLog "FATAL - No available server";
   exit 1;
 fi
 
@@ -268,7 +251,7 @@ fi
 ##   download all files, declared in 'update.ver')
 function makeMirror() {
   ## $1 = From (url,  ex.: http://nod32.com/not_upd/)
-  ## $2 = To   (path, ex.: /home/kot/nod_upd/)
+  ## $2 = To   (path, ex.: /home/username/nod_upd/)
 
   #cd $PathToTempDir;
   logmessage -n "Downloading .ver file from $1.. "
@@ -280,6 +263,7 @@ function makeMirror() {
   ## If main .ver file not exists (ex.: download || save error)
   if [ ! -f $mainVerFile ]; then
     logmessage "${cRed}$mainVerFile after download not exists, exit${cNone}"
+    writeLog "Download \"$1update.ver\" failed";
     return 1;
   fi
 
@@ -293,15 +277,16 @@ function makeMirror() {
   ## Check - 'update.ver' packed with RAR or not?
   ## Get first 3 chars if file..
   fileHeader=$(head -c 3 $mainVerFile);
-  ## ..and comrate with template
+  ## ..and compare with template
   if [ "$fileHeader" == "Rar" ]; then
     ## Check - installed 'unrar' or not
     if [[ ! -n $(type -P unrar) ]]; then
       logmessage "$mainVerFile packed by RAR, but i cannot find 'unrar' in your system :(, exit"
+      writeLog "Unpacking .ver file error (unrar not exists)";
       exit 1;
     else
       mv $PathToTempDir'update.ver' $PathToTempDir'update.rar';
-      logmessage -n "Unpacing version file.. ";
+      logmessage -n "Unpacking version file.. ";
       ## Make unpack (without 'cd' not working O_o)
       cd $PathToTempDir; unrar x -y -inul 'update.rar' $PathToTempDir;
       if [ -f $PathToTempDir'update.ver' ]; then
@@ -310,6 +295,7 @@ function makeMirror() {
         rm -f 'update.rar';
       else
         echo -e "${cRed}Error, exit${cNone}";
+        writeLog "Unpacking .ver file error (operation failed)";
         exit 1;
       fi
     fi
@@ -389,6 +375,7 @@ function makeMirror() {
       downloadFile $item $2;
     done;
   fi
+  writeLog "Update mirror from \"$1\" to \"$2\" complete";
 }
 
 ## Create (update) main mirror
