@@ -5,7 +5,7 @@
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/nod32-update-mirror/
-## @version   0.3.7
+## @version   0.3.8
 ##
 ## @depends   curl, wget, grep, cut, cat, basename, 
 ##            unrar (if use official mirrors)
@@ -308,7 +308,7 @@ function makeMirror() {
     ## Find 'file=' in line
     if [[ $line == *file=* ]]; then
       ## get 'file=THIS_IS_OUR_VALUE'
-      tempFileName=$(echo $line | grep file= | cut -d "=" -f2 | tr -d '\r');
+      tempFileName=$(echo $line | grep "file=" | grep -v "ver" | cut -d "=" -f2 | tr -d '\r');
       if [ ! "$tempFileName" == '' ]; then
         ## Take only /some/url/CUIT_THIS.SHIT
         lineToNewVerFile=${tempFileName##*/};
@@ -347,7 +347,11 @@ function makeMirror() {
             ## Anyone know how faster trin string to parts?!
             local protocol=$(echo $inputUrl | awk -F/ '{print $1}');
             local host=$(echo $inputUrl | awk -F/ '{print $3}');
-            line='file='$protocol'//'$USERNAME':'$PASSWD'@'$host''$tempFileName;
+            local mirrorHttpAuth='';
+            if [ ! -z $USERNAME ] && [ ! -z $PASSWD ]; then
+              mirrorHttpAuth=$USERNAME':'$PASSWD'@';
+            fi
+            line='file='$protocol'//'$mirrorHttpAuth''$host''$tempFileName;
           else
             ## Else - return full url (ex.: http://someurl.com/path/file.nup)
             line='file='${filesArray[@]:(-1)};
