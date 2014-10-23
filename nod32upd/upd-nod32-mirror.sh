@@ -5,7 +5,7 @@
 ## @copyright 2014 <samoylovnn@gmail.com>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/nod32-update-mirror/
-## @version   0.3.8
+## @version   Look in 'settings.cfg'
 ##
 ## @depends   curl, wget, grep, cut, cat, basename, 
 ##            unrar (if use official mirrors)
