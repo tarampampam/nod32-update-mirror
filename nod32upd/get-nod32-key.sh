@@ -70,7 +70,7 @@ BPC $((RD%2+6)).0.$((RD%100+500)).0; OS: 5.1.2600 SP 3.0 NT; CH 1.1; \
 LNG 1049; x32c; APP eavbe; BEO 1; ASP 0.10; FW 0.0; PX 0; PUA 0; RA 0)";
   
   local UpdServer='update.eset.com';
-  local TestPath='/v3-rel-sta/mod_000_loader_1074/em000_32_l0.nup';
+  local TestPath='/v3-rel-sta/mod_000_loader_1080/em000_32_l0.nup';
   local flag='' Login='' Pass='';
   if [ "$1" == "-n" ]; then
     flag="-en"; Login=$2; Pass=$3;
