@@ -2,7 +2,7 @@
 
 ## @author    Samoylov Nikolay
 ## @project   Get NOD32 key
-## @copyright 2014 <https://github.com/tarampampam>
+## @copyright 2014 <github.com/tarampampam>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/nod32-update-mirror/
 ## @version   Look in 'settings.cfg'
