@@ -1,0 +1,14 @@
+[2015-02-03/13:33:04] [get-nod32-key.sh] - Getting new keys and save valid in './.nod32keys/validkeys.txt'
+[2015-02-03/13:33:15] [get-nod32-key.sh] - File "./.nod32keys/validkeys.txt" not created. Exit
+[2015-02-03/13:33:49] [get-nod32-key.sh] - Getting new keys and save valid in './.nod32keys/validkeys.txt'
+[2015-02-03/13:34:44] [get-nod32-key.sh] - Getting new keys and save valid in './.nod32keys/validkeys.txt'
+[2015-02-03/13:37:00] [get-nod32-key.sh] - Getting new keys and save valid in './.nod32keys/validkeys.txt'
+[2015-02-03/13:37:40] [get-nod32-key.sh] - Getting new keys and save valid in './.nod32keys/validkeys.txt'
+[2015-02-03/13:38:32] [get-nod32-key.sh] - Return key "TRIAL-0131274769:use93pxdap" from local file
+[2015-02-03/13:38:49] [get-nod32-key.sh] - Return key "EAV-0126295644:64p7nh4xx3" from local file
+[2015-02-03/13:40:46] [get-nod32-key.sh] - Return key "TRIAL-0131274793:4fhxjj6d3p" from local file
+[2015-02-03/13:40:46] [upd-nod32-mirror.sh] - Unpacking .ver file error (unrar not exists)
+[2015-02-03/13:41:38] [get-nod32-key.sh] - Getting new keys and save valid in './.nod32keys/validkeys.txt'
+[2015-02-03/13:42:17] [get-nod32-key.sh] - Return key "EAV-0125449617:9ahshmxbsx" from local file
+[2015-02-03/13:42:17] [upd-nod32-mirror.sh] - Unpacking .ver file error (unrar not exists)
+[2015-02-03/13:43:05] [upd-nod32-mirror.sh] - Update mirror from "http://nod.dr-fresh.ru/" to "/home/kot/nod32mirror/" complete

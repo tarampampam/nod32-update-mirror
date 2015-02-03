@@ -15,7 +15,7 @@
 # *****************************************************************************
 
 ## Path to settings file
-PathToSettingsFile=$(pwd)'/settings.cfg';
+PathToSettingsFile=$(dirname $0)'/settings.cfg';
 
 # *****************************************************************************
 # ***                            END Config                                  **
@@ -91,8 +91,11 @@ downloadFile() {
     flag="-n "; url=$2; saveto=$3;
   else
     url=$1; saveto=$2;
-  fi
+  fi;
 
+  if [ ! -z "$wget_wait_sec" ]; then wget_wait_sec='0'; fi;
+  if [ ! -z "$wget_limit_rate" ]; then wget_limit_rate='102400k'; fi;
+  
   ## wget manual <http://www.gnu.org/software/wget/manual/wget.html>
   ##
   ## --cache=off    When set to off, disable server-side cache

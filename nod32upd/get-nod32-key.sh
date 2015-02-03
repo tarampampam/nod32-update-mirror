@@ -15,7 +15,7 @@
 # *****************************************************************************
 
 ## Path to settings file
-PathToSettingsFile=$(pwd)'/settings.cfg';
+PathToSettingsFile=$(dirname $0)'/settings.cfg';
 
 # *****************************************************************************
 # ***                            END Config                                  **
@@ -70,7 +70,7 @@ BPC $((RD%2+6)).0.$((RD%100+500)).0; OS: 5.1.2600 SP 3.0 NT; CH 1.1; \
 LNG 1049; x32c; APP eavbe; BEO 1; ASP 0.10; FW 0.0; PX 0; PUA 0; RA 0)";
   
   local UpdServer='update.eset.com';
-  local TestPath='/v3-rel-sta/mod_000_loader_1080/em000_32_l0.nup';
+  local TestPath='/v3-rel-sta/mod_000_loader_1082/em000_32_l0.nup';
   local flag='' Login='' Pass='';
   if [ "$1" == "-n" ]; then
     flag="-en"; Login=$2; Pass=$3;
@@ -101,17 +101,20 @@ getKeys() {
   ##  TRIAL-0118291735:hsnu26k7hu
   ##  TRIAL-0118393856:n98nk6sm6s
   
+  #thx @cryol <https://github.com/cryol> for this
+  keysList+=$(curl -s http://tnoduse2.blogspot.ru |\
+    sed -e 's/<[^>]*>//g' |\
+	awk -F: '/((TRIAL|EAV)-[0-9]+)|(Password: [a-z0-9]+)/ {print $2}' |\
+	sed -e 's/ //g' | tr -d "\r" |\
+	awk '{getline b;printf("%s:%s\n",$0,b)}');
+  
   #thx @zcooler <https://github.com/zcooler> for this
   keysList+=$(curl -s http://nod325.com/ |\
     sed -e 's/<[^>]*>//g' |\
     awk -F: '/((TRIAL|EAV)-[0-9]+)|(Password:[a-z0-9]+)/ {print $2}' |\
     tr -d "\r" |\
     awk '{getline b;printf("%s:%s\n",$0,b)}');
-  keysList+=$(curl -s http://www.nod327.net/ |\
-    sed -e 's/<[^>]*>//g' |\
-    awk -F: '/((TRIAL|EAV)-[0-9]+)|(nod32key:[a-z0-9]+)/ {print $2}' |\
-    tr -d "\r" |\
-    awk '{getline b;printf("\n%s:%s",$0,b)}');
+
   echo "$keysList";
 }
 
