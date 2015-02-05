@@ -2,7 +2,7 @@
 
 ## @author    Samoylov Nikolay
 ## @project   Get NOD32 key
-## @copyright 2014 <github.com/tarampampam>
+## @copyright 2015 <github.com/tarampampam>
 ## @license   MIT <http://opensource.org/licenses/MIT>
 ## @github    https://github.com/tarampampam/nod32-update-mirror/
 ## @version   Look in 'settings.cfg'
@@ -23,17 +23,11 @@ PathToSettingsFile=$(dirname $0)'/settings.cfg';
 
 ## Load setting from file
 if [ -f "$PathToSettingsFile" ]; then source $PathToSettingsFile; else
-  echo -e "\e[1;31mCannot load settings ('$PathToSettingsFile') file. Exit\e[0m"; exit 1;
-fi
-
-## Switch output language to English (DO NOT CHANGE THIS)
-export LC_ALL=C;
+  echo -e "\e[1;31mCannot load settings ('"$PathToSettingsFile"') file. Exit\e[0m"; exit 1;
+fi;
 
 ## Init global variables
 KEY_FOUND=false;
-
-cRed='\e[1;31m'; cGreen='\e[0;32m'; cNone='\e[0m'; cYel='\e[1;33m';
-cBlue='\e[1;34m'; cGray='\e[1;30m';
 
 ## Helpers Functions ##########################################################
 
@@ -47,7 +41,7 @@ logmessage() {
     flag="-n "; outtext=$2;
   else
     outtext=$1;
-  fi
+  fi;
 
   echo -e $flag[$(date +%H:%M:%S)] "$outtext";
 }
@@ -56,7 +50,7 @@ logmessage() {
 writeLog() {
   if [ ! -z "$LOGFILE" ]; then
     echo "[$(date +%Y-%m-%d/%H:%M:%S)] [$(basename $0)] - $1" >> "$LOGFILE";
-  fi
+  fi;
 }
 
 ## Check - Login and Pass is valid or not?
@@ -76,7 +70,7 @@ LNG 1049; x32c; APP eavbe; BEO 1; ASP 0.10; FW 0.0; PX 0; PUA 0; RA 0)";
     flag="-en"; Login=$2; Pass=$3;
   else
     flag="-e"; Login=$1; Pass=$2;
-  fi
+  fi;
   
   ## Wait 1..3 sec before making request
   sleep $(((RANDOM%3)+1))s;
@@ -91,7 +85,7 @@ LNG 1049; x32c; APP eavbe; BEO 1; ASP 0.10; FW 0.0; PX 0; PUA 0; RA 0)";
     return 0;
   else
     return 1;
-  fi
+  fi;
 }
 
 ## Getting new keys by pirates
@@ -102,11 +96,11 @@ getKeys() {
   ##  TRIAL-0118393856:n98nk6sm6s
   
   #thx @cryol <https://github.com/cryol> for this
-  keysList+=$(curl -s http://tnoduse2.blogspot.ru |\
+  keysList+=$(curl -s http://tnoduse2.blogspot.ru/ |\
     sed -e 's/<[^>]*>//g' |\
-	awk -F: '/((TRIAL|EAV)-[0-9]+)|(Password: [a-z0-9]+)/ {print $2}' |\
-	sed -e 's/ //g' | tr -d "\r" |\
-	awk '{getline b;printf("%s:%s\n",$0,b)}');
+    awk -F: '/((TRIAL|EAV)-[0-9]+)|(Password: [a-z0-9]+)/ {print $2}' |\
+    sed -e 's/ //g' | tr -d "\r" |\
+    awk '{getline b;printf("%s:%s\n",$0,b)}');
   
   #thx @zcooler <https://github.com/zcooler> for this
   keysList+=$(curl -s http://nod325.com/ |\
@@ -123,7 +117,7 @@ removeEmptyLinesInFile() {
   ## $1 = file name (with path)
   if [ -f $1 ]; then
     echo "$(sed 's/^ *//; s/ *$//; /^$/d' $1)" > $1;
-  fi
+  fi;
 }
 
 ## Remove line containing $1 from file $2
@@ -132,13 +126,13 @@ removeKeyFromFile() {
   ## $2 = file name (with path)
   if [ -f "$2" ]; then
     ## Save invalid key (if path is setted)
-    if [ ! -z "$INVALID_KEYS" ] && [ "$2" == "$VALID_KEYS" ]; then
-      echo "$1" >> "$INVALID_KEYS";
-    fi
+    if [ ! -z "$invalidKeysFile" ] && [ "$2" == "$validKeysFile" ]; then
+      echo "$1" >> "$invalidKeysFile";
+    fi;
     local result=$(sed "/$1/d" $2);
     echo "$result" > $2;
     writeLog "Remove key \"$1\" from \"$2\"";
-  fi
+  fi;
 }
 
 echoKey() {
@@ -152,8 +146,8 @@ echoKey() {
 
 ## Get new keys by getKeys() and store new+valid keys in file
 getNewKeysAndSave() {
-  logmessage "${cYel}Getting new keys and save valid in '$VALID_KEYS'${cNone}";
-  writeLog "Getting new keys and save valid in '$VALID_KEYS'";
+  logmessage "${cYel}Getting new keys and save valid in '$validKeysFile'${cNone}";
+  writeLog "Getting new keys and save valid in '$validKeysFile'";
   ## Get list of warez keys, and read result 'line by line'
   while read line; do
     ## Get user:pass from line
@@ -163,30 +157,30 @@ getNewKeysAndSave() {
       logmessage -n "Checking key ${cYel}$Username${cNone}:$Password.. ";
       if checkKey -n $Username $Password; then
         ## If tested key valid and not exists in keys file - add it (or skip)
-        if [ -f "$VALID_KEYS" ] && grep -Fq $Username "$VALID_KEYS"; then
+        if [ -f "$validKeysFile" ] && grep -Fq $Username "$validKeysFile"; then
           echo -ne "  ${cYel}skipped${cNone}";
         else
-          echo "$Username:$Password" >> "$VALID_KEYS";
+          echo "$Username:$Password" >> "$validKeysFile";
           echo -ne " +${cGreen}added${cNone}";
-        fi
+        fi;
       else
         echo -ne " -${cRed}invalid${cNone}";
-      fi
+      fi;
       echo "";
     else
       logmessage "${cRed}Error${cNone} reading new key ('${cRed}$Username${cNone}':'${cRed}$Password${cNone}')";
-    fi
-  done <<< "$(getKeys)"; removeEmptyLinesInFile "$VALID_KEYS";
+    fi;
+  done <<< "$(getKeys)"; removeEmptyLinesInFile "$validKeysFile";
 }
 
 removeInvalidKeys() {
-  if [ -f "$VALID_KEYS" ]; then
+  if [ -f "$validKeysFile" ]; then
     ## Make a copy of file..
-    cp -f "$VALID_KEYS" "$VALID_KEYS.lock";
+    cp -f "$validKeysFile" "$validKeysFile.lock";
     local lineCounter=0;
     ## ..and work with it
-    logmessage "${cYel}Removing invalid keys from '$VALID_KEYS'${cNone}";
-    writeLog "Removing invalid keys from '$VALID_KEYS'";
+    logmessage "${cYel}Removing invalid keys from '$validKeysFile'${cNone}";
+    writeLog "Removing invalid keys from '$validKeysFile'";
     while read line; do
       lineCounter=$((lineCounter+1));
       ## Get user:pass from line
@@ -195,23 +189,23 @@ removeInvalidKeys() {
         logmessage -n "Checking key before erasing ${cYel}$Username${cNone}:$Password.. ";
         if ! checkKey -n $Username $Password; then
           echo -ne " -${cRed}remove${cNone}";
-          removeKeyFromFile "$Username:$Password" "$VALID_KEYS";
+          removeKeyFromFile "$Username:$Password" "$validKeysFile";
         else
           echo -ne "  ${cYel}skipped${cNone}";
-        fi
+        fi;
         echo "";
       else
-        logmessage "Error reading '${cYel}$VALID_KEYS${cNone}' - damn line \"${cYel}$lineCounter${cNone}\" is broken";
+        logmessage "Error reading '${cYel}$validKeysFile${cNone}' - damn line \"${cYel}$lineCounter${cNone}\" is broken";
       fi;
-    done < "$VALID_KEYS.lock"; rm -f "$VALID_KEYS.lock";
-    removeEmptyLinesInFile "$VALID_KEYS";
-  fi
+    done < "$validKeysFile.lock"; rm -f "$validKeysFile.lock";
+    removeEmptyLinesInFile "$validKeysFile";
+  fi;
 }
 
 testRandomKey() {
   ## Get random key..
-  #local randomKey=$(sort -R "$VALID_KEYS" | head --lines=1);
-  local randomKey=$(head -$((${RANDOM} % `wc -l < "$VALID_KEYS"` + 1)) "$VALID_KEYS" | tail -1);
+  #local randomKey=$(sort -R "$validKeysFile" | head --lines=1);
+  local randomKey=$(head -$((${RANDOM} % `wc -l < "$validKeysFile"` + 1)) "$validKeysFile" | tail -1);
   local Username=${randomKey%%:*} Password=${randomKey#*:};
   ## ..and if some error catched, we..
   if [ -z "$randomKey" ] || [ -z $Username ] || [ -z $Password ]; then
@@ -222,11 +216,11 @@ testRandomKey() {
       echo "$Username:$Password";
       return 0; # NO err
     else
-      removeKeyFromFile "$Username:$Password" "$VALID_KEYS";
-      removeEmptyLinesInFile "$VALID_KEYS";
+      removeKeyFromFile "$Username:$Password" "$validKeysFile";
+      removeEmptyLinesInFile "$validKeysFile";
       return 1; # err
-    fi
-  fi
+    fi;
+  fi;
 }
 
 createDirByFilePath() {
@@ -234,8 +228,17 @@ createDirByFilePath() {
   local CreatePath=${1%/*};
   if [ ! -z "$CreatePath" ] && [ ! -d "$CreatePath" ]; then
     mkdir -p "$CreatePath";
-  fi
+  fi;
 }
+
+## Here we go! ################################################################
+
+echo "  _  _         _ _______    ___     _   _  __";
+echo " | \| |___  __| |__ /_  )  / __|___| |_| |/ /___ _  _";
+echo " | .' / _ \/ _' ||_ \/ /  | (_ / -_)  _| ' </ -_) || |";
+echo " |_|\_\___/\__,_|___/___|  \___\___|\__|_|\_\___|\_, | //j.mp/GitNod32Mirror";
+echo "                                                 |__/";
+echo "";
 
 ## Run script with params #####################################################
 
@@ -243,12 +246,12 @@ createDirByFilePath() {
 if [ "$1" == "--help" ] || [ "$1" == "-h" ] || [ "$1" == "-H" ]; then
   me=$(basename $0);
   echo -e "This script get valid Nod32 key using pirates web-sites. Now we supports:\n";
-  echo -e "  ${cYel}http://nod325.com/${cNone}";
-  echo -e "  ${cYel}http://www.nod327.net/${cNone}\n";
+  echo -e "  ${cYel}http://tnoduse2.blogspot.ru/${cNone}";
+  echo -e "  ${cYel}http://nod325.com/${cNone}\n";
   echo -e "You can run with parameters:";
-  echo -e "  ${cYel}-u, --update${cNone}     Get new valid keys and write to $VALID_KEYS";
-  echo -e "  ${cYel}-r, --remove${cNone}     Remove invalid keys from $VALID_KEYS";
-  echo -e "  ${cYel}-s, -p, --show${cNone}   Print keys from $VALID_KEYS";
+  echo -e "  ${cYel}-u, --update${cNone}     Get new valid keys and write to $validKeysFile";
+  echo -e "  ${cYel}-r, --remove${cNone}     Remove invalid keys from $validKeysFile";
+  echo -e "  ${cYel}-s, -p, --show${cNone}   Print keys from $validKeysFile";
   echo -e "  ${cYel}-h, --help${cNone}       Show this help\n\n";
   echo -e "Valid key (or \"error\") will printed in ${cYel}LAST OUTPUT LINE${cNone} (format 'user:password')";
   echo -e "                                       ${cBlue}^^^^^^^^^^^^^^^^${cNone}";
@@ -256,49 +259,49 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ] || [ "$1" == "-H" ]; then
   echo -e "Last update: 12.08.2014, MIT License, ${cRed}use for educational or information";
   echo -e "  purposes only!${cNone}";
   exit 0;
-fi
+fi;
 ## --update
-if [ "$1" == "-u" ] || [ "$1" == "--update" ]; then getNewKeysAndSave; exit 0; fi
+if [ "$1" == "-u" ] || [ "$1" == "--update" ]; then getNewKeysAndSave; exit 0; fi;
 ## --remove
-if [ "$1" == "-r" ] || [ "$1" == "--remove" ]; then removeInvalidKeys; exit 0; fi
+if [ "$1" == "-r" ] || [ "$1" == "--remove" ]; then removeInvalidKeys; exit 0; fi;
 ## --show --print
 if [ "$1" == "-s" ] || [ "$1" == "--show" ] || [ "$1" == "-p" ] || [ "$1" == "--print" ]; then
-  if [ -f "$VALID_KEYS" ]; then cat "$VALID_KEYS"; fi; exit 0;
-fi
+  if [ -f "$validKeysFile" ]; then cat "$validKeysFile"; fi; exit 0;
+fi;
 
 ## Begin work #################################################################
 
 ## Create patches
-createDirByFilePath $VALID_KEYS;
-createDirByFilePath $INVALID_KEYS;
+createDirByFilePath $validKeysFile;
+createDirByFilePath $invalidKeysFile;
 createDirByFilePath $LOGFILE;
 
 ## If keys file not exists - get new keys and save them
-if [ ! -f "$VALID_KEYS" ]; then
+if [ ! -f "$validKeysFile" ]; then
   getNewKeysAndSave;
-fi
+fi;
 
 ## Double file exists check (if getNewKeysAndSave() failed)
-if [ ! -f "$VALID_KEYS" ]; then
-  logmessage "File ${cRed}$VALID_KEYS${cNone} not created. Exit";
+if [ ! -f "$validKeysFile" ]; then
+  logmessage "File ${cRed}$validKeysFile${cNone} not created. Exit";
   echoKey "error";
-  writeLog "File \"$VALID_KEYS\" not created. Exit";
+  writeLog "File \"$validKeysFile\" not created. Exit";
   exit 1;
-fi
+fi;
 
 ## Getting random key and..
 randomKey=$(testRandomKey);
 ## ..check him
 
 if [ -z "$randomKey" ]; then
-  logmessage "Getted random key from $VALID_KEYS is invalid";
+  logmessage "Getted random key from $validKeysFile is invalid";
   ## If he not not valid, we remove all invalid keys from file
   removeInvalidKeys;
   ## Then again get random key from file
   randomKey=$(testRandomKey);
   ## And if now random key invalid (or empty)
   if [ -z "$randomKey" ]; then
-    logmessage "Getted random key from $VALID_KEYS again is invalid";
+    logmessage "Getted random key from $validKeysFile again is invalid";
     ## Get new files from web
     getNewKeysAndSave;
     ## And make 3rd test
@@ -311,17 +314,17 @@ if [ -z "$randomKey" ]; then
       ## After getNewKeysAndSave()
       echoKey $randomKey;
       writeLog "Return key \"$randomKey\" from from web";
-    fi
+    fi;
   else
     ## After removeInvalidKeys()
     echoKey $randomKey;
     writeLog "Return key \"$randomKey\" from local file after remove all invalid keys";
-  fi
+  fi;
 else
   ## After 1st randomKey()
   echoKey $randomKey;
   writeLog "Return key \"$randomKey\" from local file";
-fi
+fi;
 
 
 # If key not found (not setted ) - write 'error'
@@ -329,6 +332,6 @@ if [ ! "$KEY_FOUND" = true ] ; then
   echoKey "error";
   writeLog "FATAL error - key not returned";
   exit 1;
-fi
+fi;
 exit 0;
 
