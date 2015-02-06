@@ -7,7 +7,7 @@
 ## @github    https://github.com/tarampampam/nod32-update-mirror/
 ## @version   Look in 'settings.cfg'
 ##
-## @depends   curl, wget, grep, cut, cat, basename, 
+## @depends   curl, wget, grep, sed, cut, cat, basename, 
 ##            unrar (if use official mirrors)
 
 # *****************************************************************************
@@ -149,6 +149,36 @@ downloadFile() {
   return 0;
 }
 
+## Parse data from passed content of ini section
+function getValueFromINI() {
+  local sourceData=$1; local paramName=$2;
+  ## 1. Get value "platform=%OUR_VALUE%"
+  ## 2. Remove illegal characters
+  echo $(echo "$sourceData" | sed -n '/^'$paramName'=\(.*\)$/s//\1/p' | tr -d "\r" | tr -d "\n");
+}
+
+## Create some directory
+createDir() {
+  local dirPath=$1;
+  if [ ! -d $dirPath ]; then
+    logmessage -n "Create $dirPath.. "; mkdir -p $dirPath >/dev/null 2>&1;
+    if [ -d "$dirPath" ]; then
+      echo -e $msgOk; else echo -e $msgErr;
+    fi;
+  fi;
+}
+
+## Remove some directory
+removeDir() {
+  local dirPath=$1;
+  if [ -d $dirPath ]; then
+    logmessage -n "Remove $dirPath.. "; rm -R -f $dirPath >/dev/null 2>&1;
+    if [ ! -d "$dirPath" ]; then
+      echo -e $msgOk; else echo -e $msgErr;
+    fi;
+  fi;
+}
+
 ## Here we go! ################################################################
 
 echo "  _  _         _ _______   __  __ _";
@@ -194,7 +224,7 @@ fi;
 ## Prepare ####################################################################
 
 ###############################################################################
-## If you want get updates from official servers using 'getkey.sh' #####
+## If you want get updates from official servers using 'getkey.sh' ############
 ## (freeware keys), leave this code (else - comment|remove). ##################
 ## Use it for educational or information purposes only! #######################
 
@@ -214,7 +244,7 @@ if [ "$getFreeKey" = true ] && [ -f "$pathToGetFreeKey" ]; then
   fi;
 fi;
 
-## End of code for 'getkey.sh' #########################################
+## End of code for 'getkey.sh' ################################################
 ###############################################################################
 
 
@@ -247,29 +277,11 @@ if [ "$WORKURL" == "" ]; then
 fi;
 
 ## Remove old temp directory
-if [ -d "$pathToTempDir" ]; then
-  logmessage -n "Remove $pathToTempDir.. "; rm -R -f $pathToTempDir;
-  if [ ! -d "$pathToTempDir" ]; then
-    echo -e $msgOk; else echo -e $msgErr;
-  fi;
-fi;
-
+removeDir $pathToTempDir;
 ## Create base directory
-if [ ! -d $pathToSaveBase ]; then
-  logmessage -n "Create $pathToSaveBase.. "; mkdir -p $pathToSaveBase;
-  if [ -d "$pathToSaveBase" ]; then
-    echo -e $msgOk; else echo -e $msgErr;
-  fi;
-fi;
-
+createDir $pathToSaveBase;
 ## Create temp directory
-if [ ! -d $pathToTempDir ]; then
-  logmessage -n "Create $pathToTempDir.. "; mkdir -p $pathToTempDir;
-  if [ -d "$pathToTempDir" ]; then
-    echo -e $msgOk; else echo -e $msgErr;
-  fi;
-fi;
-
+createDir $pathToTempDir;
 
 ## Begin work #################################################################
 
@@ -343,42 +355,39 @@ function makeMirror() {
 200@http://91.228.167.21/eset_upd/v7/\n\
 ;; This mirror created by <github.com/tarampampam/nod32-update-mirror> ;;\n" > $newVerFile;
 
-  # Get sections names from update.ver file, and store in array
-  verSectionsNamesArray=($(grep -Po '(?<=^\[).*(?=\]$)' $mainVerFile));
+  ## Get sections names from update.ver file, and store in array
+  #local verSectionsNamesArray=($(grep -Po '(?<=^\[).*(?=\]$)' $mainVerFile));
+  local verSectionsNamesArray=($(sed -n 's/^\[\(.*\)\]/\1/p' $mainVerFile | sed -e 's/[^A-Za-z0-9._-]//g'));
+  ## Pass this sections list
+  local passSections=('HOSTS' 'Expire' 'SETUP');
+  for pass in "${passSections[@]}"; do
+    verSectionsNamesArray=(${verSectionsNamesArray[@]/$pass});
+  done;
+  #printf '%s\n' "${verSectionsNamesArray[@]}";
   for SectionName in ${verSectionsNamesArray[*]}; do
     #logmessage $SectionName;
     local sectionContent="";
-    ## Get section content (text between '[%section_name%]' and next '[')
-    sectionContent=$(sed -e '/^\['$SectionName'\]/,/^\[/!d' $mainVerFile);
-    ## Remove first line with '[%section_name%]'
-    sectionContent=$(echo "$sectionContent" | tail -n +2);
-    ## Remove last line, if it begins from next section name
-    if [[ $(echo "$sectionContent" | tail -1) =~ ^\[ ]]; then
-      sectionContent=$(echo "$sectionContent" | head -n -1);
-    fi;
-    ## And now we begin make selection - what we will write in new .ver file
-    ##  and download, and what - passed. We make check some sections fields.
-    ## And our fist important field - is 'platform='
-    ## Get substring with word 'platform'
-    local filePlatformRaw=$(echo "$sectionContent" | grep 'platform\=');
-    ## And remove all before char '='
-    local filePlatform=${filePlatformRaw#*=};
-    ## Find $filePlatform in $updPlatforms
+    if [ -z $SectionName ]; then break; fi;
+    ## 1. Get section content (text between '[%section_name%]' and next '[')
+    ## 2. Remove lines, what begins on '['..
+    ## 3. Remove empty lines
+    sectionContent=$(sed -n '/^\['$SectionName'\]/,/^\[/p' $mainVerFile | sed -e '/^\[/d' | sed -e '/^$/d');
+    #echo "$sectionContent"; exit 1;
+    local filePlatform=$(getValueFromINI "$sectionContent" "platform");
+    #echo $filePlatform; exit 1;
     if [ ! -z $filePlatform ]; then
       for i in "${updPlatforms[@]}"; do
         if [ "$i" == "$filePlatform" ]; then
           ## $filePlatform founded in $updPlatforms
           ## Second important field - is 'type='
-          local fileTypeRaw=$(echo "$sectionContent" | grep 'type\=');
-          local fileType=${fileTypeRaw#*=};
-          #echo $fileType;
+          local fileType=$(getValueFromINI "$sectionContent" "type");
+          #echo "$fileType"; exit 1;
           if [ ! -z $fileType ]; then 
             for j in "${updTypes[@]}"; do
               if [ "$j" == "$fileType" ]; then
                 ## $fileType founded in $updTypes
                 ## And 3rd fields - 'level=' or 'language='
-                local fileLevelRaw=$(echo "$sectionContent" | grep 'level\=');
-                local fileLevel=${fileLevelRaw#*=};
+                local fileLevel=$(getValueFromINI "$sectionContent" "level");
                 ## Whis is flag-var
                 local writeSection=false;
                 ## Check update file level
@@ -392,8 +401,7 @@ function makeMirror() {
                   done;
                 fi;
                 ## Check component language
-                local fileLanguageRaw=$(echo "$sectionContent" | grep 'language\=');
-                local fileLanguage=${fileLanguageRaw#*=};
+                local fileLanguage=$(getValueFromINI "$sectionContent" "language");
                 if [ ! -z $fileLanguage ]; then
                   for k in "${updLanguages[@]}"; do
                     if [ "$k" == "$fileLanguage" ]; then
@@ -407,8 +415,7 @@ function makeMirror() {
                 if [ "$writeSection" = true ]; then
                   #echo "$sectionContent"; echo;
                   ## get 'file=THIS_IS_OUR_VALUE'
-                  local fileNamePathRaw=$(echo "$sectionContent" | grep 'file\=');
-                  local fileNamePath=${fileNamePathRaw#*=};
+                  local fileNamePath=$(getValueFromINI "$sectionContent" "file");
                   if [ ! -z "$fileNamePath" ]; then
                     ## If path contains '://'
                     if [[ $fileNamePath == *\:\/\/* ]]; then
@@ -519,14 +526,8 @@ fi;
 
 ## Finish work ################################################################
 
-## Remove temp directory
-if [ -d "$pathToTempDir" ]; then
-  logmessage -n "Remove $pathToTempDir.. ";
-  rm -R -f $pathToTempDir;
-  if [ ! -d "$pathToTempDir" ]; then
-    echo -e $msgOk; else echo -e $msgErr;
-  fi;
-fi;
+## Remove old temp directory
+removeDir $pathToTempDir;
 
 if [ "$createTimestampFile" = true ]; then
   logmessage -n "Create timestamp file.. ";
