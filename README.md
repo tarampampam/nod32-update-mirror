@@ -113,7 +113,7 @@ $ ./update.sh
 * **0.2.4** - Релиз на гитхабе.
 
 ----------
-#### <i class="icon-refresh"></i>Лицензия:
+#### <i class="icon-refresh"></i>Лицензия MIT
 
 > Copyright (c) 2014 [github.com/tarampampam](http://github.com/tarampampam/)
 
