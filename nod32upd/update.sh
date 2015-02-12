@@ -179,6 +179,28 @@ removeDir() {
   fi;
 }
 
+## Try to skip work
+skipTask() {
+
+  if [ "$skipTask" = 0 ] || [ "$pSkipTask" = false ]; then return 0; fi;
+  if [ -e "$skipTaskFile" ]; then
+
+    ## File exists, may not be should work
+    local COUNT=$( head -n 1 "$skipTaskFile" );
+    if [ "$COUNT" != "0" ]; then
+      ## Can skip this task
+      logmessage "Skipping task ${cGreen}[$COUNT]${cNone}";
+      writeLog "Skipping task [$COUNT]";
+      COUNT=$(($COUNT-1));
+      echo "$COUNT" > "$skipTaskFile";
+      exit 0;
+    else
+ 	  ## remove file, in the case of a fatal error the next time
+	  ## guaranteed to get started
+      rm -f "$skipTaskFile";
+    fi;
+  fi;
+}
 ## Here we go! ################################################################
 
 echo "  _  _         _ _______   __  __ _";
@@ -221,7 +243,20 @@ else
 you can use flag '${cYel}--nolimit${cNone}'";
   fi;
 fi;
+
+## --noskip
+## Disable download speed limit and off delay
+if [ "$1" == "--noskip" ]; then
+  pSkipTask=false;
+else
+  pSkipTask=true;
+  echo -e "${cYel}Hint${cNone}: For not skip task \
+you can use flag '${cYel}--noskip${cNone}'";
+fi;
 ## Prepare ####################################################################
+
+## Try to skip work
+skipTask
 
 ###############################################################################
 ## If you want get updates from official servers using 'getkey.sh' ############
@@ -547,4 +582,14 @@ if [ "$createRobotsFile" = true ]; then
       echo -e $msgOk; else echo -e $msgErr;
     fi;
   fi;
+fi;
+
+if [ "$skipTask" != 0 ]; then
+   if [ ! -f $skipTaskFile ]; then
+      logmessage -n "Create 'skip.txt'.. ";
+	  echo "$skipTask" > "$skipTaskFile";
+	    if [ -f "$skipTaskFile" ]; then
+        echo -e $msgOk; else echo -e $msgErr;
+      fi;
+   fi;
 fi;
