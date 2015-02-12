@@ -270,6 +270,7 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ] || [ "$1" == "-H" ]; then
   echo -e "  ${cYel}-u, --update${cNone}     Get new valid keys and write to $validKeysFile";
   echo -e "  ${cYel}-r, --remove${cNone}     Remove invalid keys from $validKeysFile";
   echo -e "  ${cYel}-s, -p, --show${cNone}   Print keys from $validKeysFile";
+  echo -e "  ${cYel}-d, --delete${cNone}     Delete this $validKeysFile";
   echo -e "  ${cYel}-h, --help${cNone}       Show this help\n\n";
   echo -e "Valid key (or \"error\") will printed in ${cYel}LAST OUTPUT LINE${cNone} (format 'user:password')";
   echo -e "                                       ${cBlue}^^^^^^^^^^^^^^^^${cNone}";
@@ -286,7 +287,16 @@ if [ "$1" == "-r" ] || [ "$1" == "--remove" ]; then removeInvalidKeys; exit 0; f
 if [ "$1" == "-s" ] || [ "$1" == "--show" ] || [ "$1" == "-p" ] || [ "$1" == "--print" ]; then
   if [ -f "$validKeysFile" ]; then cat "$validKeysFile"; fi; exit 0;
 fi;
-
+## --delete
+if [ "$1" == "-d" ] || [ "$1" == "--delete" ]; then
+  if [ -f "$validKeysFile" ];then
+	rm "$validKeysFile";
+	echo -e "File $validKeysFile ${cYel}delete${cNone}";
+  else
+    echo -e "Nothing ${cYel}remove${cNone}";
+  fi;
+  exit 0;
+fi;
 ## Begin work #################################################################
 
 ## Create patches
