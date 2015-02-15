@@ -108,7 +108,7 @@
         updateBaseDate = function(){
           if(ShowUpdateDateLabel && updLabel.length){
             $.ajax({
-              type: "GET", url: UrlToBaseDateFile, contentType: "text/plain; charset=utf-8",
+              type: "GET", url: UrlToBaseDateFile, contentType: "text/plain; charset=utf-8", cache: false,
               success: function(data, textStatus){
                 updLabel.slideUp().text('Updated: ' + data).slideDown();
               },
