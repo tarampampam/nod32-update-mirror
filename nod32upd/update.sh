@@ -165,7 +165,8 @@ function getValueFromINI() {
   local sourceData=$1; local paramName=$2;
   ## 1. Get value "platform=%OUR_VALUE%"
   ## 2. Remove illegal characters
-  echo $(echo "$sourceData" | sed -n '/^'$paramName'=\(.*\)$/s//\1/p' | tr -d "\r" | tr -d "\n");
+  #echo $(echo "$sourceData" | sed -n '/^'$paramName'=\(.*\)$/s//\1/p' | tr -d "\r" | tr -d "\n");
+  echo $(echo "$sourceData" | grep "$paramName=" | sed s/^$paramName=//);
 }
 
 ## Create some directory
@@ -413,142 +414,110 @@ function makeMirror() {
 200@http://91.228.167.21/eset_upd/v7/\n\
 ;; This mirror created by <github.com/tarampampam/nod32-update-mirror> ;;\n" > $newVerFile;
 
-  ## Get sections names from update.ver file, and store in array
-  #local verSectionsNamesArray=($(grep -Po '(?<=^\[).*(?=\]$)' $mainVerFile));
-  local verSectionsNamesArray=($(sed -n 's/^\[\(.*\)\]/\1/p' $mainVerFile | sed -e 's/[^A-Za-z0-9._-]//g'));
-  ## Pass this sections list
-  local passSections=('HOSTS' 'Expire' 'SETUP');
-  for pass in "${passSections[@]}"; do
-    verSectionsNamesArray=(${verSectionsNamesArray[@]/$pass});
-  done;
-  #printf '%s\n' "${verSectionsNamesArray[@]}";
-  for SectionName in ${verSectionsNamesArray[*]}; do
+  OLD_IFS=$IFS; IFS=[
+  for section in `cat $mainVerFile | sed '1s/\[//; s/^ *//'`; do
+    IFS=$OLD_IFS;
+    #for SectionName in ${verSectionsNamesArray[*]}; do
     #logmessage $SectionName;
-    local sectionContent="";
-    if [ -z $SectionName ]; then break; fi;
-    ## 1. Get section content (text between '[%section_name%]' and next '[')
-    ## 2. Remove lines, what begins on '['..
-    ## 3. Remove empty lines
-    sectionContent=$(sed -n '/^\['$SectionName'\]/,/^\[/p' $mainVerFile | sed -e '/^\[/d' | sed -e '/^$/d');
-    #echo "$sectionContent"; exit 1;
+    ## 1. Get section content (text between '[' and next '[')
+    local sectionContent="[$section";
+    # echo "$sectionContent"; exit 1;
     local filePlatform=$(getValueFromINI "$sectionContent" "platform");
     #echo $filePlatform; exit 1;
-    if [ ! -z $filePlatform ]; then
-      for i in "${updPlatforms[@]}"; do
-        if [ "$i" == "$filePlatform" ]; then
-          ## $filePlatform founded in $updPlatforms
-          ## Second important field - is 'type='
-          local fileType=$(getValueFromINI "$sectionContent" "type");
-          #echo "$fileType"; exit 1;
-          if [ ! -z $fileType ]; then 
-            for j in "${updTypes[@]}"; do
-              if [ "$j" == "$fileType" ]; then
-                ## $fileType founded in $updTypes
-                ## And 3rd fields - 'level=' or 'language='
-                local fileLevel=$(getValueFromINI "$sectionContent" "level");
-                ## Whis is flag-var
-                local writeSection=false;
-                ## Check update file level
-                if [ ! -z $fileLevel ]; then
-                  for k in "${updLevels[@]}"; do
-                    if [ "$k" == "$fileLevel" ]; then
-                      ## NOD32 **Base** Update File <is here>
-                      writeSection=true;
-                      break;
-                    fi;
-                  done;
-                fi;
-                ## Check component language
-                local fileLanguage=$(getValueFromINI "$sectionContent" "language");
-                if [ ! -z $fileLanguage ]; then
-                  for k in "${updLanguages[@]}"; do
-                    if [ "$k" == "$fileLanguage" ]; then
-                      ## NOD32 **Component** Update File <is here>
-                      writeSection=true;
-                      break;
-                    fi;
-                  done;
-                fi;
-                ## Write active section to new update.ver file
-                if [ "$writeSection" = true ]; then
-                  #echo "$sectionContent"; echo;
-                  ## get 'file=THIS_IS_OUR_VALUE'
-                  local fileNamePath=$(getValueFromINI "$sectionContent" "file");
-                  if [ ! -z "$fileNamePath" ]; then
-                    ## If path contains '://'
-                    if [[ $fileNamePath == *\:\/\/* ]]; then
-                      ## IF path is FULL
-                      ## (ex.: http://nod32mirror.com/nod_upd/em002_32_l0.nup)
-                      ## Save value 'as is' - with full path
-                      filesArray+=($fileNamePath);
-                    else
-                      if [[ $fileNamePath == \/* ]]; then
-                        ## IF path with some 'parent directory' (is slash in path)
-                        ## (ex.: /nod_upd/em002_32_l0.nup)
-                        ## Write at begin server name
-                        ## Anyone know how faster trin string to parts?!
-                        local protocol=$(echo $WORKURL | awk -F/ '{print $1}');
-                        local host=$(echo $WORKURL | awk -F/ '{print $3}');
-                        filesArray+=($protocol'//'$host''$fileNamePath);
-                      else
-                        ## IF filename ONLY
-                        ## (ex.: em002_32_l0.nup)
-                        ## Write at begin full WORKURL (passed in $sourceUrl)
-                        filesArray+=($sourceUrl''$fileNamePath);
-                      fi;
-                    fi;
-                    ## Replace fileNamePath
-                    local newFileNamePath='';
-                    if [ "$createLinksOnly" = true ]; then
-                      ## get full path to file (pushed in $filesArray)
-                      if [ "$isOfficialUpdate" = true ]; then
-                        ## If is official update - add user:pass to url string
-                        ##   (ex.: http://someurl.com/path/file.nup -> 
-                        ##   -> http://user:pass@someurl.com/path/file.nup)
-                        local inputUrl=${filesArray[@]:(-1)};
-                        ## Anyone know how faster trin string to parts?!
-                        local protocol=$(echo $inputUrl | awk -F/ '{print $1}');
-                        local host=$(echo $inputUrl | awk -F/ '{print $3}');
-                        local mirrorHttpAuth='';
-                        if [ ! -z $USERNAME''$PASSWD ]; then
-                          mirrorHttpAuth=$USERNAME':'$PASSWD'@';
-                        fi;
-                        newFileNamePath=$protocol'//'$mirrorHttpAuth''$host''$fileNamePath;
-                      else
-                        ## Else - return full url (ex.: http://someurl.com/path/file.nup)
-                        newFileNamePath=${filesArray[@]:(-1)};
-                      fi;
-                    else
-                      justFileName=${fileNamePath##*/};
-                      newFileNamePath=$justFileName;
-                    fi;
-                  fi;
-                  ## Echo (test) last (recently added) download task
-                  #echo ${filesArray[${#filesArray[@]}-1]};
-                  #echo $newFileNamePath;
-                  ## Mare replace 'file=...' in section
-                  sectionContent=$(echo "${sectionContent/$fileNamePath/$newFileNamePath}");
-                  echo "["$SectionName"]" >> $newVerFile;
-                  echo -e "$sectionContent\n" >> $newVerFile;
-                fi;
-                break;
+    if [ ! -z $filePlatform ] && [[ "`echo ${updPlatforms[@]}`" == *$filePlatform* ]]; then
+      ## $filePlatform founded in $updPlatforms
+      ## Second important field - is 'type='
+      local fileType=$(getValueFromINI "$sectionContent" "type");
+      #echo "$fileType"; exit 1;
+      if [ ! -z $fileType ] && [[ `echo ${updTypes[@]}` == *$fileType* ]]; then
+        ## $fileType founded in $updTypes
+        ## And 3rd fields - 'level=' or 'language='
+
+        ## Whis is flag-var
+        local writeSection=false;
+
+        ## Check update file level
+        local fileLevel=$(getValueFromINI "$sectionContent" "level");
+        ## NOD32 **Base** Update File <is here>
+        [ ! -z $fileLevel ] && [[ "`echo ${updLevels[@]}`" == *$fileLevel* ]] && writeSection=true;
+
+        ## Check component language
+        local fileLanguage=$(getValueFromINI "$sectionContent" "language");
+        ## NOD32 **Component** Update File <is here>
+        [ ! -z $fileLanguage ] && [[ "`echo ${updLanguages[@]}`" == *$fileLanguage* ]] && writeSection=true;
+
+        ## Write active section to new update.ver file
+        if [ "$writeSection" = true ]; then
+          #echo "$sectionContent"; echo;
+          ## get 'file=THIS_IS_OUR_VALUE'
+          local fileNamePath=$(getValueFromINI "$sectionContent" "file");
+          if [ ! -z "$fileNamePath" ]; then
+            ## If path contains '://'
+            if [[ $fileNamePath == *\:\/\/* ]]; then
+              ## IF path is FULL
+              ## (ex.: http://nod32mirror.com/nod_upd/em002_32_l0.nup)
+              ## Save value 'as is' - with full path
+              filesArray+=($fileNamePath);
+            else
+              if [[ $fileNamePath == \/* ]]; then
+                ## IF path with some 'parent directory' (is slash in path)
+                ## (ex.: /nod_upd/em002_32_l0.nup)
+                ## Write at begin server name
+                ## Anyone know how faster trin string to parts?!
+                local protocol=$(echo $WORKURL | awk -F/ '{print $1}');
+                local host=$(echo $WORKURL | awk -F/ '{print $3}');
+                filesArray+=($protocol'//'$host''$fileNamePath);
+              else
+                ## IF filename ONLY
+                ## (ex.: em002_32_l0.nup)
+                ## Write at begin full WORKURL (passed in $sourceUrl)
+                filesArray+=($sourceUrl''$fileNamePath);
               fi;
-            done;
+            fi;
+            ## Replace fileNamePath
+            local newFileNamePath='';
+            if [ "$createLinksOnly" = true ]; then
+              ## get full path to file (pushed in $filesArray)
+              if [ "$isOfficialUpdate" = true ]; then
+                ## If is official update - add user:pass to url string
+                ##   (ex.: http://someurl.com/path/file.nup ->
+                ##   -> http://user:pass@someurl.com/path/file.nup)
+                local inputUrl=${filesArray[@]:(-1)};
+                ## Anyone know how faster trin string to parts?!
+                local protocol=$(echo $inputUrl | awk -F/ '{print $1}');
+                local host=$(echo $inputUrl | awk -F/ '{print $3}');
+                local mirrorHttpAuth='';
+                if [ ! -z $USERNAME''$PASSWD ]; then
+                  mirrorHttpAuth=$USERNAME':'$PASSWD'@';
+                fi;
+                newFileNamePath=$protocol'//'$mirrorHttpAuth''$host''$fileNamePath;
+              else
+                ## Else - return full url (ex.: http://someurl.com/path/file.nup)
+                newFileNamePath=${filesArray[@]:(-1)};
+              fi;
+            else
+              justFileName=${fileNamePath##*/};
+              newFileNamePath=$justFileName;
+            fi;
           fi;
-          break;
+          ## Echo (test) last (recently added) download task
+          #echo ${filesArray[${#filesArray[@]}-1]};
+          #echo $newFileNamePath;
+          ## Mare replace 'file=...' in section
+          sectionContent=$(echo "${sectionContent/$fileNamePath/$newFileNamePath}");
+          logmessage -t "$sectionContent" >> $newVerFile;
         fi;
-      done;
+      fi;
     fi;
-    #echo "$sectionContent"; echo;
     if [ "$writeSection" = true ]; then
       logmessage -nt '.';
     else
       logmessage -nt "${cGray}.${cNone}";
     fi;
   done; logmessage -t " $msgOk";
+  IFS=$OLD_IFS;
 
-
-  if [ "$createLinksOnly" = true ] ; then
+  if [ "$createLinksOnly" = true ]; then
     logmessage "'createLinksOnly' is 'true', download files is ${cYel}skipped${cNone}"
   else
     local dlNum=0;
@@ -568,9 +537,9 @@ function makeMirror() {
 ## Create (update) main mirror
 if [[ "$nomain" == 'true' ]]; then
   logmessage "Do not create main mirror";
-	writeLog "Do not create main mirror";
+  writeLog "Do not create main mirror";
 else
-	makeMirror $WORKURL $pathToSaveBase;
+  makeMirror $WORKURL $pathToSaveBase;
 fi;
 
 ## Create (update) (if available) subdirs with updates
