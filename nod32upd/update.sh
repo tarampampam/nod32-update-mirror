@@ -35,15 +35,26 @@ WORKURL=''; USERNAME=''; PASSWD='';
 logmessage() {
   ## $1 = (not required) '-n' flag for echo output
   ## $2 = message to output
-
-  flag=''; outtext='';
-  if [ "$1" == "-n" ]; then
-    flag="-n "; outtext=$2;
-  else
-    outtext=$1;
-  fi;
-
-  echo -e $flag[$(date +%H:%M:%S)] "$outtext";
+	[[ "$quiet" == true ]] && return 1;
+	local mytime=[$(date +%H:%M:%S)];
+	local flag='-e';
+	local outtext='';
+	if [[ "$1" == '-'* ]]; then 
+      outtext=$2;
+	  [[ "$1" == *t* ]] && mytime='';
+	  [[ "$1" == *n* ]] && flag='-e -n';
+      #local i;
+      #for ((i=0; $i<${#1}; i=$(($i+1)))); do
+      #  local char=${1:$i:1};
+      #  case $char in
+      #    t) mytime='';;
+      #    n) flag=$flag''$char;;
+      #  esac;	
+      #done;
+	else 
+	  outtext=$1;
+	fi;
+  echo $flag $mytime "$outtext";
 }
 
 ## Write log file (if filename setted)
@@ -67,10 +78,10 @@ checkAvailability() {
   headers=$(curl -A "$USERAGENT" --user $USERNAME:$PASSWD -Is $URL'update.ver');
   if [ "$(echo \"$headers\" | head -n 1 | cut -d' ' -f 2)" == '200' ]
   then
-    echo -e $flag "${cGreen}Available${cNone}";
+    logmessage -t $flag "${cGreen}Available${cNone}";
     return 0;
   else
-    echo -e $flag "${cRed}Failed${cNone}";
+    logmessage -t $flag "${cRed}Failed${cNone}";
     return 1;
   fi;
 }
@@ -127,24 +138,24 @@ downloadFile() {
 
   ## ..if we found string 'not retrieving' - download skipped..
   if [[ $wgetResult == *not\ retrieving* ]]; then
-    echo -e $flag "${cYel}Skipped${cNone}";
+    logmessage -t $flag "${cYel}Skipped${cNone}";
     return 1;
   fi;
 
   ## ..also - if we found 'saved' string - download was executed..
   if [[ $wgetResult == *saved* ]]; then
-    echo -e $flag "${cGreen}Complete${cNone}";
+    logmessage -t $flag "${cGreen}Complete${cNone}";
     return 1;
   fi;
 
   ## ..or resource not found
   if [[ $wgetResult == *ERROR\ \4\0\4* ]]; then
-    echo -e $flag "${cRed}Not found${cNone}";
+    logmessage -t $flag "${cRed}Not found${cNone}";
     return 1;
   fi;
 
   ## if no one substring founded - maybe error?
-  echo -e $flag "${cRed}Error =(${cNone}\nWget debug info: \
+  logmessage -t $flag "${cRed}Error =(${cNone}\nWget debug info: \
     \n\n${cYel}$wgetResult${cNone}\n\n";
   return 0;
 }
@@ -163,7 +174,7 @@ createDir() {
   if [ ! -d $dirPath ]; then
     logmessage -n "Create $dirPath.. "; mkdir -p $dirPath >/dev/null 2>&1;
     if [ -d "$dirPath" ]; then
-      echo -e $msgOk; else echo -e $msgErr;
+      logmessage -t $msgOk; else logmessage -t $msgErr;
     fi;
   fi;
 }
@@ -174,7 +185,7 @@ removeDir() {
   if [ -d $dirPath ]; then
     logmessage -n "Remove $dirPath.. "; rm -R -f $dirPath >/dev/null 2>&1;
     if [ ! -d "$dirPath" ]; then
-      echo -e $msgOk; else echo -e $msgErr;
+      logmessage -t $msgOk; else logmessage -t $msgErr;
     fi;
   fi;
 }
@@ -196,13 +207,13 @@ if [ "$1" == "--flush" ]; then
   if [ -d "$pathToTempDir" ]; then
     logmessage -n "Remove $pathToTempDir.. ";
     rm -R -f $pathToTempDir;
-    echo -e $msgOk;
+    logmessage -t $msgOk;
   fi;
 
   if [ "$(ls $pathToSaveBase)" ]; then
     logmessage -n "Remove all files (except .hidden) in $pathToSaveBase.. ";
     rm -R -f $pathToSaveBase*;
-    echo -e $msgOk;
+    logmessage -t $msgOk;
   fi;
   writeLog "Files storage erased";
   exit 0;
@@ -219,6 +230,15 @@ else
   if [ ! -z "$wgetDelay" ] && [ ! -z "$wgetLimitSpeed" ]; then
     echo -e "${cYel}Hint${cNone}: For umlimit download speed & disable delay \
 you can use flag '${cYel}--nolimit${cNone}'";
+fi;
+
+## --quiet
+## quiet mode
+if [ "$1" == "--quiet" ]; then
+  quiet=true;
+else
+  echo -e "${cYel}Hint${cNone}: For quiet mode \
+you can use flag '${cYel}--quiet${cNone}'";
   fi;
 fi;
 ## Prepare ####################################################################
@@ -235,12 +255,12 @@ if [ "$getFreeKey" = true ] && [ -f "$pathToGetFreeKey" ]; then
     nodUsername=${nodKey%%:*} nodPassword=${nodKey#*:};
     if [ ! -z $nodUsername ] && [ ! -z $nodPassword ]; then
       updServer0=('http://update.eset.com/eset_upd/' $nodUsername $nodPassword);
-      echo -e "$msgOk ($nodUsername:$nodPassword)";
+      logmessage -t "$msgOk ($nodUsername:$nodPassword)";
     else
-      echo -e $msgErr;
+      logmessage -t $msgErr;
     fi;
   else
-    echo -e $msgErr;
+    logmessage -t $msgErr;
   fi;
 fi;
 
@@ -330,11 +350,11 @@ function makeMirror() {
       ## Make unpack (without 'cd' not working O_o)
       cd $pathToTempDir; unrar x -y -inul 'update.rar' $pathToTempDir;
       if [ -f $pathToTempDir'update.ver' ]; then
-        echo -e $msgOk;
+        logmessage -t $msgOk;
         isOfficialUpdate=true;
         rm -f 'update.rar';
       else
-        echo -e "${cRed}Error while unpacking update.ver file, exit${cNone}";
+        logmessage -t "${cRed}Error while unpacking update.ver file, exit${cNone}";
         writeLog "Unpacking .ver file error (operation failed)";
         exit 1;
       fi;
@@ -483,11 +503,11 @@ function makeMirror() {
     fi;
     #echo "$sectionContent"; echo;
     if [ "$writeSection" = true ]; then
-      echo -n '.';
+      logmessage -nt '.';
     else
-      echo -ne "${cGray}.${cNone}";
+      logmessage -nt "${cGray}.${cNone}";
     fi;
-  done; echo -e " $msgOk";
+  done; logmessage -t " $msgOk";
 
 
   if [ "$createLinksOnly" = true ] ; then
@@ -534,7 +554,7 @@ if [ "$createTimestampFile" = true ]; then
   timestampFile=$pathToSaveBase'lastevent.txt';
   echo $(date "+%Y-%m-%d %H:%M:%S") > $timestampFile;
   if [ -f "$timestampFile" ]; then
-    echo -e $msgOk; else echo -e $msgErr;
+    logmessage -t $msgOk; else logmessage -t $msgErr;
   fi;
 fi;
 
@@ -544,7 +564,7 @@ if [ "$createRobotsFile" = true ]; then
     logmessage -n "Create 'robots.txt'.. ";
     echo -e "User-agent: *\r\nDisallow: /\r\n" > $robotsTxtFile;
     if [ -f "$robotsTxtFile" ]; then
-      echo -e $msgOk; else echo -e $msgErr;
+      logmessage -t $msgOk; else logmessage -t $msgErr;
     fi;
   fi;
 fi;
