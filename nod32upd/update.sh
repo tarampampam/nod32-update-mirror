@@ -374,6 +374,8 @@ function makeMirror() {
   local filesArray=();
   local isOfficialUpdate=false;
 
+  function downloadSource() { 
+  local sourceUrl=$1;
   ## Download source 'update.ver' file
   logmessage -n "Downloading $sourceUrl""update.ver.. ";
   downloadFile $sourceUrl'update.ver' $pathToTempDir;
@@ -412,7 +414,21 @@ function makeMirror() {
       fi;
     fi;
   fi;
-
+  }
+	
+  downloadSource $sourceUrl;
+	
+  # found random url from update.ver
+  local URLs=`cat $mainVerFile | grep 'Other=' | sed 's/,/\n/g; s/200@//g; s/Other=//;s/ //g'`;
+  local count=`echo "$URLs" | wc -l`;
+  local num=0;
+  while [[ "$num" == 0 ]]; do num=$(($RANDOM*$count/32768)); done;
+  local sourceUrl2=`echo "$URLs" | sed -n "${num}p"`;
+  
+  logmessage "Random change sourceUrl $sourceUrl -> $sourceUrl2";
+  writeLog  "Random change sourceUrl $sourceUrl -> $sourceUrl2"
+  downloadSource $sourceUrl2;
+	
   #cat $mainVerFile;
   ## Use function from read_ini.sh
   logmessage -n "Parsing & writing new update.ver file ${cGray}(gray dots = skipped sections)${cNone} "
