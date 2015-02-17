@@ -198,9 +198,10 @@ echo " | \| |___  __| |__ /_  ) |  \/  (_)_ _ _ _ ___ _ _";
 echo " | .' / _ \/ _' ||_ \/ /  | |\/| | | '_| '_/ _ \ '_|";
 echo " |_|\_\___/\__,_|___/___| |_|  |_|_|_| |_| \___/_|  //j.mp/GitNod32Mirror";
 echo "";
-echo -e " ${cYel}Hint${cNone}: For quiet mode \
-you can use flag '${cYel}--quiet ${cNone}'or '${cYel}-q${cNone}',\n\
-       for more options use '${cYel}--help ${cNone}'or '${cYel}-h${cNone}'";
+echo -e " ${cYel}Hint${cNone}: If you want ${cYel}quit${cNone} \
+from 'parsing & writing new update.ver file' or
+       ${cYel}quit${cNone} from 'Download files' - press 'q'; \
+${cGray}for more options use '${cYel}--help ${cGray}'or '${cYel}-h${cGray}'${cNone}";
 
 ## Run script with params #####################################################
 
@@ -276,6 +277,18 @@ helpPrint(){
                  that may be you don need main mirror with v3 updates)";
   echo "-h, --help     - this help"
   exit 1;
+}
+
+quit() {
+  read -s -t 0.1 -n 1 INPUT;
+    if [[ "$INPUT" = q ]];then
+      logmessage -t "${cGray}>${cNone}";
+      local version=$(echo "$saveToPath" | sed "s|${pathToSaveBase}||" | sed 's/\///');
+      [ -z "$version" ] && version=v3;
+      logmessage "${cRed}Stop update NOD32 $version${cNone}";
+    return 0;
+  fi;
+  return 1;
 }
 ## Prepare ####################################################################
 
@@ -417,7 +430,8 @@ function makeMirror() {
   OLD_IFS=$IFS; IFS=[
   for section in `cat $mainVerFile | sed '1s/\[//; s/^ *//'`; do
     IFS=$OLD_IFS;
-    #for SectionName in ${verSectionsNamesArray[*]}; do
+    ## for exit from makeMirror, return 1
+    quit && return 1;
     #logmessage $SectionName;
     ## 1. Get section content (text between '[' and next '[')
     local sectionContent="[$section";
@@ -524,6 +538,8 @@ function makeMirror() {
     local dlTotal=${#filesArray[@]};
     ## Download all files from 'filesArray'
     for item in ${filesArray[*]}; do
+      ## for exit from makeMirror, return 1
+      quit && return 1;
       # Inc counter
       dlNum=$((dlNum+1));
       logmessage -n "Download file $item ($dlNum of $dlTotal).. ";
@@ -535,7 +551,7 @@ function makeMirror() {
 }
 
 ## Create (update) main mirror
-if [[ "$nomain" == 'true' ]]; then
+if [[ "$nomain" == true ]]; then
   logmessage "Do not create main mirror";
   writeLog "Do not create main mirror";
 else
@@ -545,6 +561,8 @@ fi;
 ## Create (update) (if available) subdirs with updates
 if [ ! -z "$checkSubdirsList" ]; then
   for item in ${checkSubdirsList[*]}; do
+    ## for exit from makeMirror, return 1
+    quit;
     checkUrl=$WORKURL''$item'/';
 
     logmessage -n "Checking $checkUrl.. ";
