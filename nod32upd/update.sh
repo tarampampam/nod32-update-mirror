@@ -197,12 +197,46 @@ echo " | \| |___  __| |__ /_  ) |  \/  (_)_ _ _ _ ___ _ _";
 echo " | .' / _ \/ _' ||_ \/ /  | |\/| | | '_| '_/ _ \ '_|";
 echo " |_|\_\___/\__,_|___/___| |_|  |_|_|_| |_| \___/_|  //j.mp/GitNod32Mirror";
 echo "";
+echo -e " ${cYel}Hint${cNone}: For quiet mode \
+you can use flag '${cYel}--quiet ${cNone}'or '${cYel}-q${cNone}',\n\
+       for more options use '${cYel}--help ${cNone}'or '${cYel}-h${cNone}'";
 
 ## Run script with params #####################################################
 
+## render all script param with recursion
+handleParam(){
+  ## $* - all incoming params of script
+  for opt in $*; do
+    ## render keys with -- and ''
+    if [ $(echo $opt | grep ^\-\-) ] || [ ! $(echo $opt | grep ^\-) ]; then
+      case $opt in
+        --flush)   flush;;
+        --nolimit) nolimit;;
+        --quiet)   quiet=true;;
+        --help)    helpPrint;;
+        *) echo -n $0; echo -e ": illegal param -- ${cYel}$opt${cNone}";
+           echo -e "For help you can use flag '${cYel}--help ${cNone}'or '${cYel}-h${cNone}'";
+           exit 1;;
+      esac;
+      continue;
+    fi;
+    ## render params with -
+    while getopts "flqh" p; do
+      case $p in
+        f) handleParam --flush;;
+        l) handleParam --nolimit;;
+        q) handleParam --quiet;;
+        h) handleParam --help;;
+        *) echo -e "For help you can use flag '${cYel}--help ${cNone}'or '${cYel}-h${cNone}'";
+           exit 1;;
+      esac;
+    done;
+  done;
+}
+
 ## --flush
 ## Remove all files (temp and base) (except .hidden)
-if [ "$1" == "--flush" ]; then
+flush(){
   ## Remove temp directory
   if [ -d "$pathToTempDir" ]; then
     logmessage -n "Remove $pathToTempDir.. ";
@@ -217,31 +251,31 @@ if [ "$1" == "--flush" ]; then
   fi;
   writeLog "Files storage erased";
   exit 0;
-else
-  echo -e "${cYel}Hint${cNone}: For remove all files (except .hidden) \
-in $pathToSaveBase you can use flag '${cYel}--flush${cNone}'";
-fi;
+}
 
 ## --nolimit
 ## Disable download speed limit and off delay
-if [ "$1" == "--nolimit" ]; then
+nolimit(){
   wgetDelay=''; wgetLimitSpeed='';
-else
-  if [ ! -z "$wgetDelay" ] && [ ! -z "$wgetLimitSpeed" ]; then
-    echo -e "${cYel}Hint${cNone}: For umlimit download speed & disable delay \
-you can use flag '${cYel}--nolimit${cNone}'";
-fi;
+}
 
 ## --quiet
 ## quiet mode
-if [ "$1" == "--quiet" ]; then
-  quiet=true;
-else
-  echo -e "${cYel}Hint${cNone}: For quiet mode \
-you can use flag '${cYel}--quiet${cNone}'";
-  fi;
-fi;
+quiet=false;
+
+#--help
+helpPrint(){
+  echo ;
+  echo "-f, --flush    - remove all files (except .hidden) in $pathToSaveBase";
+  echo "-l, --nolimit  - unlimit download speed & disable delay";
+  echo "-q, --quiet    - quiet mode";
+  echo "-h, --help     - this help"
+  exit 1;
+}
 ## Prepare ####################################################################
+
+## render all script params with recursion
+handleParam $*;
 
 ###############################################################################
 ## If you want get updates from official servers using 'getkey.sh' ############
