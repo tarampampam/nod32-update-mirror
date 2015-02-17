@@ -369,7 +369,7 @@ function makeMirror() {
   ## Path to DOWNLOADED 'update.ver' file
   local mainVerFile=$pathToTempDir'update.ver';
   ## Path to RESULT 'update.ver' file
-  local newVerFile=$saveToPath'update.ver';
+  local newVerFile=$saveToPath'update.ver.new';
   ## Here we will store all parsed filenames from 'update.ver'
   local filesArray=();
   local isOfficialUpdate=false;
@@ -548,6 +548,12 @@ function makeMirror() {
     logmessage "Mirroring \"$sourceUrl\" -> \"$saveToPath\" ${cGreen}complete${cNone}";
     writeLog "Mirroring \"$sourceUrl\" -> \"$saveToPath\" complete";
   fi;
+
+  ## Delete old file, if exists local
+  if [ -f $saveToPath'update.ver' ]; then rm -f $saveToPath'update.ver'; fi;
+  mv $newVerFile $saveToPath'update.ver';
+  logmessage "${cYel}File ${saveToPath}update.ver update${cNone}";
+  writeLog "File ${saveToPath}update.ver update";
 }
 
 ## Create (update) main mirror
