@@ -433,14 +433,7 @@ function makeMirror() {
   ## Use function from read_ini.sh
   logmessage -n "Parsing & writing new update.ver file ${cGray}(gray dots = skipped sections)${cNone} "
 
-  echo -e "[HOSTS]\nOther=200@http://um01.eset.com/eset_upd/v7/, \
-200@http://91.228.166.14/eset_upd/v7/, 200@http://um03.eset.com/eset_upd/v7/, \
-200@http://91.228.166.16/eset_upd/v7/, 200@http://um05.eset.com/eset_upd/v7/, \
-200@http://91.228.167.133/eset_upd/v7/, 200@http://um07.eset.com/eset_upd/v7/, \
-200@http://38.90.226.37/eset_upd/v7/, 200@http://um09.eset.com/eset_upd/v7/, \
-200@http://38.90.226.39/eset_upd/v7/, 200@http://um11.eset.com/eset_upd/v7/, \
-200@http://38.90.226.40/eset_upd/v7/, 200@http://um21.eset.com/eset_upd/v7/, \
-200@http://91.228.167.21/eset_upd/v7/\n\
+  echo -en "[HOSTS]\n$(cat $mainVerFile | grep 'Other')\n\
 ;; This mirror created by <github.com/tarampampam/nod32-update-mirror> ;;\n" > $newVerFile;
 
   OLD_IFS=$IFS; IFS=[
