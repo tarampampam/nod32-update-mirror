@@ -213,6 +213,7 @@ handleParam(){
         --flush)   flush;;
         --nolimit) nolimit;;
         --quiet)   quiet=true;;
+        --nomain)  nomain=true;;
         --help)    helpPrint;;
         *) echo -n $0; echo -e ": illegal param -- ${cYel}$opt${cNone}";
            echo -e "For help you can use flag '${cYel}--help ${cNone}'or '${cYel}-h${cNone}'";
@@ -221,11 +222,12 @@ handleParam(){
       continue;
     fi;
     ## render params with -
-    while getopts "flqh" p; do
+    while getopts "flqmh" p; do
       case $p in
         f) handleParam --flush;;
         l) handleParam --nolimit;;
         q) handleParam --quiet;;
+        m) handleParam --nomain;;
         h) handleParam --help;;
         *) echo -e "For help you can use flag '${cYel}--help ${cNone}'or '${cYel}-h${cNone}'";
            exit 1;;
@@ -269,6 +271,8 @@ helpPrint(){
   echo "-f, --flush    - remove all files (except .hidden) in $pathToSaveBase";
   echo "-l, --nolimit  - unlimit download speed & disable delay";
   echo "-q, --quiet    - quiet mode";
+  echo -e "-m, --nomain   - do not create main mirror (if you need v4 or v8,
+                 that may be you don need main mirror with v3 updates)";
   echo "-h, --help     - this help"
   exit 1;
 }
@@ -562,7 +566,12 @@ function makeMirror() {
 }
 
 ## Create (update) main mirror
-makeMirror $WORKURL $pathToSaveBase;
+if [[ "$nomain" == 'true' ]]; then
+  logmessage "Do not create main mirror";
+	writeLog "Do not create main mirror";
+else
+	makeMirror $WORKURL $pathToSaveBase;
+fi;
 
 ## Create (update) (if available) subdirs with updates
 if [ ! -z "$checkSubdirsList" ]; then
