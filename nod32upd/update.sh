@@ -251,6 +251,7 @@ echo -e " ${cYel}Hint${cNone}: If you want ${cYel}quit${cNone} \
 from 'parsing & writing new update.ver file' or
        ${cYel}quit${cNone} from 'Download files' - press 'q'; \
 ${cGray}for more options use '${cYel}--help ${cGray}'or '${cYel}-h${cGray}'${cNone}";
+echo ;
 
 ## Run script with params #####################################################
 
@@ -267,6 +268,7 @@ handleParam(){
         --quiet)   quiet=true;;
         --nomain)  nomain=true;;
         --random)  random=true;;
+        --check)   checkVerFile=true;;
         --help)    helpPrint;;
         *) echo -n $0; echo -e ": illegal param -- ${cYel}$opt${cNone}";
            echo -e "For help you can use flag '${cYel}--help ${cNone}'or '${cYel}-h${cNone}'";
@@ -285,6 +287,7 @@ handleParam(){
         q) handleParam --quiet;;
         m) handleParam --nomain;;
         r) handleParam --random;;
+        c) handleParam --check;;
         h) handleParam --help;;
         *) echo -n $0; echo -e ": illegal param -- ${cYel}$char${cNone}";
            echo -e "For help you can use flag '${cYel}--help ${cNone}'or '${cYel}-h${cNone}'";
@@ -327,16 +330,19 @@ quiet=false;
 ## random WORKURL from update.ver [HOSTS] for $getFreeKey" = true
 random=false;
 
+## --check
+## check if need update mirror for actual
+checkVerFile=false;
 #--help
 helpPrint(){
-  echo ;
   echo "-f, --flush    - remove all files (except .hidden) in $pathToSaveBase";
   echo "-l, --nolimit  - unlimit download speed & disable delay";
   echo "-q, --quiet    - quiet mode";
   echo -e "-m, --nomain   - do not create main mirror (if you need v4 or v8,
                  that may be you don need main mirror with v3 updates)";
   echo "-r, --random   - random WORK mirror if getFreeKey=true";
-  echo "-h, --help     - this help"
+  echo "-c, --check    - check if need update mirror for actual";
+	echo "-h, --help     - this help"
   exit 1;
 }
 
@@ -455,9 +461,37 @@ function makeMirror() {
   local filesArray=();
   local isOfficialUpdate=false;
 
-  # download update.ver zip from $WORKURL to $pathToTempDir and unzip
+  ## download update.ver zip from $WORKURL to $pathToTempDir and unzip
   downloadSource $sourceUrl $saveToPath;
 	
+  ## find version update
+  local diffVerFile=$saveToPath'diff.ver';
+	local diffVerFileNew=$saveToPath'diff.ver.new';
+  if [[ "$checkVerFile" == true ]]; then
+    [ -f $diffVerFileNew ] && rm -f $diffVerFileNew;
+    sed \
+    -e '/HOST/d' \
+    -e '/\[.*/b' \
+    -e '/date=/b' \
+    -e '/file=/b' \
+    -e '/version=/b' \
+    -e d $mainVerFile |\
+    tr '\n' ' ' |\
+    sed 's/\[/\n\[/g' |\
+    grep `date +%d.%m.%Y -u` \
+    > $diffVerFileNew;
+
+    if [ -f $diffVerFile ]; then
+      if [ ! "`diff -E -b -B -w $diffVerFileNew $diffVerFile`" ]; then
+        ## actual version files
+        rm -f $diffVerFileNew;
+        #mv $diffVerFileNew $diffVerFile;
+        logmessage "${cGreen}Base actual${cNone}"; return 1;
+      fi;
+    fi;
+  fi;
+    rm -f $diffVerFile;
+
   #cat $mainVerFile;
   ## Use function from read_ini.sh
   logmessage -n "Parsing & writing new update.ver file ${cGray}(gray dots = skipped sections)${cNone} "
@@ -591,7 +625,10 @@ function makeMirror() {
   if [ -f $saveToPath'update.ver' ]; then rm -f $saveToPath'update.ver'; fi;
   mv $newVerFile $saveToPath'update.ver';
   logmessage "File ${saveToPath}update.ver ${cYel}update${cNone}";
-  #writeLog "File ${saveToPath}update.ver update";
+  writeLog "File ${saveToPath}update.ver update";
+  ## for diff.ver
+  mv $diffVerFileNew $diffVerFile;
+	logmessage "File $diffVerFile ${cYel}update${cNone}";
 }
 
 ## Create (update) main mirror
