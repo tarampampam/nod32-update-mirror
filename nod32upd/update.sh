@@ -269,6 +269,7 @@ handleParam(){
         --nomain)  nomain=true;;
         --random)  random=true;;
         --check)   checkVerFile=true;;
+        --checksubdir=*|--s=*) checkSubdir $opt;;
         --help)    helpPrint;;
         *) echo -n $0; echo -e ": illegal param -- ${cYel}$opt${cNone}";
            echo -e "For help you can use flag '${cYel}--help ${cNone}'or '${cYel}-h${cNone}'";
@@ -288,6 +289,7 @@ handleParam(){
         m) handleParam --nomain;;
         r) handleParam --random;;
         c) handleParam --check;;
+        s) handleParam "-$opt"; break;;
         h) handleParam --help;;
         *) echo -n $0; echo -e ": illegal param -- ${cYel}$char${cNone}";
            echo -e "For help you can use flag '${cYel}--help ${cNone}'or '${cYel}-h${cNone}'";
@@ -333,16 +335,38 @@ random=false;
 ## --check
 ## check if need update mirror for actual
 checkVerFile=false;
+
+## --check
+## Check only included sub-dirs
+checkSubdir() {
+  local ver=$(echo $1 | sed 's/^.*=//');
+  local check;
+	handleParam --nomain;
+  checkSubdirsList=();
+  logmessage -n "You check update..";
+  [[ all == "$ver" ]] && ver=345678;
+  [[ "$ver" == *3* ]] && check=true && logmessage -nt " v3" && nomain=false;
+  [[ "$ver" == *4* ]] && check=true && logmessage -nt " v4" && checkSubdirsList+=('v4');
+  [[ "$ver" == *5* ]] && check=true && logmessage -nt " v5" && checkSubdirsList+=('v5');
+  [[ "$ver" == *6* ]] && check=true && logmessage -nt " v6" && checkSubdirsList+=('v6');
+  [[ "$ver" == *7* ]] && check=true && logmessage -nt " v7" && checkSubdirsList+=('v7');
+  [[ "$ver" == *8* ]] && check=true && logmessage -nt " v8" && checkSubdirsList+=('v8');
+  [[ ! "$check" ]] && echo -e " ${cRed}Error${cNone}
+Illigal param -- $1;  use - all, 3, 4, 5, 6, 7, 8" && exit 1;
+  echo ;
+}
+
 #--help
 helpPrint(){
-  echo "-f, --flush    - remove all files (except .hidden) in $pathToSaveBase";
-  echo "-l, --nolimit  - unlimit download speed & disable delay";
-  echo "-q, --quiet    - quiet mode";
-  echo -e "-m, --nomain   - do not create main mirror (if you need v4 or v8,
-                 that may be you don need main mirror with v3 updates)";
-  echo "-r, --random   - random WORK mirror if getFreeKey=true";
-  echo "-c, --check    - check if need update mirror for actual";
-	echo "-h, --help     - this help"
+  echo "-f, --flush         - remove all files (except .hidden) in $pathToSaveBase";
+  echo "-l, --nolimit       - unlimit download speed & disable delay";
+  echo "-q, --quiet         - quiet mode";
+  echo -e "-m, --nomain        - do not create main mirror (if you need v4 or v8,
+                      that may be you don need main mirror with v3 updates)";
+  echo "-r, --random        - random WORK mirror if getFreeKey=true";
+  echo "-c, --check         - check if need update mirror for actual";
+
+  echo "-h, --help          - this help"
   exit 1;
 }
 
