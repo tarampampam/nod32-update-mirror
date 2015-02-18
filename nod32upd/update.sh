@@ -40,7 +40,7 @@ logmessage() {
 	local flag='-e';
 	local outtext='';
 	if [[ "$1" == '-'* ]]; then 
-      outtext=$2;
+    outtext=$2;
 	  [[ "$1" == *t* ]] && mytime='';
 	  [[ "$1" == *n* ]] && flag='-e -n';
       #local i;
@@ -260,11 +260,13 @@ handleParam(){
   for opt in $*; do
     ## render keys with -- and ''
     if [ $(echo $opt | grep ^\-\-) ] || [ ! $(echo $opt | grep ^\-) ]; then
+      #echo opt=\'$opt\';
       case $opt in
         --flush)   flush;;
         --nolimit) nolimit;;
         --quiet)   quiet=true;;
         --nomain)  nomain=true;;
+        --random)  random=true;;
         --help)    helpPrint;;
         *) echo -n $0; echo -e ": illegal param -- ${cYel}$opt${cNone}";
            echo -e "For help you can use flag '${cYel}--help ${cNone}'or '${cYel}-h${cNone}'";
@@ -273,14 +275,19 @@ handleParam(){
       continue;
     fi;
     ## render params with -
-    while getopts "flqmh" p; do
-      case $p in
+    local i;
+    for ((i=1; $i<${#1}; i=$(($i+1)))); do
+      local char=${1:$i:1};
+      #echo char=\'$char\';
+      case "$char" in
         f) handleParam --flush;;
         l) handleParam --nolimit;;
         q) handleParam --quiet;;
         m) handleParam --nomain;;
+        r) handleParam --random;;
         h) handleParam --help;;
-        *) echo -e "For help you can use flag '${cYel}--help ${cNone}'or '${cYel}-h${cNone}'";
+        *) echo -n $0; echo -e ": illegal param -- ${cYel}$char${cNone}";
+           echo -e "For help you can use flag '${cYel}--help ${cNone}'or '${cYel}-h${cNone}'";
            exit 1;;
       esac;
     done;
@@ -316,6 +323,10 @@ nolimit(){
 ## quiet mode
 quiet=false;
 
+## --random WORKURL
+## random WORKURL from update.ver [HOSTS] for $getFreeKey" = true
+random=false;
+
 #--help
 helpPrint(){
   echo ;
@@ -324,6 +335,7 @@ helpPrint(){
   echo "-q, --quiet    - quiet mode";
   echo -e "-m, --nomain   - do not create main mirror (if you need v4 or v8,
                  that may be you don need main mirror with v3 updates)";
+  echo "-r, --random   - random WORK mirror if getFreeKey=true";
   echo "-h, --help     - this help"
   exit 1;
 }
@@ -357,22 +369,24 @@ if [ "$getFreeKey" = true ] && [ -f "$pathToGetFreeKey" ]; then
     if [ ! -z $nodUsername ] && [ ! -z $nodPassword ]; then
       logmessage -t "$msgOk ($nodUsername:$nodPassword)";
       WORKURL='http://update.eset.com/eset_upd/';
-      # download update.ver zip from $WORKURL to $pathToTempDir and unzip
-      downloadSource $WORKURL $pathToTempDir;
-      logmessage -n "Random change sourceUrl $WORKURL ->";
-      # found random url from update.ver
-      URLs=`cat $pathToTempDir'update.ver' | grep 'Other=' | sed 's/,/\n/g; s/200@//g; s/Other=//;s/ //g'`;
-      count=`echo "$URLs" | wc -l`;
-      if [[ "$count" == 0 ]]; then
-        logmessage -t ".. $msgErr";
-        writeLog  "Random change sourceUrl $WORKURL -> $WORKURL2 - ERROR"
-      else
-        num=0;
-        while [[ "$num" == 0 ]]; do num=$(($RANDOM*$count/32768)); done;
-        WORKURL2=`echo "$URLs" | sed -n "${num}p"`;
-        logmessage -t " $WORKURL2.. $msgOk";
-        writeLog  "Random change sourceUrl $WORKURL -> $WORKURL2"
-        WORKURL=$WORKURL2;
+      if [[ "$random" == true ]]; then
+        # download update.ver zip from $WORKURL to $pathToTempDir and unzip
+        downloadSource $WORKURL $pathToTempDir;
+        logmessage -n "Random change sourceUrl $WORKURL ->";
+        # found random url from update.ver
+        URLs=`cat $pathToTempDir'update.ver' | grep 'Other=' | sed 's/,/\n/g; s/200@//g; s/Other=//;s/ //g'`;
+        count=`echo "$URLs" | wc -l`;
+        if [[ "$count" == 0 ]]; then
+          logmessage -t ".. $msgErr";
+          writeLog  "Random change sourceUrl $WORKURL -> $WORKURL2 - ERROR"
+        else
+          num=0;
+          while [[ "$num" == 0 ]]; do num=$(($RANDOM*$count/32768)); done;
+          WORKURL2=`echo "$URLs" | sed -n "${num}p"`;
+          logmessage -t " $WORKURL2.. $msgOk";
+          writeLog  "Random change sourceUrl $WORKURL -> $WORKURL2"
+          WORKURL=$WORKURL2;
+        fi;
       fi;
       updServer0=($WORKURL $nodUsername $nodPassword);
     else
