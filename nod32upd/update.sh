@@ -486,19 +486,24 @@ function makeMirror() {
         ## actual version files
         rm -f $diffVerFileNew;
         #mv $diffVerFileNew $diffVerFile;
-        logmessage "${cGreen}Base actual${cNone}"; return 1;
+        ## TODO: теперь нужно проверить целостность файлов согласно размерам
+        logmessage "${cGreen}Base actual${cNone}, stop update mirror";
+        return 1;
+      else
+        logmessage "${cYel}Base note actual${cNone}, continue work";
       fi;
     fi;
   fi;
-    rm -f $diffVerFile;
+  rm -f $diffVerFile;
 
-  #cat $mainVerFile;
+	#cat $mainVerFile;
   ## Use function from read_ini.sh
   logmessage -n "Parsing & writing new update.ver file ${cGray}(gray dots = skipped sections)${cNone} "
 
   echo -en "[HOSTS]\n$(cat $mainVerFile | grep 'Other')\n\
 ;; This mirror created by <github.com/tarampampam/nod32-update-mirror> ;;\n" > $newVerFile;
 
+  local sizeArray;
   OLD_IFS=$IFS; IFS=[
   for section in `cat $mainVerFile | sed '1s/\[//; s/^ *//'`; do
     IFS=$OLD_IFS;
@@ -534,7 +539,10 @@ function makeMirror() {
 
         ## Write active section to new update.ver file
         if [ "$writeSection" = true ]; then
-          #echo "$sectionContent"; echo;
+        ## Save file size in array
+        local size=$(getValueFromINI "$sectionContent" "size");
+        sizeArray+=($size);
+        #echo "$sectionContent"; echo;
           ## get 'file=THIS_IS_OUR_VALUE'
           local fileNamePath=$(getValueFromINI "$sectionContent" "file");
           if [ ! -z "$fileNamePath" ]; then
@@ -606,6 +614,10 @@ function makeMirror() {
   if [ "$createLinksOnly" = true ]; then
     logmessage "'createLinksOnly' is 'true', download files is ${cYel}skipped${cNone}"
   else
+    ## delete all symlinks for clear
+    #logmessage "${cYel}Remove all symlinks${cNone} from $saveToPath";
+    #find $saveToPath -type l -delete;
+		
     local dlNum=0;
     local dlTotal=${#filesArray[@]};
     ## Download all files from 'filesArray'
@@ -615,6 +627,31 @@ function makeMirror() {
       # Inc counter
       dlNum=$((dlNum+1));
       logmessage -n "Download file $item ($dlNum of $dlTotal).. ";
+      ## если такой update file есть, то сделаем symlink
+      local itemName=$(echo $item | sed 's/.*\///');
+      local size=${sizeArray[$(($dlNum-1))]};
+      local files=$(find $pathToSaveBase -iname $itemName -type f);
+      ## если файлы с таким именем нашлись, то может не придется их качать
+      if [ "$files" ]; then
+        ## проверяем на наличие линка если не существует и размер подходящий, то сделаем его
+        for i in $files; do
+          local sizeI=$(du -b $i | awk '{print $1}');
+          if [ "$size" = "$sizeI" ]; then
+            ## если размер файла не изменился или он уже существует, то skip
+            if [ "$saveToPath$itemName" = "$i" ]; then # && [ -f "$i" ]; then
+              logmessage -t "${cYel}Skipped ${cGray}[${size}B]${cNone}";
+              break;
+            fi;
+            ## Create symlink
+            #logmessage -t "${cYel}Create symlink${cNone}";
+            #writeLog "$item - create symlink to $i";
+						#ln -s "$i" "$saveToPath$itemName";
+            #break;
+          fi;
+        done;
+        ## если симлинк или файл есть и мы его обработали, то переходим к следующему файлу
+        [ "$(find $saveToPath -iname $itemName)" ] && [ "$size" = "$sizeI" ] && continue;
+      fi;
       downloadFile $item $saveToPath;
     done;
     logmessage "Mirroring \"$sourceUrl\" -> \"$saveToPath\" ${cGreen}complete${cNone}";
