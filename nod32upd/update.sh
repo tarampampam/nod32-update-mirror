@@ -590,8 +590,8 @@ function makeMirror() {
   ## Delete old file, if exists local
   if [ -f $saveToPath'update.ver' ]; then rm -f $saveToPath'update.ver'; fi;
   mv $newVerFile $saveToPath'update.ver';
-  logmessage "${cYel}File ${saveToPath}update.ver update${cNone}";
-  writeLog "File ${saveToPath}update.ver update";
+  logmessage "File ${saveToPath}update.ver ${cYel}update${cNone}";
+  #writeLog "File ${saveToPath}update.ver update";
 }
 
 ## Create (update) main mirror
