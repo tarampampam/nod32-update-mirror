@@ -191,6 +191,55 @@ removeDir() {
   fi;
 }
 
+## Download update.ver from $1 and unzip to $2
+function downloadSource() { 
+  local sourceUrl=$1;
+	local saveToPath=$2;
+	
+	## Path to DOWNLOADED 'update.ver' file
+  local mainVerFile=$pathToTempDir'update.ver';
+  ## Path to RESULT 'update.ver' file
+  local newVerFile=$saveToPath'update.ver.new';
+	
+  ## Download source 'update.ver' file
+  logmessage -n "Downloading $sourceUrl""update.ver.. ";
+  downloadFile $sourceUrl'update.ver' $pathToTempDir;
+  if [ ! -f $mainVerFile ]; then
+    logmessage "${cRed}$mainVerFile after download not exists, stopping${cNone}";
+    writeLog "Download \"$sourceUrl""update.ver\" failed";
+    return 1;
+  fi;
+
+  ## Delete old file, if exists
+  if [ -f $newVerFile ]; then rm -f $newVerFile; fi;
+
+  ## Check - 'update.ver' packed with RAR or not?
+  ## Get first 3 chars if file..
+  fileHeader=$(head -c 3 $mainVerFile);
+  ## ..and compare with template
+  if [ "$fileHeader" == "Rar" ]; then
+    ## Check - installed 'unrar' or not
+    if [[ ! -n $(type -P unrar) ]]; then
+      logmessage "${cRed}$mainVerFile packed by RAR, but i cannot find 'unrar' in your system :(, exit${cNone}"
+      writeLog "Unpacking .ver file error (unrar not exists)";
+      exit 1;
+    else
+      mv $pathToTempDir'update.ver' $pathToTempDir'update.rar';
+      logmessage -n "Unpacking update.ver.. ";
+      ## Make unpack (without 'cd' not working O_o)
+      cd $pathToTempDir; unrar x -y -inul 'update.rar' $pathToTempDir;
+      if [ -f $pathToTempDir'update.ver' ]; then
+        logmessage -t $msgOk;
+        isOfficialUpdate=true;
+        rm -f 'update.rar';
+      else
+        logmessage -t "${cRed}Error while unpacking update.ver file, exit${cNone}";
+        writeLog "Unpacking .ver file error (operation failed)";
+        exit 1;
+      fi;
+    fi;
+  fi;
+}
 ## Here we go! ################################################################
 
 echo "  _  _         _ _______   __  __ _";
@@ -306,8 +355,26 @@ if [ "$getFreeKey" = true ] && [ -f "$pathToGetFreeKey" ]; then
   if [ ! "$nodKey" == "error" ]; then
     nodUsername=${nodKey%%:*} nodPassword=${nodKey#*:};
     if [ ! -z $nodUsername ] && [ ! -z $nodPassword ]; then
-      updServer0=('http://update.eset.com/eset_upd/' $nodUsername $nodPassword);
       logmessage -t "$msgOk ($nodUsername:$nodPassword)";
+      WORKURL='http://update.eset.com/eset_upd/';
+      # download update.ver zip from $WORKURL to $pathToTempDir and unzip
+      downloadSource $WORKURL $pathToTempDir;
+      logmessage -n "Random change sourceUrl $WORKURL ->";
+      # found random url from update.ver
+      URLs=`cat $pathToTempDir'update.ver' | grep 'Other=' | sed 's/,/\n/g; s/200@//g; s/Other=//;s/ //g'`;
+      count=`echo "$URLs" | wc -l`;
+      if [[ "$count" == 0 ]]; then
+        logmessage -t ".. $msgErr";
+        writeLog  "Random change sourceUrl $WORKURL -> $WORKURL2 - ERROR"
+      else
+        num=0;
+        while [[ "$num" == 0 ]]; do num=$(($RANDOM*$count/32768)); done;
+        WORKURL2=`echo "$URLs" | sed -n "${num}p"`;
+        logmessage -t " $WORKURL2.. $msgOk";
+        writeLog  "Random change sourceUrl $WORKURL -> $WORKURL2"
+        WORKURL=$WORKURL2;
+      fi;
+      updServer0=($WORKURL $nodUsername $nodPassword);
     else
       logmessage -t $msgErr;
     fi;
@@ -374,60 +441,8 @@ function makeMirror() {
   local filesArray=();
   local isOfficialUpdate=false;
 
-  function downloadSource() { 
-  local sourceUrl=$1;
-  ## Download source 'update.ver' file
-  logmessage -n "Downloading $sourceUrl""update.ver.. ";
-  downloadFile $sourceUrl'update.ver' $pathToTempDir;
-  if [ ! -f $mainVerFile ]; then
-    logmessage "${cRed}$mainVerFile after download not exists, stopping${cNone}";
-    writeLog "Download \"$sourceUrl""update.ver\" failed";
-    return 1;
-  fi;
-
-  ## Delete old file, if exists
-  if [ -f $newVerFile ]; then rm -f $newVerFile; fi;
-
-  ## Check - 'update.ver' packed with RAR or not?
-  ## Get first 3 chars if file..
-  fileHeader=$(head -c 3 $mainVerFile);
-  ## ..and compare with template
-  if [ "$fileHeader" == "Rar" ]; then
-    ## Check - installed 'unrar' or not
-    if [[ ! -n $(type -P unrar) ]]; then
-      logmessage "${cRed}$mainVerFile packed by RAR, but i cannot find 'unrar' in your system :(, exit${cNone}"
-      writeLog "Unpacking .ver file error (unrar not exists)";
-      exit 1;
-    else
-      mv $pathToTempDir'update.ver' $pathToTempDir'update.rar';
-      logmessage -n "Unpacking update.ver.. ";
-      ## Make unpack (without 'cd' not working O_o)
-      cd $pathToTempDir; unrar x -y -inul 'update.rar' $pathToTempDir;
-      if [ -f $pathToTempDir'update.ver' ]; then
-        logmessage -t $msgOk;
-        isOfficialUpdate=true;
-        rm -f 'update.rar';
-      else
-        logmessage -t "${cRed}Error while unpacking update.ver file, exit${cNone}";
-        writeLog "Unpacking .ver file error (operation failed)";
-        exit 1;
-      fi;
-    fi;
-  fi;
-  }
-	
-  downloadSource $sourceUrl;
-	
-  # found random url from update.ver
-  local URLs=`cat $mainVerFile | grep 'Other=' | sed 's/,/\n/g; s/200@//g; s/Other=//;s/ //g'`;
-  local count=`echo "$URLs" | wc -l`;
-  local num=0;
-  while [[ "$num" == 0 ]]; do num=$(($RANDOM*$count/32768)); done;
-  local sourceUrl2=`echo "$URLs" | sed -n "${num}p"`;
-  
-  logmessage "Random change sourceUrl $sourceUrl -> $sourceUrl2";
-  writeLog  "Random change sourceUrl $sourceUrl -> $sourceUrl2"
-  downloadSource $sourceUrl2;
+  # download update.ver zip from $WORKURL to $pathToTempDir and unzip
+  downloadSource $sourceUrl $saveToPath;
 	
   #cat $mainVerFile;
   ## Use function from read_ini.sh
