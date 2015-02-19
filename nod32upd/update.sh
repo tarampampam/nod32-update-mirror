@@ -29,31 +29,34 @@ fi;
 ## Init global variables
 WORKURL=''; USERNAME=''; PASSWD='';
 
+## запомним начало запуска скрипта 
+timeStartUpdate=$(date +%s);
+
 ## Helpers Functions ##########################################################
 
 ## Show log message in console
 logmessage() {
   ## $1 = (not required) '-n' flag for echo output
   ## $2 = message to output
-	[[ "$quiet" == true ]] && return 1;
-	local mytime=[$(date +%H:%M:%S)];
-	local flag='-e';
-	local outtext='';
-	if [[ "$1" == '-'* ]]; then 
+  [[ "$quiet" == true ]] && return 1;
+  local mytime=[$(date +%H:%M:%S)];
+  local flag='-e';
+  local outtext='';
+  if [[ "$1" == '-'* ]]; then 
     outtext=$2;
-	  [[ "$1" == *t* ]] && mytime='';
-	  [[ "$1" == *n* ]] && flag='-e -n';
+    [[ "$1" == *t* ]] && mytime='';
+    [[ "$1" == *n* ]] && flag='-e -n';
       #local i;
       #for ((i=0; $i<${#1}; i=$(($i+1)))); do
       #  local char=${1:$i:1};
       #  case $char in
       #    t) mytime='';;
       #    n) flag=$flag''$char;;
-      #  esac;	
+      #  esac;  
       #done;
-	else 
-	  outtext=$1;
-	fi;
+  else 
+    outtext=$1;
+  fi;
   echo $flag $mytime "$outtext";
 }
 
@@ -145,19 +148,19 @@ downloadFile() {
   ## ..also - if we found 'saved' string - download was executed..
   if [[ $wgetResult == *saved* ]]; then
     logmessage -t $flag "${cGreen}Complete${cNone}";
-    return 1;
+    return 0;
   fi;
 
   ## ..or resource not found
   if [[ $wgetResult == *ERROR\ \4\0\4* ]]; then
     logmessage -t $flag "${cRed}Not found${cNone}";
-    return 1;
+    return 2;
   fi;
 
   ## if no one substring founded - maybe error?
   logmessage -t $flag "${cRed}Error =(${cNone}\nWget debug info: \
     \n\n${cYel}$wgetResult${cNone}\n\n";
-  return 0;
+  return 3;
 }
 
 ## Parse data from passed content of ini section
@@ -194,13 +197,13 @@ removeDir() {
 ## Download update.ver from $1 and unzip to $2
 function downloadSource() { 
   local sourceUrl=$1;
-	local saveToPath=$2;
-	
-	## Path to DOWNLOADED 'update.ver' file
+  local saveToPath=$2;
+  
+  ## Path to DOWNLOADED 'update.ver' file
   local mainVerFile=$pathToTempDir'update.ver';
   ## Path to RESULT 'update.ver' file
   local newVerFile=$saveToPath'update.ver.new';
-	
+
   ## Download source 'update.ver' file
   logmessage -n "Downloading $sourceUrl""update.ver.. ";
   downloadFile $sourceUrl'update.ver' $pathToTempDir;
@@ -247,9 +250,8 @@ echo " | \| |___  __| |__ /_  ) |  \/  (_)_ _ _ _ ___ _ _";
 echo " | .' / _ \/ _' ||_ \/ /  | |\/| | | '_| '_/ _ \ '_|";
 echo " |_|\_\___/\__,_|___/___| |_|  |_|_|_| |_| \___/_|  //j.mp/GitNod32Mirror";
 echo "";
-echo -e " ${cYel}Hint${cNone}: If you want ${cYel}quit${cNone} \
-from 'parsing & writing new update.ver file' or
-       ${cYel}quit${cNone} from 'Download files' - press 'q'; \
+echo -e " ${cYel}Hint${cNone}: If you want quit from \
+'parsing & writing new update.ver file' or \n quit from 'Download files' - press 'q'; \
 ${cGray}for more options use '${cYel}--help ${cGray}'or '${cYel}-h${cGray}'${cNone}";
 echo ;
 
@@ -258,20 +260,22 @@ echo ;
 ## render all script param with recursion
 handleParam(){
   ## $* - all incoming params of script
+  local opt;
   for opt in $*; do
     ## render keys with -- and ''
+    #echo -e "${cYel}[$*]${cNone}\nopt='$opt'";
     if [ $(echo $opt | grep ^\-\-) ] || [ ! $(echo $opt | grep ^\-) ]; then
-      #echo opt=\'$opt\';
+      #echo --opt=\'$opt\';
       case $opt in
-        --flush)   flush;;
-        --nolimit) nolimit;;
-        --quiet)   quiet=true;;
-        --nomain)  nomain=true;;
-        --random)  random=true;;
-        --check)   checkVerFile=true;;
-        --checksubdir=*|--s=*) checkSubdir $opt;;
+        --flush)         flush;;
+        --nolimit)       nolimit;;
+        --quiet)         quiet=true;;
+        --nomain)        nomain=true;;
+        --random)        random true;;
+        --checkver)      checkVerFile=true;;
+        --checksubdir=*) checkSubdir $opt;;
         --help)    helpPrint;;
-        *) echo -n $0; echo -e ": illegal param -- ${cYel}$opt${cNone}";
+        *) echo -n $0; echo -e ": illegal option -- ${cYel}$opt${cNone}";
            echo -e "For help you can use flag '${cYel}--help ${cNone}'or '${cYel}-h${cNone}'";
            exit 1;;
       esac;
@@ -279,18 +283,21 @@ handleParam(){
     fi;
     ## render params with -
     local i;
-    for ((i=1; $i<${#1}; i=$(($i+1)))); do
-      local char=${1:$i:1};
-      #echo char=\'$char\';
+    for ((i=1; $i<${#opt}; i=$(($i+1)))); do
+      local char=${opt:$i:1};
+      #echo -char=\'$char\';
       case "$char" in
-        f) handleParam --flush;;
-        l) handleParam --nolimit;;
-        q) handleParam --quiet;;
-        m) handleParam --nomain;;
-        r) handleParam --random;;
-        c) handleParam --check;;
-        s) handleParam "-$opt"; break;;
-        h) handleParam --help;;
+        -) ;;
+        =) break;;
+        f) $FUNCNAME --flush;;
+        l) $FUNCNAME --nolimit;;
+        q) $FUNCNAME --quiet;;
+        m) $FUNCNAME --nomain;;
+        r) $FUNCNAME --random;;
+        c) $FUNCNAME --checkver;;
+        s) $FUNCNAME --checksubdir=$(echo $opt | sed 's/^.*=//');
+           $FUNCNAME --nomain;;
+        h) $FUNCNAME --help;;
         *) echo -n $0; echo -e ": illegal param -- ${cYel}$char${cNone}";
            echo -e "For help you can use flag '${cYel}--help ${cNone}'or '${cYel}-h${cNone}'";
            exit 1;;
@@ -330,9 +337,13 @@ quiet=false;
 
 ## --random WORKURL
 ## random WORKURL from update.ver [HOSTS] for $getFreeKey" = true
-random=false;
+random(){
+ if [ -n "$*" ]; then randomServer=true; fi;
+ if [ -n "$randomServer" ]; then return 0; fi;
+ return 1;
+}
 
-## --check
+## --checkver
 ## check if need update mirror for actual
 checkVerFile=false;
 
@@ -341,7 +352,6 @@ checkVerFile=false;
 checkSubdir() {
   local ver=$(echo $1 | sed 's/^.*=//');
   local check;
-	handleParam --nomain;
   checkSubdirsList=();
   logmessage -n "You check update..";
   [[ all == "$ver" ]] && ver=345678;
@@ -364,13 +374,13 @@ helpPrint(){
   echo -e "-m, --nomain        - do not create main mirror (if you need v4 or v8,
                       that may be you don need main mirror with v3 updates)";
   echo "-r, --random        - random WORK mirror if getFreeKey=true";
-  echo "-c, --check         - check if need update mirror for actual";
-
+  echo "-c, --checkver      - check if need update mirror for actual";
+  echo "-s=, --checksubdir= - checkSubdir options: 3, 4, 5, 6, 7, 8, all";
   echo "-h, --help          - this help"
   exit 1;
 }
 
-quit() {
+pressKeyBoard() {
   read -s -t 0.1 -n 1 INPUT;
     if [[ "$INPUT" = q ]];then
       logmessage -t "${cGray}>${cNone}";
@@ -399,9 +409,8 @@ if [ "$getFreeKey" = true ] && [ -f "$pathToGetFreeKey" ]; then
     if [ ! -z $nodUsername ] && [ ! -z $nodPassword ]; then
       logmessage -t "$msgOk ($nodUsername:$nodPassword)";
       WORKURL='http://update.eset.com/eset_upd/';
-      if [[ "$random" == true ]]; then
-        # download update.ver zip from $WORKURL to $pathToTempDir and unzip
-        downloadSource $WORKURL $pathToTempDir;
+      USERNAME=$nodUsername; PASSWD=$nodPassword;
+      if random && downloadSource $WORKURL $pathToTempDir; then
         logmessage -n "Random change sourceUrl $WORKURL ->";
         # found random url from update.ver
         URLs=`cat $pathToTempDir'update.ver' | grep 'Other=' | sed 's/,/\n/g; s/200@//g; s/Other=//;s/ //g'`;
@@ -418,7 +427,7 @@ if [ "$getFreeKey" = true ] && [ -f "$pathToGetFreeKey" ]; then
           WORKURL=$WORKURL2;
         fi;
       fi;
-      updServer0=($WORKURL $nodUsername $nodPassword);
+      updServer0=($WORKURL $USERNAME $PASSWD);
     else
       logmessage -t $msgErr;
     fi;
@@ -486,11 +495,11 @@ function makeMirror() {
   local isOfficialUpdate=false;
 
   ## download update.ver zip from $WORKURL to $pathToTempDir and unzip
-  downloadSource $sourceUrl $saveToPath;
-	
+  if ! downloadSource $sourceUrl $saveToPath; then return 1; fi;
+  
   ## find version update
   local diffVerFile=$saveToPath'diff.ver';
-	local diffVerFileNew=$saveToPath'diff.ver.new';
+  local diffVerFileNew=$saveToPath'diff.ver.new';
   if [[ "$checkVerFile" == true ]]; then
     [ -f $diffVerFileNew ] && rm -f $diffVerFileNew;
     sed \
@@ -517,10 +526,10 @@ function makeMirror() {
         logmessage "${cYel}Base note actual${cNone}, continue work";
       fi;
     fi;
+    rm -f $diffVerFile;
   fi;
-  rm -f $diffVerFile;
 
-	#cat $mainVerFile;
+  #cat $mainVerFile;
   ## Use function from read_ini.sh
   logmessage -n "Parsing & writing new update.ver file ${cGray}(gray dots = skipped sections)${cNone} "
 
@@ -532,7 +541,7 @@ function makeMirror() {
   for section in `cat $mainVerFile | sed '1s/\[//; s/^ *//'`; do
     IFS=$OLD_IFS;
     ## for exit from makeMirror, return 1
-    quit && return 1;
+    if pressKeyBoard; then return 1; fi;
     #logmessage $SectionName;
     ## 1. Get section content (text between '[' and next '[')
     local sectionContent="[$section";
@@ -641,55 +650,67 @@ function makeMirror() {
     ## delete all symlinks for clear
     #logmessage "${cYel}Remove all symlinks${cNone} from $saveToPath";
     #find $saveToPath -type l -delete;
-		
+
     local dlNum=0;
     local dlTotal=${#filesArray[@]};
     ## Download all files from 'filesArray'
     for item in ${filesArray[*]}; do
       ## for exit from makeMirror, return 1
-      quit && return 1;
+      if pressKeyBoard; then return 1; fi;
       # Inc counter
       dlNum=$((dlNum+1));
       logmessage -n "Download file $item ($dlNum of $dlTotal).. ";
       ## если такой update file есть, то сделаем symlink
       local itemName=$(echo $item | sed 's/.*\///');
       local size=${sizeArray[$(($dlNum-1))]};
-      local files=$(find $pathToSaveBase -iname $itemName -type f);
-      ## если файлы с таким именем нашлись, то может не придется их качать
-      if [ "$files" ]; then
-        ## проверяем на наличие линка если не существует и размер подходящий, то сделаем его
-        for i in $files; do
-          local sizeI=$(du -b $i | awk '{print $1}');
-          if [ "$size" = "$sizeI" ]; then
-            ## если размер файла не изменился или он уже существует, то skip
-            if [ "$saveToPath$itemName" = "$i" ]; then # && [ -f "$i" ]; then
-              logmessage -t "${cYel}Skipped ${cGray}[${size}B]${cNone}";
-              break;
-            fi;
-            ## Create symlink
-            #logmessage -t "${cYel}Create symlink${cNone}";
-            #writeLog "$item - create symlink to $i";
-						#ln -s "$i" "$saveToPath$itemName";
-            #break;
-          fi;
-        done;
-        ## если симлинк или файл есть и мы его обработали, то переходим к следующему файлу
-        [ "$(find $saveToPath -iname $itemName)" ] && [ "$size" = "$sizeI" ] && continue;
+      [ -f ${saveToPath}${itemName} ] &&
+        local sizeItem=$(du -b ${saveToPath}${itemName} | awk '{print $1}');
+      if [ "$sizeItem" = "$size" ];then
+        logmessage -t "${cYel}Skipped ${cGray}[$(($size/1024)) KB]${cNone}";
+        continue;
       fi;
-      downloadFile $item $saveToPath;
+      #local files=$(find $pathToSaveBase -iname $itemName -type f);
+      ## если файлы с таким именем нашлись, то может не придется их качать
+      #if [ "$files" ]; then
+      #  ## проверяем на наличие линка если не существует и размер подходящий, то сделаем его
+      #  for i in $files; do
+      #    local sizeI=$(du -b $i | awk '{print $1}');
+      #    if [ "$size" = "$sizeI" ]; then
+      #      ## если размер файла не изменился или он уже существует, то skip
+      #      if [ "$saveToPath$itemName" = "$i" ]; then # && [ -f "$i" ]; then
+      #        logmessage -t "${cYel}Skipped ${cGray}[${size}B]${cNone}";
+      #        break;
+      #      fi;
+      #      ## Create symlink
+      #      logmessage -t "${cYel}Create symlink${cNone}";
+      #      writeLog "$item - create symlink to $i";
+      #      ln -s "$i" "$saveToPath$itemName";
+      #     break;
+      #    fi;
+      #  done;
+      #  ## если симлинк или файл есть и мы его обработали, то переходим к следующему файлу
+      #  [ -f $item ] && [ "$size" = "$sizeI" ] && continue;
+      #fi;
+      if downloadFile $item $saveToPath; then
+        writeLog "$item Saved";
+        DownloadFileCount=$(( $DownloadFileCount + 1 ));
+        downloadFileSize=$(( $downloadFileSize + $size ));
+      fi;
     done;
-    logmessage "Mirroring \"$sourceUrl\" -> \"$saveToPath\" ${cGreen}complete${cNone}";
-    writeLog "Mirroring \"$sourceUrl\" -> \"$saveToPath\" complete";
+    logmessage "Mirroring \"${sourceUrl}\" -> \"${saveToPath}\" ${cGreen}complete${cNone}";
+    logmessage "Spend time: $(( ($(date +%s) - $timeStartUpdate)/60 ))min.";
+		writeLog "Mirroring \"${sourceUrl}\" -> \"${saveToPath}\" complete";
   fi;
 
   ## Delete old file, if exists local
-  if [ -f $saveToPath'update.ver' ]; then rm -f $saveToPath'update.ver'; fi;
-  mv $newVerFile $saveToPath'update.ver';
+  [ -f "${saveToPath}update.ver" ] && rm -f "${saveToPath}update.ver";
+  [ -f "$newVerFile" ] && mv "$newVerFile" "${saveToPath}update.ver";
   logmessage "File ${saveToPath}update.ver ${cYel}update${cNone}";
   writeLog "File ${saveToPath}update.ver update";
   ## for diff.ver
-  mv $diffVerFileNew $diffVerFile;
-	logmessage "File $diffVerFile ${cYel}update${cNone}";
+  [ -f $diffVerFileNew ] && 
+  mv $diffVerFileNew $diffVerFile &&
+  logmessage "File $diffVerFile ${cYel}update${cNone}";
 }
 
 ## Create (update) main mirror
@@ -703,15 +724,13 @@ fi;
 ## Create (update) (if available) subdirs with updates
 if [ ! -z "$checkSubdirsList" ]; then
   for item in ${checkSubdirsList[*]}; do
-    ## for exit from makeMirror, return 1
-    quit;
     checkUrl=$WORKURL''$item'/';
 
     logmessage -n "Checking $checkUrl.. ";
     if checkAvailability $checkUrl; then
       downloadPath=$pathToSaveBase''$item'/';
       mkdir -p $downloadPath;
-      makeMirror $checkUrl $downloadPath;
+      makeMirror "$checkUrl" "$downloadPath";
     fi;
   done;
 fi;
@@ -739,4 +758,10 @@ if [ "$createRobotsFile" = true ]; then
       logmessage -t $msgOk; else logmessage -t $msgErr;
     fi;
   fi;
+fi;
+
+if [ -n "$DownloadFileCount" ]; then
+  logmessage "Count of download update files: [$DownloadFileCount], \
+general size: $((downloadFileSize/1024/1024))MB, \
+spend time: $(( ($(date +%s) - $timeStartUpdate)/60 ))) min.";
 fi;
