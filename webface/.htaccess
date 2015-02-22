@@ -14,7 +14,7 @@
 </IfModule>
 
 ## And one more else security rule
-<FilesMatch "(\.(htaccess|htpasswd|pl|cqi|sh|sql)$|tmp$)">
+<FilesMatch "(\.(htaccess|htpasswd|pl|cqi|sh|sql|conf)$|tmp$)">
   Order allow,deny
   Deny from all
 </FilesMatch>
@@ -33,7 +33,7 @@
   ## Next line for ----> Apache2.x <----
   IndexOptions -HTMLTable -IconsAreLinks +IgnoreClient +IconHeight=1 +IconWidth=1
   ## Hide some files types from listing
-  IndexIgnore .htaccess .htpasswd .webface *.php* *.htm* *.txt *.log *.tmp*
+  IndexIgnore .htaccess .htpasswd .webface *.php* *.htm* *.txt *.conf *.log *.tmp*
   
   ##### Path to webface files ####
   HeaderName /.webface/header.html
