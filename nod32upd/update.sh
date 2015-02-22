@@ -164,12 +164,12 @@ downloadFile() {
 }
 
 ## Parse data from passed content of ini section
-function getValueFromINI() {
+getValueFromINI() {
   local sourceData=$1; local paramName=$2;
   ## 1. Get value "platform=%OUR_VALUE%"
   ## 2. Remove illegal characters
   #echo $(echo "$sourceData" | sed -n '/^'$paramName'=\(.*\)$/s//\1/p' | tr -d "\r" | tr -d "\n");
-  echo $(echo "$sourceData" | grep "$paramName=" | sed s/^$paramName=//);
+  echo $(echo "$sourceData" | grep "^$paramName=" | sed s/$paramName=//);
 }
 
 ## Create some directory
@@ -202,7 +202,7 @@ function downloadSource() {
   ## Path to DOWNLOADED 'update.ver' file
   local mainVerFile=$pathToTempDir'update.ver';
   ## Path to RESULT 'update.ver' file
-  local newVerFile=$saveToPath'update.ver.new';
+  local newVerFile=$mainVerFile'.new';
 
   ## Download source 'update.ver' file
   logmessage -n "Downloading $sourceUrl""update.ver.. ";
@@ -345,7 +345,7 @@ random(){
 
 ## --checkver
 ## check if need update mirror for actual
-checkVerFile=false;
+#checkVerFile=false;
 
 ## --check
 ## Check only included sub-dirs
@@ -402,8 +402,8 @@ handleParam $*;
 ## Use it for educational or information purposes only! #######################
 
 if [ "$getFreeKey" = true ] && [ -f "$pathToGetFreeKey" ]; then
-  logmessage -n "Getting valid key from '$pathToGetFreeKey'.. "
   nodKey=$(bash "$pathToGetFreeKey" | tail -n 1);
+  logmessage -n "Getting valid key from '$pathToGetFreeKey'.. "
   if [ ! "$nodKey" == "error" ]; then
     nodUsername=${nodKey%%:*} nodPassword=${nodKey#*:};
     if [ ! -z $nodUsername ] && [ ! -z $nodPassword ]; then
@@ -489,7 +489,7 @@ function makeMirror() {
   ## Path to DOWNLOADED 'update.ver' file
   local mainVerFile=$pathToTempDir'update.ver';
   ## Path to RESULT 'update.ver' file
-  local newVerFile=$saveToPath'update.ver.new';
+  local newVerFile=$mainVerFile'.new';
   ## Here we will store all parsed filenames from 'update.ver'
   local filesArray=();
   local isOfficialUpdate=false;
@@ -497,36 +497,47 @@ function makeMirror() {
   ## download update.ver zip from $WORKURL to $pathToTempDir and unzip
   if ! downloadSource $sourceUrl $saveToPath; then return 1; fi;
   
+#############################################################
+  ## delete old files if it not in $mainVerFile
+  local str=`cat $mainVerFile`;
+    for file in $(find $saveToPath -type f -iname \*nup | grep $saveToPath'e' | sed 's/.*\///' | tr '\n' ' '); do
+      if [ -z "`echo "$str" | grep $file`" ]; then
+      logmessage "File '$saveToPath$file' - ${cRed}need delete${cNone}";
+      writeLog "File '$saveToPath$file' - need delete"
+      #rm $saveToPath$file;
+    fi;
+  done;
+############################################################
+
   ## find version update
-  local diffVerFile=$saveToPath'diff.ver';
-  local diffVerFileNew=$saveToPath'diff.ver.new';
+  local diffVerFile=$saveToPath'update.diff.ver';
+  local diffVerFileNew=$diffVerFile'.new';
+
   if [[ "$checkVerFile" == true ]]; then
     [ -f $diffVerFileNew ] && rm -f $diffVerFileNew;
     sed \
-    -e '/HOST/d' \
-    -e '/\[.*/b' \
-    -e '/date=/b' \
-    -e '/file=/b' \
-    -e '/version=/b' \
+    -e '/HOST/d; /\[.*/b; /date=/b; /file=/b; /version=/b' \
     -e d $mainVerFile |\
     tr '\n' ' ' |\
-    sed 's/\[/\n\[/g' |\
-    grep `date +%d.%m.%Y -u` \
+    sed 's/\r//g; s/\[/\n\[/g' |\
+    grep 'version=' \
     > $diffVerFileNew;
 
     if [ -f $diffVerFile ]; then
       if [ ! "`diff -E -b -B -w $diffVerFileNew $diffVerFile`" ]; then
         ## actual version files
-        rm -f $diffVerFileNew;
         #mv $diffVerFileNew $diffVerFile;
         ## TODO: теперь нужно проверить целостность файлов согласно размерам
+        rm -f $diffVerFileNew;
         logmessage "${cGreen}Base actual${cNone}, stop update mirror";
+        writeLog "Base actual, stop update mirror";
         return 1;
       else
         logmessage "${cYel}Base note actual${cNone}, continue work";
+        writeLog "Base note actual, continue work";
       fi;
+      rm -f $diffVerFile;
     fi;
-    rm -f $diffVerFile;
   fi;
 
   #cat $mainVerFile;
@@ -544,7 +555,7 @@ function makeMirror() {
     if pressKeyBoard; then return 1; fi;
     #logmessage $SectionName;
     ## 1. Get section content (text between '[' and next '[')
-    local sectionContent="[$section";
+    local sectionContent=$(echo "[$section" | tr -d "\r");
     # echo "$sectionContent"; exit 1;
     local filePlatform=$(getValueFromINI "$sectionContent" "platform");
     #echo $filePlatform; exit 1;
@@ -699,7 +710,7 @@ function makeMirror() {
     done;
     logmessage "Mirroring \"${sourceUrl}\" -> \"${saveToPath}\" ${cGreen}complete${cNone}";
     logmessage "Spend time: $(( ($(date +%s) - $timeStartUpdate)/60 ))min.";
-		writeLog "Mirroring \"${sourceUrl}\" -> \"${saveToPath}\" complete";
+    writeLog "Mirroring \"${sourceUrl}\" -> \"${saveToPath}\" complete";
   fi;
 
   ## Delete old file, if exists local
@@ -710,7 +721,8 @@ function makeMirror() {
   ## for diff.ver
   [ -f $diffVerFileNew ] && 
   mv $diffVerFileNew $diffVerFile &&
-  logmessage "File $diffVerFile ${cYel}update${cNone}";
+  logmessage "File $diffVerFile ${cYel}update${cNone}" &&
+  writeLog "File $diffVerFile update";
 }
 
 ## Create (update) main mirror
@@ -763,5 +775,5 @@ fi;
 if [ -n "$DownloadFileCount" ]; then
   logmessage "Count of download update files: [$DownloadFileCount], \
 general size: $((downloadFileSize/1024/1024))MB, \
-spend time: $(( ($(date +%s) - $timeStartUpdate)/60 ))) min.";
+spend time: $(( ($(date +%s) - $timeStartUpdate)/60 )) min.";
 fi;

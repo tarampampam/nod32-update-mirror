@@ -26,17 +26,19 @@ HASHES=''
 hashsum() { md5sum $*; }
 updateVer(){
   local mainVerFile=${pathToSaveBase}$1;
-  sed \
-    -e '/HOST/d' \
-    -e '/\[.*/b' \
-    -e '/file=/b' \
-    -e '/date=/b' \
-    -e '/size=/b' \
-    -e '/version=/b' \
-    -e d $mainVerFile |\
-    tr '\n' ' ' |\
-    sed 's/\[/\n\[/g'\
-  ;
+  if [ -f ${pathToSaveBase}$1 ]; then
+	  sed \
+      -e '/HOST/d' \
+      -e '/\[.*/b' \
+      -e '/file=/b' \
+      -e '/date=/b' \
+      -e '/size=/b' \
+      -e '/version=/b' \
+      -e d $mainVerFile |\
+      tr '\n' ' ' |\
+      sed 's/\[/\n\[/g'\
+    ;
+	fi;
 }
 testHash() {
   
@@ -49,13 +51,13 @@ testHash() {
 
 	echo -e "\nGroup from filename:";
 	echo "file / hash / size / size from update.ver";
-  
-  for str in $HASHES;do
-	
-    local hash=$(echo $str | cut -f1 -d'#');
+
+  for str in $HASHES; do
+
+		local hash=$(echo $str | cut -f1 -d'#');
     local file=$(echo $str | cut -f2 -d'#');
-    local size=$(du -bL $file | awk '{print $1}');
-	
+		local size=$(du -bL $file | awk '{print $1}');
+
     local lastFilename=$(echo $lastFile | cut -f $countSlashes -d'/');
     local lastFile=$file;
 		local filename=$(echo $file | cut -f $countSlashes -d'/');
@@ -72,9 +74,9 @@ testHash() {
 		updateVer=`echo "$updateVer" | grep $filename | tr ' ' '\n'`;
 		
 		local verSize=`echo "$updateVer" | grep size | sed 's/.*size=//'`;
-		local version=`echo "$updateVer" | grep version | sed 's/.*version=//'`;
+    local version=`echo "$updateVer" | grep version | sed 's/.*version=//'`;
     local verDate=`echo "$updateVer" | grep date | sed 's/.*date=//'`;
-		
+
 		if [[ "$verSize" == *$size* ]]; then cVer=$cGray; else cVer=$cNone	; fi
 		
     if [ ! "$lastFilename" = "$filename" ];then 
@@ -97,17 +99,19 @@ testHash() {
       fi;
     fi;
     
-    if [ $(echo $file | grep './v') ]; then
-      echo -ne $cGray'file:'$cHash $file;
-    else
-      echo -ne $cGray'file:   '$cHash $file;
-    fi;
+    [ -z $(echo $file | grep './v') ] && file="   $file";
+    echo -ne $cGray'file:'$cHash "$file";
     echo -ne $cGray' hash:'$cHash''$hash $cNone;
     echo -ne $cGray' size:'$cSize''$size $cNone;
-		echo -ne $cVer[$verSize]$cNone;
-		echo -ne $cGray' v:'$version $cNone;
-		echo -ne $cGray' date:'$verDate $cNone;
-    echo;
+		
+    if [ -z "$updateVer" ]; then
+      echo -ne $cRed"- need delete!!!"$cNone;
+    else
+      echo -ne $cVer[$verSize]$cNone;
+      echo -ne $cGray' v:'$version $cNone;
+      echo -ne $cGray' date:'$verDate $cNone;
+    fi;
+			echo;
   done;
 }
 result() {
@@ -166,12 +170,13 @@ countSlashes=$(($countSlashes + 1));
 FILES=$(find $pathToSaveBase -iname \*.nup |\
         sed "s|${pathToSaveBase}e|${pathToSaveBase}\/e|g");
 ## sort FILES by filename
-FILES=$( echo "$FILES" | sort -t '/' -k $countSlashes);
+if [ -z "$(sort --help | grep '\-k')" ]; then echo -e $cRed"sort do not do key -k, upgrade sort"$cNone;exit 1; fi;
+FILES=$( echo "$FILES" | sort -t '/' -k $countSlashes );
 
 ## отсортированные строки по имени файла:
 ## a543cd9d693ff4fce54e52391d71a3f98e75dd77#~/nod32mirror/v7/em023_32_l1.nup
 ## ' *' -> '#'
-HASHES=$(hashsum $FILES | sed 's/ \*/#/g');
+HASHES=$(hashsum $FILES | sed 's/ ./#/');
 
 ## for script params **********************************************************
 
