@@ -524,17 +524,19 @@ function makeMirror() {
     > $diffVerFileNew;
 
     if [ -f $diffVerFile ]; then
+      local version=$(echo "$saveToPath" | sed "s|${pathToSaveBase}||" | sed 's/\///');
+      [ -z "$version" ] && version=v3;
       if [ ! "`diff -E -b -B -w $diffVerFileNew $diffVerFile`" ]; then
         ## actual version files
         #mv $diffVerFileNew $diffVerFile;
         ## TODO: теперь нужно проверить целостность файлов согласно размерам
         rm -f $diffVerFileNew;
-        logmessage "${cGreen}Base actual${cNone}, stop update mirror";
-        writeLog "Base actual, stop update mirror";
+        logmessage "${cGreen}Base $version actual${cNone}, stop update mirror";
+        writeLog "Base $version actual, stop update mirror";
         return 1;
       else
-        logmessage "${cYel}Base note actual${cNone}, continue work";
-        writeLog "Base note actual, continue work";
+        logmessage "${cYel}Base $version note actual${cNone}, continue work";
+        writeLog "Base $version note actual, continue work";
       fi;
       rm -f $diffVerFile;
     fi;
