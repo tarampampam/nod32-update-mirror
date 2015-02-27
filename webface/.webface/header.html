@@ -1,82 +1,171 @@
 <!DOCTYPE html>
 <html><head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="robots" content="noindex, nofollow" />
-    <meta name="description" content="ESET NOD32 Updates server" />
-    <title>ESET NOD32 Updates Mirror</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <style type="text/css">
-        html,body{margin:0;padding:0;text-align:center}
-        body {overflow: hidden;}
-        *{background:#1a1a1a;color:#eee;font-weight:normal;cursor:default}
-        a{text-decoration:none;cursor:pointer}
-        a:hover{text-decoration:underline; opacity: 1 !important; -webkit-transition: all 0.3s;-moz-transition:all 0.3s;-o-transition:all 0.3s}
-        h1,h2,h3,h4,h5{font-family:Tahoma,Verdana,Arial;font-weight:400;text-transform:uppercase; margin: 20px 0;}
-        table{width:400px; margin: 0 auto;}
-        tr td, tr th{text-align:left !important; font-family:Consolas,monospace,Tahoma,Verdana,Arial; font-size: 12px;}
-        hr{background:#444;border:none;height:3px; width: 400px;}
-        #splash{position:fixed;top:0;left:0;width:100%;height:100%;background:#1a1a1a}
-        #splash div{height:265px;position:relative;top:50%;margin-top:-263px;font-family:Tahoma,Verdana,Arial;font-size:33px}
-        #splash div p{margin:0;text-shadow:0px 2px 1px rgba(0,2,0,1)}
-        #splash div p small{font-size:60%;display:block}
-        #splash div p span{display:none}
-        #splash div p input{border:none;font-size:15px;outline:none;font-weight:bold;padding:0 0 18px 0;text-align:center}
-        #splash div ul{list-style:none;margin:0;padding:0;font-size:12px}
-        #splash div ul li{padding:2px 0}
-        #splash div ul li a{color:#76c1ff}
-        #splash div ul li a.dl{background:url('http://oi58.tinypic.com/2dr9bpw.jpg') no-repeat left center;padding-left:20px}
-        #splash div > a{display:block;font-size:9px;padding:0;color:#666}
-        #splash div a.howchange{margin:3px 0 0 0}
-        #lastupdate{font-size:9px;color:#444;padding:15px 0 0 0}
-        #content{display:none;overflow:hidden;}
-        #monitoring * {opacity: 0.1;-webkit-transition: opacity 0.5s;-moz-transition:opacity 0.5s;-o-transition:opacity 0.5s}
-        #monitoring *:hover {opacity: 0.9}
-        @media only screen and (max-width: 321px){#content{zoom:0.8}}
-        @media only screen and (max-width: 385px){#content{zoom:0.9}}
-    </style>
-    <link rel="shortcut icon" href="//static1.esetstatic.com/fileadmin/templates/favicon.ico" type="image/x-ico; charset=binary" />
-    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>ESET NOD32 Updates Mirror</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAADFBMVEUAAAAAfGz///8Lg3VOMV6zAAAAAXRSTlMAQObYZgAAACpJREFUCNdjwAbs////w3Br1dVwhqxVoaEMqdMyl4IJMBcoERoOUYIFAAD5FhLhbIFP3QAAAABJRU5ErkJggg==" />
+  <style type="text/css">
+    .nod-logo{background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALoAAABGCAMAAABMgH6hAAAAtFBMVEUAAAAAnq0Anq0Anq0Anq0Anq0Anq0Anq0Anq0Anq0Anq0Anq0Anq0Anq0Anq0Anq0Anq3////w+PkAoK/+//8Ar7sAo7H6/f7c8PM4tsLL6u1Xv8nX7/G74+ed1t2p2+EArLjy+vsAprMAqbW04OTB5uqM0Nf3/Pzm9Pbh8vTR7O8AobCU09rH6OxqxM5jwsx+y9N5ydJyx9BCucQ8t8Oj2d9Ku8br9/gttMAhs78Ysr2FztXAownkAAAAEHRSTlMA8Y37vadLD9UbB2Z7MmrhXq42UwAABsVJREFUaN7dm+ly2jAQgIEQmrZpsr4NBt/4wsaE+3j/9yoxoJVsiWQ6007cL38yFjKfV+uVfND5S/y40vmnfBv0Hp+68GXoPj32Bt8+4f2z/wBfkIf+z/v233tfKNp1ur3v4vx8/sLilfyz4Nz59QRfnqdfPPOfXzLH6zz8bJr3oCX0WmvecH+GFvFMmw+gVQyocv7Fi2KdLhb4R2gZj6SgQ+v41dagk7B/a8VcxPLw7TKNQgt5qdT7cEO5MVOARpnh5lqDrw1Xq9VQ8xWl1lQHeCgzd1suF8ty684UTmtwXG9X+6DZ1mfzZehMJxeKSAfEz0fXzfkMKILSLsyd7J3/duYk2ip026aYUISb6G3rQg2/tLPE8+I49rykiI61VisvTPm8czkt8iEvY3A6Kk1JvSCpC0DckXTdbOIR6dbEM1SJoKpGmqOcdt4XofrXMOLM3lLHvnJkegeSGoeUvJYnhkq1jarIIANm9WKZEiFdUxGcSldGN/XZdixx8HL99s1MOyqYbz5cSTn9rVvEI0+qY+v1lUyfVkdC/Y56sJEEZAdU55Na151sVKH7Ck0opn4t2buMOrIQq2uFJEQeoroA+6IwjDltZtUWSlxCKme65/ULCNSTPV+9yv07JBqqC5gE8A4vtHEVsWMq8TCWgHzvDGrqyETnq89C6S6Fj+oi9yq2J0nyzCK07dCkmuCdyJB4mDp9nr7U1ZE3hate0kEah/Yp2kzonsaCUU+mo9EoM2WJ5qS8fyYL59qsGiOHqGbVUflVd3k8DcNpQmWjRU9KPbG6fOCpB9RgjubaZe44RNTWcUCpqxs9CAL3YEVTg9r1vjLGUluQzpcCu1Qlc2NpOoC/3sSkQOUKVWIeG+pIoTTVlTm2hy4Q9hkOxZJWz3ECyuqVDslVJuqgTBxyrimOyql7j51+Ux15a6rrGZOxiJbQlQDVbSBQlUnWgIHYTW6fnVH9iFjoU9Xx6Z66rDXUNTLs3gEYFjEZdI1VRwfM+BJojilWmCZKwVF/6rxy1YlrQ73EMZ8Bg27i2cSqIwvSe6MDYmUq1vUmbsbJ9ddOl6eOnOrqOWnaAggGXV2K1F2PVJLgumVY5sWOnCZb4LCMbzEpFWpOeuCoy1iUPY1VV0hR3x2hxpxkTAQuX12fku7udWm387DyJBZwCMgUmFJD9dABjnoy3+CipKY+oqpYjbVMckmkPiODZmgX9VRCTA142OqtTw4UXPV4efDIV0Ssekb+b6jvibojUldIsquHizqdpPK05KWLgUEXq2PUTipWGb/gRb34I/U3VMeoI4bjQ40yJiZb+FjdAX+CKaNseFHPGupDor75OOrG8Vo8ZFn2DJQvdLYulgY1/p9Sh3VCztRFRKlPqRViDYtkWf5xrsvuRS1wtX2ZZx7WXIX+/FIl5jbU1B8E6rAghxublLoj3RgCUlvuLYQVhgym6bLViUQq3dNXxZLQ/IFf15362hbr+kkifgqwkAGJS1FdD2RcRYgr6w0NFTyyFev6q0gdDglPfYWlLACGo4yBE6m/SUSwfvMjxS+/ssqw4C+hzit/DeNgVaqrBx6zOEOUCUnLqS5QP+AaZgU10toljr/w8Hvx09Qapi9Wh7CpTueRZ/EzXY2Ap45hxHUAou2I+qyWLIbtQpN+5/GOups01amMkRK8M6HZKl7za7z1erC1qd3NgWUWkiMPq2o+JuLhSnDHtHdHHSyOul5IBKNYbDVN28/tsYTYQKtnp+hMHo4Sekc+wHKx0q6Hrq+oAY4AXCfGKTay3m4s5hp1lfRyTx2cpjqsmVtWiTkep55EkbqoLmC3OusmRjLOpqGz2TCHtduCRXc2dp5BMJfUtengrrqfNtUhku7hbeEj9XiuAKw9fmOhY8CQZqUZdL7fVYc1R113JDHGHD5S997N4RRLCBN02Egi0jl1H6bT5aoT8qY6+LY4oKXykfp4XX0kVLmH9R5W+xPqXbznKFL3x011mM13EpfpEW+Xiobc56UiXgZ9Ur3P3OktKXXkaGDPTMdiKNcnLNUYzZXGRTxzG9ubzv1bJiZqPeyGt6kKyKcSpsfcX7cy+YrDLLFlwjnqBHc52Xmxob5jGJ48tleAaCOZJRlNIssFgr6KJql83sGF2JOL063y2bKIMVEfME81/MN6WLHWgEIf3lgfgUbRrMgJJ2ecfL73FWaKqfZFOh40V28+snHX5cl23rEX1nGGQ4Z9Wdb7gHkO1ocW0u+88wIt5KXtz01b/LS6ze8ItC/sj//D+zAtfgupze9+tfmNuxa59/6nt0vb/E5vm9+kbvP7663+1UCrfqvxG8UMYoiQvUjFAAAAAElFTkSuQmCC')!important}
+    .github-icon{background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAclBMVEUAAAD///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////9eWEHEAAAAJXRSTlMA8jLcYhAD/NJcF+GqE/bCrpp0DwdmH9ahQAzs6biNfTkoxrBGcLp3BgAAAUFJREFUOMuNUtmCwyAIJNWkue+raY52d/3/X1wFNo0xDzsPijCAjsAHmRxDTykvHGUGLm7pXe24pzew0VTqhKqx0oVyIA5FHp66gPfY8ynuMriGn+jDUHpWrBz0mvhIGI0nglbO+olFoZ86yxYi4x2xAaaYas07MI7g3Vjuki0bTCgBYtInOhMiUiyGDo3EETdLMNBBirsEBxIDKQxYqXEJDfYeIMcOcAHskQPpfkWg/yGCd0UgaXmL3XjMqaElgyNECBXtwTkeUGbFRLWeCavi0lNOVhpbF0jJm09geqyPwgxqd6PffHUlioQdAHpdom6/6O8Q3+oPeW/Om7ZefWJWHtGdsNF9df0FfLn98FMyxSjYEQvdBD7wOS72e/dCs2tZtxZB9IfpWNDlHwmLPUNytgnPDk6YavHkFu1T1BP8F7/MNTvljylfmwAAAABJRU5ErkJggg==')!important}
+    .github{z-index:99999;position:fixed;bottom:0;right:0;width:32px;height:32px;margin:8px;background: no-repeat top center;
+    opacity:.02!important;-webkit-transition:all .3s;-moz-transition:all .3s;-o-transition:all .3s}
+    .github:hover{padding-bottom:2px;opacity:1!important}
+    html,body{margin:0;padding:0}
+    body{overflow:hidden;text-align:center;background:#1a1a1a;font-family:Tahoma,Verdana,Arial}
+    .noselect{ -webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+    .clear,.clear:after{clear:both;content:' ';display:block;font-size:0;height:0;line-height:0;visibility:hidden;width:0}
+    .left{float:left}.right{float:right}
+    .gray{color:#555}
+    *{color:#eee;font-weight:400;cursor:default}
+    a{text-decoration:none;cursor:pointer}
+    a:hover{text-decoration:underline;opacity:1!important;-webkit-transition:all .3s;-moz-transition:all .3s;-o-transition:all .3s}
+    #content{display:none;overflow:hidden}
+    #content pre img,#content table img{display:none}
+    #content h1,#content h2,#content h3,#content h4,#content h5{font-weight:400;text-transform:uppercase;margin:20px 0}
+    #content table, #content pre{width:500px;margin:0 auto}
+    #content td,#content th{text-align:left!important;font-family:Consolas,monospace;font-size:12px}
+    #content hr{background:#444;border:none;height:3px;width:400px}
+    #splash{position:fixed;top:0;left:0;width:100%;height:100%;background:#1a1a1a}
+    #splash > div{position:relative;height:250px;width:250px;top:50%;margin:-90px auto 0 auto}
+    #splash div.nod-logo{width:186px;height:70px;margin:0 auto 10px auto;background:no-repeat center center;}
+    #splash h1,#splash h2,#splash h3,#splash h4,#splash h5{text-shadow:0 2px 1px rgba(0,2,0,1)}
+    #splash .desc{font-size:19px;margin-bottom:8px}
+    #splash .title{font-size:15px;margin:20px 0 5px 0;color:#59d7ea}
+    #splash .software{width:155px;margin:30px auto 0 auto;overflow:hidden;height:0;}
+    #splash .dl-item .left {font-size:12px}
+    #splash .dl-item .right{font-size:12px}
+    #splash .dl-item .right a{color:#76c1ff}
+    #splash .extended{display:none}
+    #splash div h2{margin:0;font-size:20px;text-shadow:0 2px 1px rgba(0,2,0,1)}
+    #splash div .lastupdate{font-size:9px;color:#444;margin:15px 0 0;text-shadow:none!important}
+  </style>
+  <noscript><style type="text/css">#splash .software{height:auto}#splash .openExtended{display:none}#splash .extended{display:inline}</style></noscript>
+  <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 </head><body>
-<div id="splash">
-    <div>
-        <img id="nod-logo" src="http://oi57.tinypic.com/2ebgye1.jpg" alt="Nod32 logo" width="256" height="256" />
-        <p>ESET NOD32<br />
-          <small>Сервер  обновлений</small>
-          <input id="srvadr" type="text" value="http://yourserver.here/" />
-        </p>
-        <ul>
-            <li><a href="http://link.to/distrib32bit" rel="nofollow" class="dl 32bit">ESET NOD32 4.x (32-bit)</a></li>
-            <li><a href="http://link.to/distrib64bit" rel="nofollow" class="dl 64bit">ESET NOD32 4.x (64-bit)</a></li>
-        </ul>
-        <a class="howchange" href="http://goo.gl/sFiUzq" rel="nofollow" 
-            target="_blank">Как изменить сервер обновлений?</a>
-
-        <p id="lastupdate"></p>
-        <p id="monitoring">
-            <img alt="Uptume counter" width="80" height="15" 
-                src="https://i.h-t.co:8089//web%20site%20monitoring%20down.png" />
-        </p>
+<a class="github github-icon" href="https://github.com/tarampampam/nod32-update-mirror" target="_blank" title="Fork me on GitHub"></a>
+<div id="splash" class="noselect">
+  <div>
+    <div class="header">
+      <div class="nod-logo"></div>
+      <h2 class="desc">UPDATES MIRROR</h2>
     </div>
+    
+    <div class="software">
+      <div class="dl-item">
+        <div class="left">Antivirus 4</div>
+        <div class="right">
+          <a href="#" class="openExtended">Download</a>
+          <span class="extended"><a href="http://download.eset.com/download/win/v4eav/eav_nt64_enu.msi" class="64bit">x64</a> <a href="http://download.eset.com/download/win/v4eav/eav_nt32_enu.msi" class="32bit">x32</a></span>
+        </div>
+        <div class="clear"></div>
+      </div>
+      
+      <div class="dl-item">
+        <div class="left">Smart Security 4</div>
+        <div class="right">
+          <a href="#" class="openExtended">Download</a>
+          <span class="extended"><a href="http://download.eset.com/download/win/v4ess/ess_nt64_enu.msi" class="64bit">x64</a> <a href="http://download.eset.com/download/win/v4ess/ess_nt32_enu.msi" class="32bit">x32</a></span>
+        </div>
+        <div class="clear"></div>
+      </div>
+    </div>
+
+    <p class="lastupdate"></p>
+  </div>
 </div>
 <script type="text/javascript">
-    $(document).ready(function(){
-        function hideSplash(){
-            $('body').css({'overflow': 'auto'});
-            $('#content').css({'display': 'block'});
-            $('#splash').stop().slideUp('normal');
-        }
-        function isWin64bit() {
-            return navigator.userAgent.indexOf('WOW64') != -1 || navigator.userAgent.indexOf('Win64') != -1;
+  $(document).ready(function(){
+    // --- SETTINGS ---------------------------------------------------------------------
+    var GA_Track = '', // Google Analytics Track Code (like 'UA-xxxxxxxx-x') (set '' for
+                       // disable this feature)
+        ShowUpdateDateLabel = true,   // Show or hide label with last updated data
+        UrlToBaseDateFile = '/lastevent.txt', // Url to file with timestamp
+        HighlightCurrentOSbit = true, // Detect and higtlight current OS type
+        ShowSoftwareSection = true,   // Show or hide software section
+    // --- / SETTINGS -------------------------------------------------------------------
+        body = $('body').first(), content = body.find('#content'),
+        splash = body.find('#splash'), splashDiv = splash.find('div').first(),
+        header = splash.find('.header'), logo = splash.find('.nod-logo'),
+        software = splash.find('.software'), updLabel = splash.find('.lastupdate'),
+        openDlExt = splash.find('.openExtended'), x32distr = splash.find('.32bit'),
+        x64distr = splash.find('.64bit'),
+        isRootDir = document.location.pathname.length <= 1,
+        hideSplash = function(fastMode){
+          body.css({'overflow': 'auto'});
+          content.css({'display': 'block'});
+          if(!fastMode) 
+            splash.stop().slideUp('normal');
+          else
+            splash.stop().slideUp(0);
+        },
+        isWin64bit = function(){
+          var u = navigator.userAgent.toLowerCase(),
+              p = window.navigator.platform.toLowerCase();
+          return u.indexOf('wow64') != -1 || u.indexOf('win64') != -1 || p == 'win64';
+        },
+        updateBaseTimer = null,
+        updateBaseDate = function(){
+          if(ShowUpdateDateLabel && updLabel.length){
+            $.ajax({
+              type: "GET", url: UrlToBaseDateFile, contentType: "text/plain; charset=utf-8", cache: false,
+              success: function(data, textStatus){
+                updLabel.slideUp().text('Updated: ' + data).slideDown();
+              },
+              error: function(data){
+                console.warn('Can\'t say when we were updated')
+                window.clearTimeout(updateBaseTimer);
+                return false;
+              }
+            });
+            window.clearTimeout(updateBaseTimer);
+            updateBaseTimer = window.setTimeout(updateBaseDate, 60 * 1000);
+          }
         };
-        $(isWin64bit() ? '.32bit' : '.64bit').css({'opacity': '0.6'});
-        
-        if (document.location.pathname.length > 1) {hideSplash()}
-        $('#nod-logo').on('click', function(e){hideSplash()});
-        $('#srvadr').hover(function(){this.select()}).select();
-        $.get("/lastevent.txt", function(data){
-            $("#lastupdate").text('Updated: ').append(document.createTextNode(data));
-        });
+    x32distr.attr('title', 'Download for 32-bit OS');
+    x64distr.attr('title', 'Download for 64-bit OS');
+    openDlExt.on('click', function(){
+      $(this).hide().parent().find('.extended').show();
+      return false;
     });
+    if(HighlightCurrentOSbit)
+      $(isWin64bit()?x32distr:x64distr)
+        .css({opacity: '0.6'});
+    if(!isRootDir)
+      hideSplash(true);
+    logo.on('click', function(){
+      hideSplash();
+    });
+    if(software.length){
+      var sHeight = software.height(),
+          sAutoHeight = software.css({height: 'auto'}).height(),
+          sTotalHeight = sAutoHeight + software.outerHeight(true),
+          spOrigMTop = parseInt(splashDiv.css('marginTop'), 10);
+      // Prepare positions before animate
+      software.css({height: sHeight, opacity: 0});
+      splashDiv.css({marginTop: Math.floor(spOrigMTop / 2)+'px'});
+      window.setTimeout(function(){
+        if(ShowSoftwareSection){
+          // Animate software section expanding
+          software.animate({height: sAutoHeight, opacity: 1}, 500);
+          // Animate splash div moving up (back)
+          splashDiv.animate({marginTop: spOrigMTop+'px'}, 500);
+        }
+        window.setTimeout(updateBaseDate, 250);
+      }, 800);
+    } else {
+      window.setTimeout(updateBaseDate, 250);
+    }
+    // Init google analytics (if 'GA_Track' is setted)
+    if(GA_Track.length){
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', GA_Track, 'auto');
+      ga('send', 'pageview');
+    }
+  });
 </script>
 <div id="content">
 <h3>Eset NOD32 Updates files</h3>
