@@ -413,7 +413,7 @@ if [ "$getFreeKey" = true ] && [ -f "$pathToGetFreeKey" ]; then
       if random && downloadSource $WORKURL $pathToTempDir; then
         logmessage -n "Random change sourceUrl $WORKURL ->";
         # found random url from update.ver
-        URLs=`cat $pathToTempDir'update.ver' | grep 'Other=' | sed 's/,/\n/g; s/200@//g; s/Other=//;s/ //g'`;
+        URLs=`cat $pathToTempDir'update.ver' | grep 'Other=' | sed 's/,/\n/g; s/[1-9]00@//g; s/Other=//;s/ //g'`;
         count=`echo "$URLs" | wc -l`;
         if [[ "$count" == 0 ]]; then
           logmessage -t ".. $msgErr";
