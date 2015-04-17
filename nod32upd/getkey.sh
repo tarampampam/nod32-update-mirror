@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 ## @author    Samoylov Nikolay
 ## @project   Get NOD32 key
