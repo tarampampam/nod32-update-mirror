@@ -7,7 +7,7 @@
 ## @github    https://github.com/tarampampam/nod32-update-mirror/
 ## @version   Look in 'settings.cfg'
 ##
-## @depends   curl, sed, awk, tr, wc, head, basename
+## @depends   curl, sed, awk, tr, wc, head, basename, iconv
 
 
 # *****************************************************************************
@@ -95,19 +95,27 @@ getKeys() {
   ##  TRIAL-0118291735:hsnu26k7hu
   ##  TRIAL-0118393856:n98nk6sm6s
   
-  #thx @cryol <https://github.com/cryol> for this
-  keysList+=$(curl -s http://tnoduse2.blogspot.ru/ |\
-    sed -e 's/<[^>]*>//g' |\
-    awk -F: '/((TRIAL|EAV)-[0-9]+)|(Password: [a-z0-9]+)/ {print $2}' |\
-    sed -e 's/ //g' | tr -d "\r" |\
-    awk '{getline b;printf("%s:%s\n",$0,b)}');
+  for URL in ${HTML_list[*]}; do
+	  
+	  ## TODO:
+	  ## условие проверки на кодировку страницы в WINDOWS-1251
+	  #[ "$(curl -s $URL | grep '<meta.*charset=' | grep -i 'win*')" ] && WIN=1
+	  
+	  keysList+="$URL";
+	  keysList+=$(curl -s $URL |\
+		  # нужно еще искать кодировку и в такую кодировку менять iconv
+		  iconv -c -f WINDOWS-1251 -t UTF-8 |\
+		  #sed -e 's/<[^>]*>//g' |\ - поменял из скрипта с форума asus
+		  sed 's/<[^<>]*>/\n/g;s/ *//g' |\
+		  # замена локального языка на eng
+		  sed 's/Пароль:/Password:/I' |\
+		  awk -F: '/((TRIAL|EAV)-[0-9]+)|(Password:[a-z0-9]+)/ {print $2}' |\
+		  tr -d "\r" |\
+		  awk '{getline b;printf("\n%s:%s",$0,b)}');
+	  keysList+="
+	  ";
   
-  #thx @zcooler <https://github.com/zcooler> for this
-  keysList+=$(curl -s http://nod325.com/ |\
-    sed -e 's/<[^>]*>//g' |\
-    awk -F: '/((TRIAL|EAV)-[0-9]+)|(Password:[a-z0-9]+)/ {print $2}' |\
-    tr -d "\r" |\
-    awk '{getline b;printf("%s:%s\n",$0,b)}');
+  done;
 
   echo "$keysList";
 }
@@ -152,6 +160,15 @@ getNewKeysAndSave() {
   while read line; do
     ## Get user:pass from line
     local Username=${line%%:*} Password=${line#*:};
+
+	 if [[ $Username == *http* ]]; then
+		logmessage "--------------------------------------------------";
+		logmessage "${cBold}Checking server ${cYel}$Username:$Password${cNone}";
+		logmessage "--------------------------------------------------";
+		continue;
+	 fi;
+	 
+	 #echo "проверка" Username=${line%%:*} Password=${line#*:};
     ## Check values for != empty
     if [ ! -z $Username ] && [ ! -z $Password ]; then
       logmessage -n "Checking key ${cYel}$Username${cNone}:$Password.. ";
@@ -245,10 +262,11 @@ echo "";
 ## --help
 if [ "$1" == "--help" ] || [ "$1" == "-h" ] || [ "$1" == "-H" ]; then
   me=$(basename $0);
-  echo -e "This script get valid Nod32 key using pirates web-sites. Now we supports:\n";
-  echo -e "  ${cYel}http://tnoduse2.blogspot.ru/${cNone}";
-  echo -e "  ${cYel}http://nod325.com/${cNone}\n";
-  echo -e "You can run with parameters:";
+  echo -e "This script get valid Nod32 key using pirates web-sites. Now we supports:";
+  for URL in ${HTML_list[*]}; do
+	  echo -e "  ${cYel}$URL${cNone}";
+  done;
+  echo -e "\nYou can run with parameters:";
   echo -e "  ${cYel}-u, --update${cNone}     Get new valid keys and write to $validKeysFile";
   echo -e "  ${cYel}-r, --remove${cNone}     Remove invalid keys from $validKeysFile";
   echo -e "  ${cYel}-s, -p, --show${cNone}   Print keys from $validKeysFile";
@@ -257,7 +275,7 @@ if [ "$1" == "--help" ] || [ "$1" == "-h" ] || [ "$1" == "-H" ]; then
   echo -e "Valid key (or \"error\") will printed in ${cYel}LAST OUTPUT LINE${cNone} (format 'user:password')";
   echo -e "                                       ${cBlue}^^^^^^^^^^^^^^^^${cNone}";
   echo -e "You can use: \"${cYel}$(basename $0) | tail -n 1${cNone}\" for getting key only\n\n";
-  echo -e "Last update: 12.08.2014, MIT License, ${cRed}use for educational or information";
+  echo -e "Last update: 12.02.2015, MIT License, ${cRed}use for educational or information";
   echo -e "  purposes only!${cNone}";
   exit 0;
 fi;
@@ -279,7 +297,6 @@ if [ "$1" == "-d" ] || [ "$1" == "--delete" ]; then
   fi;
   exit 0;
 fi;
-
 ## Begin work #################################################################
 
 ## Create patches
