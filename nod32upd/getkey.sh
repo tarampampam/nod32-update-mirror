@@ -102,13 +102,16 @@ getKeys() {
     sed -e 's/ //g' | tr -d "\r" |\
     awk '{getline b;printf("%s:%s\n",$0,b)}');
   
+  # Add empty line to var (bug-fix)
+  keysList=$keysList$'\n';
+  
   #thx @zcooler <https://github.com/zcooler> for this
   keysList+=$(curl -s http://nod325.com/ |\
     sed -e 's/<[^>]*>//g' |\
     awk -F: '/((TRIAL|EAV)-[0-9]+)|(Password:[a-z0-9]+)/ {print $2}' |\
     tr -d "\r" |\
     awk '{getline b;printf("%s:%s\n",$0,b)}');
-
+    
   echo "$keysList";
 }
 
