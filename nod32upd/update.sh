@@ -87,11 +87,11 @@ downloadFile() {
     url=$1; saveto=$2;
   fi;
 
-  if [ -n "$wgetDelay" ] || [ -z "$wgetDelay" ]; then
+  if [ -z "$wgetDelay" ]; then
     wgetDelay='0';
   fi;
 
-  if [ -n "$wgetLimitSpeed" ] || [ -z "$wgetLimitSpeed" ]; then
+  if [ -z "$wgetLimitSpeed" ]; then
     wgetLimitSpeed='102400k';
   fi;
 
