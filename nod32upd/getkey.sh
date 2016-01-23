@@ -107,11 +107,13 @@ getKeys() {
 		  iconv -c -f WINDOWS-1251 -t UTF-8 |\
 		  #sed -e 's/<[^>]*>//g' |\ - поменял из скрипта с форума asus
 		  sed 's/<[^<>]*>/\n/g;s/ *//g' |\
+
 		  # замена локального языка на eng
 		  sed 's/Пароль:/Password:/I' |\
 		  awk -F: '/((TRIAL|EAV)-[0-9]+)|(Password:[a-z0-9]+)/ {print $2}' |\
 		  tr -d "\r" |\
-		  awk '{getline b;printf("\n%s:%s",$0,b)}');
+		  awk '{getline b;printf("%s:%s\n",$0,b)}');
+      awk '{getline b;printf("%s:%s\n",$0,b)}');
 	  keysList+="
 	  ";
   
