@@ -1,7 +1,5 @@
 # ESET Nod32 Update Mirror
 
-![license MIT](http://gitshields.com/v2/text/license/MIT/green.png)&nbsp;![OS Linux](http://gitshields.com/v2/text/OS/Linux/blue.png)
-
 Набор скриптов для создания зеркала базы обновления антивируса "Eset Nod32". Для работы требуется:
 
   - Unix-система (тестировался на CentOS 7, FreeNas 9.3 и FreeBSD 8.3);
