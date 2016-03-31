@@ -64,7 +64,7 @@ BPC $((RD%2+6)).0.$((RD%100+500)).0; OS: 5.1.2600 SP 3.0 NT; CH 1.1; \
 LNG 1049; x32c; APP eavbe; BEO 1; ASP 0.10; FW 0.0; PX 0; PUA 0; RA 0)";
   
   local UpdServer='update.eset.com';
-  local TestPath='/v3-rel-sta/mod_000_loader_1092/em000_32_l0.nup';
+  local TestPath='/v8-rel-sta/mod_010_smon_1036/em010_32_l0.nup';
   local flag='' Login='' Pass='';
   if [ "$1" == "-n" ]; then
     flag="-en"; Login=$2; Pass=$3;
@@ -81,7 +81,7 @@ LNG 1049; x32c; APP eavbe; BEO 1; ASP 0.10; FW 0.0; PX 0; PUA 0; RA 0)";
     'http://'$UpdServer''$TestPath);
   code=$(echo \"$headers\" | head -n 1 | cut -d' ' -f 2);
   
-  if [ "$code" == "200" ] || [ "$code" == "304" ]; then
+  if [ "$code" == "200" ] || [ "$code" == "304" ] || [ "$code" == "404" ]; then
     return 0;
   else
     return 1;
@@ -96,7 +96,7 @@ getKeys() {
   ##  TRIAL-0118393856:n98nk6sm6s
   
   #thx @cryol <https://github.com/cryol> for this
-  keysList+=$(curl -s http://tnoduse2.blogspot.ru/ |\
+  keysList+=$(curl -sL http://tnoduse2.blogspot.ru/ |\
     sed -e 's/<[^>]*>//g' |\
     awk -F: '/((TRIAL|EAV)-[0-9]+)|(Password: [a-z0-9]+)/ {print $2}' |\
     sed -e 's/ //g' | tr -d "\r" |\
