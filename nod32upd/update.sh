@@ -470,8 +470,8 @@ function makeMirror() {
                   #echo $newFileNamePath;
                   ## Mare replace 'file=...' in section
                   sectionContent=$(echo "${sectionContent/$fileNamePath/$newFileNamePath}");
-                  echo "["$SectionName"]" >> $newVerFile;
-                  echo -e "$sectionContent\n" >> $newVerFile;
+                  echo -e "["$SectionName"]\r" >> $newVerFile;
+                  echo -e "$sectionContent\n\r" >> $newVerFile;
                 fi;
                 break;
               fi;
