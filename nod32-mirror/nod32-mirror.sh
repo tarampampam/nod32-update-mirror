@@ -21,7 +21,7 @@
 # THE SOFTWARE. 
 
 # Declare important variables
-export NOD32MIRROR_VERSION="1.0.0.0";
+export NOD32MIRROR_VERSION="1.0.0.1";
 
 # Execute bootstrap script
 source "$(dirname $(readlink -e $0))/bootstrap.sh" || { echo "[FATAL ERROR] Bootstrap file not found or contains errors" && exit 1; };
