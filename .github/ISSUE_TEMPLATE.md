@@ -45,7 +45,7 @@ export NOD32MIRROR_USE_FREE_KEY=0;
 
 **Лог-файл (log-file):**
 ```bash
-$ cat nod32mirror.log | tail -n 30
+$ cat ./nod32mirror.log | tail -n 30
 ```
 ```log
 [YYYY-MM-DD/HH:MM:SS] [Type] Some log message.. 
