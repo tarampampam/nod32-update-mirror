@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html><head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -54,7 +53,9 @@
           left: 50%;
           margin-left: -93px;
         }
-      .download_button .updated {
+      .download_button .updated,
+      .download_button .version {
+        display: block;
         position: relative;
         color: #ccc;
         font-size: 0.7em;
@@ -70,8 +71,9 @@
       .download_button.enabled:hover .images .image.nod32logo {
         left: 38%;
       }
-      .download_button:hover .updated.enabled {
-        top: 0;
+      .download_button:hover .updated.enabled,
+      .download_button:hover .version.enabled {
+        top: 0.25em;
         opacity: 0.8;
       }
   </style>
@@ -125,6 +127,7 @@
       </svg>
     </span>
     <span class="updated"></span>
+    <span class="version"></span>
   </div>
 
   <script type="text/javascript">
@@ -142,7 +145,7 @@
           /*
             Set 'enabled' to true if you want enable downloading distribs on logo click
           */
-          enabled: false,
+          enabled: true,
           css_class: 'download_button',
           enabled_css_class: 'enabled',
           links: [
@@ -150,8 +153,8 @@
               You can make directory in web_root named '.download', put inside your NOD32 distribs,
               and then setup links URIs here:
             */
-            {bitOS: 64, uri: '/dl/NOD32_Antivirus_64_bis.exe'},
-            {bitOS: 32, uri: '/dl/NOD32_Antivirus_32_bit.exe'}
+            {bitOS: 64, uri: '/dl/NOD32_Antivirus_64_bis.msi'},
+            {bitOS: 32, uri: '/dl/NOD32_Antivirus_32_bit.msi'}
           ]
         },
         updated: {
@@ -163,7 +166,17 @@
             postfix: ''
           },
           uri: '/lastevent.txt'
-        }
+        },
+        version: {
+          enabled: true,
+          css_class: 'version',
+          enabled_css_class: 'enabled',
+          text: {
+            prefix: 'Version: ',
+            postfix: ''
+          },
+          uri: '/version.txt'
+        },
       },
 
       /**
@@ -255,7 +268,7 @@
             var enabled_css_class = self.settings.updated.enabled_css_class;
             // Check updated is enabled
             if (self.settings.updated.enabled) {
-              // Make ajax request
+              // Make ajax request (get last event data)
               self.ajax(self.settings.updated.uri, function(data){
                 // Set result text
                 var texts = self.settings.updated.text;
@@ -263,13 +276,29 @@
               }, function() {
                 // If request failed
                 self.removeCssClass($updated, enabled_css_class);
-                $updated.innerHTML = '';
               });
               // Append (or remove) enabled css class
               if (!self.hasCssClass($updated, enabled_css_class)) {
                 self.addCssClass($updated, enabled_css_class);
               } else {
                 self.removeCssClass($updated, enabled_css_class);
+              }
+            }
+          });
+          // And for version elements
+          Array.prototype.forEach.call($button.getElementsByClassName(self.settings.version.css_class), function($version) {
+            var enabled_css_class = self.settings.version.enabled_css_class;
+            if (self.settings.version.enabled) {
+              self.ajax(self.settings.version.uri, function(data){
+                var texts = self.settings.version.text;
+                $version.innerHTML = texts.prefix + data + texts.postfix;
+              }, function() {
+                self.removeCssClass($version, enabled_css_class);
+              });
+              if (!self.hasCssClass($version, enabled_css_class)) {
+                self.addCssClass($version, enabled_css_class);
+              } else {
+                self.removeCssClass($version, enabled_css_class);
               }
             }
           });
