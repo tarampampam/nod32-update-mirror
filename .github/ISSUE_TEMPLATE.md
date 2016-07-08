@@ -33,22 +33,21 @@ $ curl -V
 
 #### Настройки (settings):
 **Настройки скрипта (script settings)**:
+```bash
+$ cat ./settings.conf | grep -v -e '^#' -e '^$'
+```
 ```shell
-#  Nod32 Update Mirror Configuration File
-#  --------------------------------------
-
-# Debug mode is enabled by default (numeric)
-#   1       : Enabled
-#   0       : Disabled
-#   Default : Disabled
 export NOD32MIRROR_DEBUG_MODE=0;
-
+export NOD32MIRROR_COLOR_OUTPUT=1;
+export NOD32MIRROR_USE_FREE_KEY=0;
 ...
 ```
 
 **Лог-файл (log-file):**
+```bash
+$ cat nod32mirror.log | tail -n 30
+```
 ```log
 [YYYY-MM-DD/HH:MM:SS] [Type] Some log message.. 
-
 ...
 ```
