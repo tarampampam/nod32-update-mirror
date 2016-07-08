@@ -1,5 +1,6 @@
-# ESET Nod32 Update Mirror
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/tarampampam/nod32-update-mirror/master/LICENSE) ![OS](https://img.shields.io/badge/OS-unix-green.svg)
 
+# ESET Nod32 Update Mirror
 
 #### По-русски:
 Набор скриптов для создания зеркала базы обновления антивируса "Eset Nod32". Для работы требуется:
@@ -9,7 +10,6 @@
   - Установленные `curl`, `wget`, `unrar` (опционально), и некоторые другие стандартные приложения.
 
 Параметры запуска и дополнительные функции смотри запустив скрипт с флагом `--help`.
-
 
 #### In english:
 A set of scripts for creation "Eset Nod32" antivirus updates database mirror. Depends:
