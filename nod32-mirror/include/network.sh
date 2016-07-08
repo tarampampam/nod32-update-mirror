@@ -165,6 +165,8 @@ function network_sync_remote_file() {
         ui_message 'debug' 'Wget result' "$debug_data";
         case "$result" in
           *[Nn]ot\ retrieving*) return 101;;
+          *[Oo]mitting\ download*) return 101;;
+          *[Nn]ot\ modified\ on\ server*) return 101;;
           *[Ss]aved*) return 100;;
           *ERROR\ 404*) return 12;;
           *) return 10;;
