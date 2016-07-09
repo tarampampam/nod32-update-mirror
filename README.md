@@ -18,7 +18,7 @@
 >  
 >Another options and additional features look by running script with the flag `--help`.
 
-![Console screenshot](https://cloud.githubusercontent.com/assets/7326800/16690457/8617ac88-4541-11e6-84ee-270e1593e54f.png)
+![Console screenshot](https://cloud.githubusercontent.com/assets/7326800/16709324/ee055c38-4626-11e6-832e-17f40576d8c2.png)
 
 ----------
 ### <i class="icon-download"></i>Установка / Installation
