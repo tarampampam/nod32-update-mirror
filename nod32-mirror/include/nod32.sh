@@ -181,7 +181,7 @@ function nod32_mirror_remote_directory() {
           'PCUVER')
             # Program Component Update
             [[ "$NOD32MIRROR_VERSIONS" == *pcu* ]] && {
-              local pcu_file_relative_uri=$(fs_remove_multiple_slaches "$NOD32MIRROR_URI_PATH/pcu/update.ver");
+              local pcu_file_relative_uri=$(fs_remove_multiple_slaches "/$NOD32MIRROR_URI_PATH/pcu/update.ver");
               section_content="file=$pcu_file_relative_uri";
               dont_modify_section=1;
               write_section=1;
@@ -236,7 +236,7 @@ function nod32_mirror_remote_directory() {
                 fi;
               fi;
               files_array+=("$file_full_uri");
-              file_new_relative_uri=$(fs_remove_multiple_slaches "$NOD32MIRROR_URI_PATH/$extra_url_path/$filename_only");
+              file_new_relative_uri=$(fs_remove_multiple_slaches "/$NOD32MIRROR_URI_PATH/$extra_url_path/$filename_only");
             fi;
             sections_writed_counter=$((sections_writed_counter+1));
             ui_message 'debug' "+ Write section \"$section_name\"";

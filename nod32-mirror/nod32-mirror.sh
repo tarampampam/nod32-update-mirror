@@ -21,7 +21,7 @@
 # THE SOFTWARE. 
 
 # Declare important variables
-export NOD32MIRROR_VERSION="1.0.1.0";
+export NOD32MIRROR_VERSION="1.0.1.1";
 [[ -z $NOD32MIRROR_BASE_DIR ]]  && export NOD32MIRROR_BASE_DIR=$(dirname $(readlink -e $0));
 
 # Execute bootstrap script
@@ -117,8 +117,9 @@ done;
       -o -name "$NOD32MIRROR_TIMESTAMP_FILE_NAME" \
       -o -name "$NOD32MIRROR_VERSION_FILE_NAME" \)\
       -delete;
-    find "$NOD32MIRROR_MIRROR_DIR" -type d \
-      -name 'v[0-9]*' \
+    find "$NOD32MIRROR_MIRROR_DIR" -type d \(\
+      -name 'pcu' \
+      -o -name 'v[0-9]*' \)\
       -exec rm -Rf "{}" +;
     ui_message 'notice' 'Mirror flushed';
   };
