@@ -21,10 +21,11 @@
 # THE SOFTWARE. 
 
 # Declare important variables
-export NOD32MIRROR_VERSION="1.0.0.1";
+export NOD32MIRROR_VERSION="1.0.1.0";
+[[ -z $NOD32MIRROR_BASE_DIR ]]  && export NOD32MIRROR_BASE_DIR=$(dirname $(readlink -e $0));
 
 # Execute bootstrap script
-source "$(dirname $(readlink -e $0))/bootstrap.sh" || { echo "[FATAL ERROR] Bootstrap file not found or contains errors" && exit 1; };
+source "$NOD32MIRROR_BASE_DIR/include/bootstrap.sh" || { echo "[FATAL ERROR] Bootstrap file not found or contains errors" && exit 1; };
 
 # Declare actions flags
 ACTION_MAKE_UPDATE=0;
@@ -33,6 +34,7 @@ ACTION_GET_KEY=0;
 ACTION_KEYS_UPDATE=0;
 ACTION_KEYS_CLEAN=0;
 ACTION_KEYS_SHOW=0;
+ACTION_DISABLE_NETWORK_LIMITS=1;
 ACTION_SHOW_HELP=1;
 ACTION_SHOW_VERSION=0;
 
@@ -45,10 +47,7 @@ for arg in "$@"; do
     '--keys-update')       ACTION_SHOW_HELP=0; ACTION_KEYS_UPDATE=1;;
     '--keys-clean')        ACTION_SHOW_HELP=0; ACTION_KEYS_CLEAN=1;;
     '--keys-show')         ACTION_SHOW_HELP=0; ACTION_KEYS_SHOW=1;;
-    '-l'|'--no-limit')
-      ui_message 'debug' 'Download limits DISABLED';
-      export NOD32MIRROR_DOWNLOAD_SPEED_LIMIT=0;
-      export NOD32MIRROR_DOWNLOAD_DELAY=0;;
+    '-l'|'--no-limit')     ACTION_DISABLE_NETWORK_LIMITS=1;;
     '-h'|'-H'|'--help')    ACTION_SHOW_HELP=1;;
     '-V'|'-v'|'--version') ACTION_SHOW_HELP=0; ACTION_SHOW_VERSION=1;;
   esac;
@@ -105,6 +104,7 @@ done;
   echo 'License MIT: <rawgit.com/tarampampam/nod32-update-mirror/master/LICENSE>';
   echo;
   echo 'This is free software. There is NO WARRANTY, to the extent permitted by law.';
+  echo;
 };
 
 [[ "$ACTION_MAKE_FLUSH" -eq 1 ]] && {
@@ -130,6 +130,13 @@ done;
   nod32keys_get_valid_key || {
     ui_message 'fatal' 'Cannot get valid free key' && exit 1;
   }
+};
+
+[[ "$ACTION_DISABLE_NETWORK_LIMITS" -eq 1 ]] && {
+  ui_message 'debug' 'Execute "dissable network limits" action';
+  ui_message 'debug' 'Download limits DISABLED';
+  export NOD32MIRROR_DOWNLOAD_SPEED_LIMIT=0;
+  export NOD32MIRROR_DOWNLOAD_DELAY=0;
 };
 
 [[ "$ACTION_KEYS_UPDATE" -eq 1 ]] && {
@@ -169,10 +176,10 @@ done;
     fi;
     ui_message 'debug' 'Username and password' "$username:$password";
   } || {
-    # Work with declared servers
     ui_message 'debug' 'Use free key option is disabled';
-    nod32_autosetup_working_server; # This will setup $NOD32MIRROR_SERVER_URI, $NOD32MIRROR_SERVER_USERNAME and $NOD32MIRROR_SERVER_PASSWORD
-                                    # used settings in configuration file
+    # Setup global server URI, username and password based on settings
+    # declared in configuration file
+    nod32_autosetup_working_server;
   };
   # Check for exists work server info
   if [[ ! -z "$NOD32MIRROR_SERVER_URI" ]]; then
@@ -186,14 +193,17 @@ done;
     # Prepare directory for temporary files
     if fs_remove_temp_directory && fs_create_temp_directory; then
       ui_message 'debug' 'Directory for temporary files' "$(fs_get_temp_directory)";
+      NOD32MIRROR_VERSIONS="__ROOT__ $NOD32MIRROR_VERSIONS"; # Add '__ROOT__' to versions list
       for VERSION in $NOD32MIRROR_VERSIONS; do
-        server_uri=$(network_uri_remove_last_slash "$NOD32MIRROR_SERVER_URI");
-        target_dir=$(network_uri_remove_last_slash "$NOD32MIRROR_MIRROR_DIR");
+        extra_url='';
         if [[ ! "$VERSION" == "__ROOT__" ]]; then
-          server_uri="$server_uri/v$VERSION/";
-          target_dir="$target_dir/v$VERSION";
+          if [[ "$VERSION" =~ ^[0-9]+$ ]]; then
+            extra_url="v$VERSION/";
+          else
+            extra_url="$VERSION/";
+          fi;
         fi;
-        nod32_mirror_remote_directory "$server_uri" "$NOD32MIRROR_SERVER_USERNAME" "$NOD32MIRROR_SERVER_PASSWORD" "$target_dir";
+        nod32_mirror_remote_directory "$extra_url";
       done;
       fs_create_timestamp_file "$NOD32MIRROR_MIRROR_DIR" && {
         ui_message 'info' 'Timestamp file created' "$NOD32MIRROR_TIMESTAMP_FILE_NAME";

@@ -21,11 +21,10 @@
 # THE SOFTWARE. 
 
 export LC_ALL=C;
-[[ -z $NOD32MIRROR_BASE_DIR ]]  && export NOD32MIRROR_BASE_DIR=$(dirname $(readlink -e $0));
 [[ -z $NOD32MIRROR_FORCE_YES ]] && export NOD32MIRROR_FORCE_YES=0;
 
 function require() {
-  source "$1" 2>/dev/null || { echo "[FATAL ERROR] $2 file '$1' not exists or contains errors" && exit 1; };
+  source "$1" || { echo "[FATAL ERROR] $2 file '$1' not exists or contains errors" && exit 1; };
 }
 
 require "$NOD32MIRROR_BASE_DIR/settings.conf"        'Settings';

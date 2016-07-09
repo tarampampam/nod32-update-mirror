@@ -2,28 +2,26 @@
 
 # ESET Nod32 Update Mirror
 
-#### По-русски:
 Набор скриптов для создания зеркала базы обновления антивируса "Eset Nod32". Для работы требуется:
 
   - Unix-система (тестировался на CentOS 7, FreeNas 9.3 и FreeBSD 8.3);
   - Bash (тестировался на версиях 4.1.11(2), 4.2.24(1) и 4.2.45(1));
-  - Установленные `curl`, `wget`, `unrar` (опционально), и некоторые другие стандартные приложения.
+  - Установленные `curl` или `wget`, `unrar` (опционально), и некоторые другие стандартные приложения.
 
 Параметры запуска и дополнительные функции смотри запустив скрипт с флагом `--help`.
 
-#### In english:
-A set of scripts for creation "Eset Nod32" antivirus updates database mirror. Depends:
-
-  - Unix-system (tested on CentOS 7, FreeNas 9.3 and FreeBSD 8.3);
-  - Bash (tested on versions 4.1.11(2), 4.2.24(1) and 4.2.45(1));
-  - Installed `curl` or `wget`, `unrar` (for getting updates from official mirrors), and some other standard applications.
-
-Another options and additional features look by running script with the flag `--help`.
+> This is a set of scripts for creation "Eset Nod32" antivirus updates database mirror. Depends:
+> 
+>  - Unix-system (tested on CentOS 7, FreeNas 9.3 and FreeBSD 8.3);
+>  - Bash (tested on versions 4.1.11(2), 4.2.24(1) and 4.2.45(1));
+>  - Installed `curl` or `wget`, `unrar` (for getting updates from official mirrors), and some other standard applications.
+>  
+>Another options and additional features look by running script with the flag `--help`.
 
 ![Console screenshot](https://cloud.githubusercontent.com/assets/7326800/16690457/8617ac88-4541-11e6-84ee-270e1593e54f.png)
 
 ----------
-### <i class="icon-download"></i>Установка
+### <i class="icon-download"></i>Установка / Installation
 
 - Скачиваем крайнюю версию и распаковываем:
 ```
@@ -63,36 +61,14 @@ $ ./nod32-mirror.sh --update
 > К сообщению **обязательно** прикладывайте содержимое файла `settings.conf`, версии используемого ПО (`cat /proc/version`, `bash --version`, `wget -V`, `curl -V`), и вывод работы скрипта **в не измененном виде**!
 
 ----------
-### <i class="icon-cog"></i>Настройка
+### <i class="icon-cog"></i>Настройка / Configuration
 
-Основные параметры указываются в файле `settings.conf`, их названия и описания приведены в таблице ниже:
+Все настройки указываются в файле `settings.conf`. Каждая опция сопровождается подробным описанием и примером использования. Пожалуйста, будьте внимательны при его настройке.
 
-&nbsp; | Описание
----: | :-------------
-`NOD32MIRROR_DEBUG_MODE` | (`0`\|`1`) Режим отладки
-`NOD32MIRROR_COLOR_OUTPUT` | (`0`\|`1`) Использовать "цветной" вывод
-`NOD32MIRROR_USE_FREE_KEY` | (`0`\|`1`) Означает необходимость обновляться с официального зеркала ESET Nod32, ключ к которому необходимо взять с "пиратского" ресурса. При активировании данного функционала значения `NOD32MIRROR_SERVER_%N%` будут проигнорированы. **ВНИМАНИЕ! ДАННЫЙ ФУНКЦИОНАЛ ТОЛЬКО ДЛЯ ОЗНАКОМЛЕНИЯ И ИЗУЧЕНИЯ! ВЫ САМИ НЕСЕТЕ ОТВЕТСТВЕННОСТЬ ЗА ЕГО ИСПОЛЬЗОВАНИЕ!**
-`NOD32MIRROR_SERVER_%N%` | (`строка`) Сервера обновлений от 0 до 9 (*заменяем %N%*) в формате:<br />`%uri% %username% %password%`
-`NOD32MIRROR_PLATFORMS` | (`список`) Платформы и продукты, для которых брать обновления
-`NOD32MIRROR_TYPES` | (`список`) Типы файлов обновления, которые необходимо включить в зеркало
-`NOD32MIRROR_LANGUAGES` | (`список`) Языки файлов обновлений (касается модулей), полный список значений можно подсмотреть по [этой ссылке](http://kb.eset.com/esetkb/index?page=content&id=SOLN3308)
-`NOD32MIRROR_VERSIONS` | (`список`) Указание версий продуктов (*поиск обновлений для них будет произведен автоматически*)
-`NOD32MIRROR_MIRROR_DIR` | (`строка`) Путь до директории, в которой будут храниться файлы обновлений
-`NOD32MIRROR_TEMP_DIR` | (`строка`) Путь до директории для временных файлов
-`NOD32MIRROR_TEMP_DIRNAME` | (`строка`) Имя директории для временных файлов
-`NOD32MIRROR_LOG_PATH` | (`строка`) Путь до лог-файла, в который ведется запись
-`NOD32MIRROR_CURL_BIN` | (`строка`) Путь до бинарника `curl` *(если установить `false` то `curl` использоваться не будет)*
-`NOD32MIRROR_WGET_BIN` | (`строка`) Путь до бинарника `wget` *(если установить `false` то `wget` использоваться не будет)*
-`NOD32MIRROR_TEST_URI` | (`строка`) URI для тестирования валидности ключей. Так как он время от времени изменяется - он был вынесен отдельным парасетром
-`NOD32MIRROR_DOWNLOAD_SPEED_LIMIT` | (`число`) Лимит *(в Кб/сек.)* на скорость скачивания файлов обновления
-`NOD32MIRROR_DOWNLOAD_DELAY` | (`число`) Задержка в секундах между скачиваниями файлов
-`NOD32MIRROR_USERAGENT` | (`строка`) User-Agent с использованием которого будут выполняться запросы
-`NOD32MIRROR_TIMESTAMP_FILE_NAME` | (`строка`) Имя файла, который создается в директории с зеркалом и содержит дату крайнего запуска скрипта
-`NOD32MIRROR_VERSION_FILE_NAME` | (`строка`) Имя файла, который создается в директории с зеркалом и содержит определенную версию базы *(определяет не всегда корректно)*
-
+> All settings are specified in the file `settings.conf`. Each option is accompanied by a detailed description and example of usage. Please be careful while modify settings.
 
 ----------
-#### <i class="icon-file"></i>Особенности
+#### <i class="icon-file"></i>Особенности / Features
 
  - Работает как с `curl`, так и `wget` не зависимо друг от друга;
  - Если произошла ошибка при обновлении с сервера, который указан, например, в `NOD32MIRROR_SERVER_0` - производится попытка обновиться с сервера, указанного в `NOD32MIRROR_SERVER_1`, `NOD32MIRROR_SERVER_2`..`NOD32MIRROR_SERVER_9`;
@@ -107,6 +83,7 @@ $ ./nod32-mirror.sh --update
 
 ----------
 #### <i class="icon-pencil"></i>История изменений
+* **1.0.1.0** - Объемное изменение. Добавлены опции `NOD32MIRROR_BASE_URI`, `NOD32MIRROR_URI_PATH`и некоторые другие. Возвращена поддержка секции `[HOSTS]` в файле `update.ver` *(для неё-то и нужно указание URI сервера)*. Добавлена поддержка `pcu` *(Program Component Update)*. Изменены некоторые настройки "по умолчанию". Протестирована работа ESET Nod32 v5 с зеркалом. Корректность работы более поздних версий антивируса не представляется возможным на данный момент, так как лень;
 * **1.0.0.1** - Issue #43 fix;
 * **1.0.0.0** - Полностью переписан. Новый web-интерфейс. **Изменены параметры запуска**;
 * **0.4.5.1** - Обновлен веб-интерфейс, обновлен пример конфига для nginx, конфиги для apache обновляться более не будут;

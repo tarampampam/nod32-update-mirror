@@ -39,6 +39,21 @@ function fs_get_file_directory() {
   echo $(dirname "$path");
 }
 
+function fs_remove_multiple_slaches() {
+  local path=$1; # Any string (string)
+  tr -s '/' <<< "$path";
+}
+
+function fs_add_last_slash() {
+  local path=$1; # Path (string)
+  network_uri_add_last_slash "$path"; # Link to another function
+}
+
+function fs_remove_last_slash() {
+  local path=$1; # Path (string)
+  network_uri_remove_last_slash "$path"; # Link to another function
+}
+
 function fs_get_temp_directory() {
   echo "$NOD32MIRROR_TEMP_DIR/$NOD32MIRROR_TEMP_DIRNAME";
 }
