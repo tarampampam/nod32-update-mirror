@@ -21,7 +21,7 @@
 # THE SOFTWARE. 
 
 # Declare important variables
-export NOD32MIRROR_VERSION="1.0.1.1";
+export NOD32MIRROR_VERSION="1.0.1.2";
 [[ -z $NOD32MIRROR_BASE_DIR ]]  && export NOD32MIRROR_BASE_DIR=$(dirname $(readlink -e $0));
 
 # Execute bootstrap script
@@ -64,47 +64,48 @@ done;
   curl_inst="$not_installed"    && { system_application_exists 'curl'  && curl_inst="$installed"; };
   wget_inst="$not_installed"    && { system_application_exists 'wget'  && wget_inst="$installed"; };
   sed_awk_inst="$not_installed" && { system_application_exists 'sed'   && system_application_exists 'awk' && sed_awk_inst="$installed"; };
-  echo '    _   __          __________      __  ____';
-  echo '   / | / /___  ____/ /__  /__ \    /  |/  (_)_____________  _____';
-  echo '  /  |/ / __ \/ __  / /_ <__/ /   / /|_/ / / ___/ ___/ __ \/ ___/';
-  echo ' / /|  / /_/ / /_/ /___/ / __/   / /  / / / /  / /  / /_/ / /';
-  echo '/_/ |_/\____/\__,_//____/____/  /_/  /_/_/_/  /_/   \____/_/';
-  echo;
-  echo "$(ui_style 'NOD32 Update Mirror Script' 'green'), version "$(ui_style "$NOD32MIRROR_VERSION" 'yellow');
-  echo;
-  echo "$(ui_style 'Optional depends by:' 'yellow')";
-  echo "  $(ui_style 'unrar' 'yellow')      ($unrar_inst)";
-  echo "  $(ui_style 'curl' 'yellow')       ($curl_inst)";
-  echo "  $(ui_style 'wget' 'yellow')       ($wget_inst)";
-  echo "  $(ui_style 'sed & awk' 'yellow')  ($sed_awk_inst)";
-  echo;
-  echo "$(ui_style 'Usage:' 'yellow')";
-  echo "  $self [options]";
-  echo;
-  echo "$(ui_style 'Options:' 'yellow')";
-  echo "  $(ui_style '-u, --update' 'green')       $(ui_style 'Update mirror' 'yellow')";
-  echo "  $(ui_style '-f, --flush' 'green')        Remove all downloaded mirror files";
-  echo "  $(ui_style '-k, --get-key' 'green')      $(ui_style 'Get free key' 'yellow') ($(ui_style 'Use for educational or informational purposes only!' 'red bold'))";
-  echo "      $(ui_style '--keys-update' 'green')  Update free keys";
-  echo "      $(ui_style '--keys-clean' 'green')   Test all stored keys and remove invalid";
-  echo "      $(ui_style '--keys-show' 'green')    Show all stored valid keys";
-  echo "  $(ui_style '-C, --color' 'green')        Force enable color output";
-  echo "  $(ui_style '-c, --no-color' 'green')     Force disable color output";
-  echo "  $(ui_style '-l, --no-limit' 'green')     Disable any download limits";
-  echo "  $(ui_style '-d, --debug' 'green')        Display debug messages";
-  echo "  $(ui_style '-h, --help' 'green')         Display this help message";
-  echo "  $(ui_style '-v, --version' 'green')      Display script version";
-  echo;
+echo -e "
+    _   __          __________      __  ____
+   / | / /___  ____/ /__  /__ \    /  |/  (_)_____________  _____
+  /  |/ / __ \/ __  / /_ <__/ /   / /|_/ / / ___/ ___/ __ \/ ___/
+ / /|  / /_/ / /_/ /___/ / __/   / /  / / / /  / /  / /_/ / /
+/_/ |_/\____/\__,_//____/____/  /_/  /_/_/_/  /_/   \____/_/
+
+  $(ui_style 'NOD32 Update Mirror' 'green') ($(ui_style 'https://git.io/vKs5E' 'yellow underline')), version "$(ui_style "$NOD32MIRROR_VERSION" 'yellow')"
+
+$(ui_style 'Optional depends by:' 'yellow')
+  $(ui_style 'unrar' 'yellow')      ($unrar_inst)
+  $(ui_style 'curl' 'yellow')       ($curl_inst)
+  $(ui_style 'wget' 'yellow')       ($wget_inst)
+  $(ui_style 'sed & awk' 'yellow')  ($sed_awk_inst)
+
+$(ui_style 'Usage:' 'yellow')
+  $self [options]
+
+$(ui_style 'Options:' 'yellow')
+  $(ui_style '-u, --update' 'green')       $(ui_style 'Update mirror' 'yellow')
+  $(ui_style '-f, --flush' 'green')        Remove all downloaded mirror files
+  $(ui_style '-k, --get-key' 'green')      $(ui_style 'Get free key' 'yellow') ($(ui_style 'Use for educational or informational purposes only!' 'red bold'))
+      $(ui_style '--keys-update' 'green')  Update free keys
+      $(ui_style '--keys-clean' 'green')   Test all stored keys and remove invalid
+      $(ui_style '--keys-show' 'green')    Show all stored valid keys
+  $(ui_style '-C, --color' 'green')        Force enable color output
+  $(ui_style '-c, --no-color' 'green')     Force disable color output
+  $(ui_style '-l, --no-limit' 'green')     Disable any download limits
+  $(ui_style '-d, --debug' 'green')        Display debug messages
+  $(ui_style '-h, --help' 'green')         Display this help message
+  $(ui_style '-v, --version' 'green')      Display script version
+";
 };
 
 [[ "$ACTION_SHOW_VERSION" -eq 1 ]] && {
-  echo;
-  echo "Nod32 Update Mirror Script, version $NOD32MIRROR_VERSION";
-  echo 'Copyright 2014-2016 Paramtamtam <github.com/tarampampam>';
-  echo 'License MIT: <rawgit.com/tarampampam/nod32-update-mirror/master/LICENSE>';
-  echo;
-  echo 'This is free software. There is NO WARRANTY, to the extent permitted by law.';
-  echo;
+  echo -e "
+Nod32 Update Mirror Script, version $NOD32MIRROR_VERSION
+Copyright 2014-2016 Paramtamtam <github.com/tarampampam>
+License MIT: <rawgit.com/tarampampam/nod32-update-mirror/master/LICENSE>
+
+This is free software. There is NO WARRANTY, to the extent permitted by law.
+";
 };
 
 [[ "$ACTION_MAKE_FLUSH" -eq 1 ]] && {
