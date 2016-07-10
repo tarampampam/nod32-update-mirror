@@ -12,7 +12,7 @@ nginx config:
 ```nginx
 server {
   # ...
-  root /path/to/root/directory;
+  root /path/to/this/dir;
   # ...
 }
 ```
@@ -21,7 +21,7 @@ Apache config:
 ```apache
 <VirtualHost *:*>
   # ...
-  DocumentRoot    "/path/to/root/directory"
+  DocumentRoot "/path/to/this/dir"
   # ...
 </VirtualHost>
 ```
