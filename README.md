@@ -67,6 +67,22 @@ $ ./nod32-mirror.sh --update
 
 > All settings are specified in the file `settings.conf`. Each option is accompanied by a detailed description and example of usage. Please be careful while modify settings.
 
+### <i class="icon-cog"></i>Настройка веб-интерфейса / Web-interface configuration
+
+![Web-interface screenshot](https://cloud.githubusercontent.com/assets/7326800/16712120/bca39a8c-4695-11e6-970c-477c5e4dd081.png)
+
+Веб-интерфейс представляет из себя страницу, выполненную в минималистичном стиле, которая выводится **вместо** списка файлов зеркала обновления. Возможно его настроить таким образом, что при клике на логотип будет раскачиваться необходимый дистрибутив, или предоставляться выбор пользователю - выбрать необходимый в соответствии с разрядностью его операционной системы. Так же по умолчанию настроен вывод крайней даты обновления зеркала и версии антивирусной базы *(при наведении курсора на логотип и наличии соответствующих настроек)*.
+
+Для его установки и настройки необходимо:
+
+ - Изменить настройки ранее созданного виртуального сервера nginx *(с которого производится раздача файлов обновлений)*, приведя их в соответствие с [nginx.server.conf](https://github.com/tarampampam/nod32-update-mirror/blob/master/webface/nginx.server.conf);
+ - В директорию, которая установлена в параметре `root` виртуального сервера nginx, переместить директории `webface/webface` и `webface/download`;
+ - Разместить в директории `download` необходимые дистрибутивы *(при необходимости)*;
+ - В директории `webface` отредактировать файл `index.html`, указав в секции `General settings` необходимые настройки.
+
+> Использовать Apache как для вывода веб-интерфейса, так и для раздачи файлов крайне **не** рекомендую.
+
+
 ----------
 #### <i class="icon-file"></i>Особенности / Features
 
@@ -124,7 +140,7 @@ $ ./nod32-mirror.sh --update
 
 ----------
 
-> Copyright 2014-2016 [github.com/tarampampam](http://github.com/tarampampam/)
+> Copyright (c) 2014-2016 [github.com/tarampampam](http://github.com/tarampampam/)
 
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
