@@ -15,5 +15,7 @@
 *.conf
 *.nup
 *.ver
+lastevent.txt
+version.txt
 ._*
 !.gitignore

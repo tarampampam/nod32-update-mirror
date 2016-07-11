@@ -21,7 +21,7 @@
 # THE SOFTWARE. 
 
 # Declare important variables
-export NOD32MIRROR_VERSION="1.0.1.5";
+export NOD32MIRROR_VERSION="1.0.1.6";
 [[ -z $NOD32MIRROR_BASE_DIR ]]  && export NOD32MIRROR_BASE_DIR=$(dirname $(readlink -e $0));
 
 # Execute bootstrap script
