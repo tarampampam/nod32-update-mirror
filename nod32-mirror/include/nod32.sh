@@ -23,13 +23,12 @@
 [[ -z $NOD32MIRROR_SERVER_URI ]]              && export NOD32MIRROR_SERVER_URI='';
 [[ -z $NOD32MIRROR_SERVER_USERNAME ]]         && export NOD32MIRROR_SERVER_USERNAME='';
 [[ -z $NOD32MIRROR_SERVER_PASSWORD ]]         && export NOD32MIRROR_SERVER_PASSWORD='';
-[[ -z $NOD32MIRROR_BASE_URI ]]                && export NOD32MIRROR_BASE_URI='/';
 [[ -z $NOD32MIRROR_URI_PATH ]]                && export NOD32MIRROR_URI_PATH='';
 [[ -z $NOD32MIRROR_TEST_URI ]]                && export NOD32MIRROR_TEST_URI='';
 [[ -z $NOD32MIRROR_PLATFORMS ]]               && export NOD32MIRROR_PLATFORMS='__ALL__';
 [[ -z $NOD32MIRROR_TYPES ]]                   && export NOD32MIRROR_TYPES='__ALL__';
 [[ -z $NOD32MIRROR_LANGUAGES ]]               && export NOD32MIRROR_LANGUAGES='__ALL__';
-[[ -z $NOD32MIRROR_VERSIONS ]]                && export NOD32MIRROR_VERSIONS='pcu 4 5 6 7 8 9 10';
+[[ -z $NOD32MIRROR_VERSIONS ]]                && export NOD32MIRROR_VERSIONS='pcu 4 5 6 7 8 9 10 11';
 [[ -z $NOD32MIRROR_VERSION_FILE_NAME ]]       && export NOD32MIRROR_VERSION_FILE_NAME='';
 [[ -z $NOD32MIRROR_DB_VERSION_SECTION_NAME ]] && export NOD32MIRROR_DB_VERSION_SECTION_NAME='ENGINE2';
 [[ -z $NOD32MIRROR_VERSION_FILE_CRLF ]]       && export NOD32MIRROR_VERSION_FILE_CRLF=0;
@@ -173,8 +172,7 @@ function nod32_mirror_remote_directory() {
         fi;
         case "$section_name" in
           'HOSTS')
-            local mirror_base_uri=$(network_uri_remove_last_slash "$NOD32MIRROR_BASE_URI");
-            section_content="Other=10@$mirror_base_uri/$NOD32MIRROR_URI_PATH";
+            section_content=";; Ignore HOSTS section";
             dont_modify_section=1;
             write_section=1;
             ;;

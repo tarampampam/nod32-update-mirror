@@ -16,12 +16,3 @@ server {
   # ...
 }
 ```
-
-Apache config:
-```apache
-<VirtualHost *:*>
-  # ...
-  DocumentRoot "/path/to/this/dir"
-  # ...
-</VirtualHost>
-```

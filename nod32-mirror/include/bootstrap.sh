@@ -21,7 +21,8 @@
 # THE SOFTWARE. 
 
 export LC_ALL=C;
-[[ -z $NOD32MIRROR_FORCE_YES ]] && export NOD32MIRROR_FORCE_YES=0;
+[[ -z $NOD32MIRROR_FORCE_YES ]]         && export NOD32MIRROR_FORCE_YES=0;
+[[ -z $NOD32MIRROR_EXTRA_CONFIGS_DIR ]] && export NOD32MIRROR_EXTRA_CONFIGS_DIR="$NOD32MIRROR_BASE_DIR/conf.d";
 
 function require() {
   source "$1" || { echo "[FATAL ERROR] $2 file '$1' not exists or contains errors" && exit 1; };
@@ -38,6 +39,13 @@ require "$NOD32MIRROR_BASE_DIR/include/network.sh"   'Network functions';
 require "$NOD32MIRROR_BASE_DIR/include/nod32keys.sh" 'NOD32 keys functions';
 require "$NOD32MIRROR_BASE_DIR/include/nod32.sh"     'NOD32 servers functions';
 require "$NOD32MIRROR_BASE_DIR/include/ini.sh"       'INI files functions';
+
+# Load extra configuration files
+[ -d "$NOD32MIRROR_EXTRA_CONFIGS_DIR" ] && {
+  for extra_config in $(find $NOD32MIRROR_EXTRA_CONFIGS_DIR -type f -name '*.conf'); do
+    require "$extra_config" 'Extra configuration file';
+  done;
+};
 
 # Check passed to script arguments
 for arg in "$@"; do
