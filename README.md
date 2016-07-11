@@ -142,7 +142,7 @@ $ rm -Rf ./nod32-update-mirror/
 История изменений доступна по [этой ссылке](https://github.com/tarampampam/nod32-update-mirror/blob/master/CHANGESLOG.md).
 
 ### <i class="icon-upload"></i>Ссылки
- - [Пост в блоге](http://blog.kplus.pro/?p=29)
+ - [Пост в блоге](http://blog.kplus.pro/?p=2378)
  - [Пост на хабре](http://habrahabr.ru/post/232163/)
  - [Редактор readme.md](https://stackedit.io/)
 
