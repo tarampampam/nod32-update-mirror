@@ -34,7 +34,7 @@ $ curl -V
 #### Настройки (settings):
 **Настройки скрипта (script settings)**:
 ```bash
-$ cat ./settings.conf | grep -v -e '^#' -e '^$'
+$ cat ./settings.conf ./conf.d/*.conf | grep -v -e '^#' -e '^$'
 ```
 ```shell
 export NOD32MIRROR_DEBUG_MODE=0;
