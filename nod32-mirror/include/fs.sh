@@ -69,11 +69,20 @@ function fs_create_temp_directory() {
 
 function fs_get_file_size() {
   local path=$1; # Path to file (string)
-  if [ -f $path ]; then
-    echo $(($(ls -l "$path" | cut -f 5 -d " ")/1024));
-  else
-    echo "0";
-  fi
+  local result=0;
+  [ -f "$path" ] && {
+    result=$(($(ls -l "$path" | cut -f 5 -d " ")/1024));
+  };
+  echo "$result";
+}
+
+function fs_get_directory_size() {
+  local path=$1; # Path to directory (string)
+  local result=0;
+  if system_application_exists 'du' && [ -d "$path" ]; then
+    result=$(du -hs "$mirror_dir" | tail -n 1 | awk '{print $1;}');
+  fi;
+  echo "$result";
 }
 
 function fs_remove_temp_directory() {

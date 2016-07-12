@@ -21,7 +21,7 @@
 # THE SOFTWARE. 
 
 # Declare important variables
-export NOD32MIRROR_VERSION="1.0.1.6";
+export NOD32MIRROR_VERSION="1.0.1.7";
 [[ -z $NOD32MIRROR_BASE_DIR ]] && export NOD32MIRROR_BASE_DIR=$(dirname $(readlink -e $0));
 
 # Execute bootstrap script
@@ -41,12 +41,13 @@ ACTION_SHOW_VERSION=0;
 # Check passed options and set actions flags
 for arg in "$@"; do
   case $arg in
-    '-u'|'--update')       ACTION_SHOW_HELP=0; ACTION_MAKE_UPDATE=1;;
+    '-u'|'--update')       ACTION_SHOW_HELP=0; ACTION_MAKE_UPDATE=1; ACTION_SHOW_STAT=1;;
     '-f'|'--flush')        ACTION_SHOW_HELP=0; ACTION_MAKE_FLUSH=1;;
     '-k'|'--get-key')      ACTION_SHOW_HELP=0; ACTION_GET_KEY=1;;
     '--keys-update')       ACTION_SHOW_HELP=0; ACTION_KEYS_UPDATE=1;;
     '--keys-clean')        ACTION_SHOW_HELP=0; ACTION_KEYS_CLEAN=1;;
     '--keys-show')         ACTION_SHOW_HELP=0; ACTION_KEYS_SHOW=1;;
+    '-s'|'--stat')         ACTION_SHOW_HELP=0; ACTION_MAKE_UPDATE=0; ACTION_SHOW_STAT=1;;
     '-l'|'--no-limit')     ACTION_DISABLE_NETWORK_LIMITS=1;;
     '-h'|'-H'|'--help')    ACTION_SHOW_HELP=1;;
     '-V'|'-v'|'--version') ACTION_SHOW_HELP=0; ACTION_SHOW_VERSION=1;;
@@ -91,6 +92,7 @@ $(ui_style 'Options:' 'yellow')
       $(ui_style '--keys-show' 'green')    Show all stored valid keys
   $(ui_style '-C, --color' 'green')        Force enable color output
   $(ui_style '-c, --no-color' 'green')     Force disable color output
+  $(ui_style '-s, --stat' 'green')         Show statistics
   $(ui_style '-l, --no-limit' 'green')     Disable any download limits
   $(ui_style '-d, --debug' 'green')        Display debug messages
   $(ui_style '-h, --help' 'green')         Display this help message
@@ -210,13 +212,32 @@ This is free software. There is NO WARRANTY, to the extent permitted by law.
       fs_create_timestamp_file "$NOD32MIRROR_MIRROR_DIR" && {
         ui_message 'info' 'Timestamp file created' "$NOD32MIRROR_TIMESTAMP_FILE_NAME";
       };
-      ui_message 'info' 'Work complete';
     else
-      ui_message 'fatal' 'Cannot create (or remove) directory for temporary files' "$(fs_get_temp_directory)" && exit 1;
+      ui_message 'fatal' 'Cannot create (or remove) directory for temporary files' "$(fs_get_temp_directory)";
+      ACTION_SHOW_STAT=0;
     fi;
   else
     ui_message 'fatal' 'No available servers could be found at this time. Please, check configuration file';
+    ACTION_SHOW_STAT=0;
   fi;
+};
+
+[[ "$ACTION_SHOW_STAT" -eq 1 ]] && {
+  mirror_dir="$NOD32MIRROR_MIRROR_DIR";
+  [ -d "$mirror_dir" ] && {
+    files_count=$(find "$mirror_dir" -type f -iname '*.nup' | wc -l);
+    [[ ! "$files_count" == "" ]] && {
+      ui_message 'info' "Total updates (*.nup) files count: $(ui_style "$files_count file(s)" 'yellow')";
+    };
+    updates_files_size=$(find "$mirror_dir" -type f -name '*.nup' -ls | awk '{total += $7} END {printf("%.1fM", (total/1024/1024))}');
+    [[ ! "$updates_files_size" == "" ]] && {
+      ui_message 'info' "Total updates files size: $(ui_style $updates_files_size 'yellow')";
+    };
+    mirror_dir_size=$(fs_get_directory_size "$mirror_dir");
+    [[ ! "$mirror_dir_size" == "0" ]] && {
+      ui_message 'info' "Mirror directory size is $(ui_style $mirror_dir_size 'yellow')";
+    };
+  };
 };
 
 [ -d "$(fs_get_temp_directory)" ] && fs_remove_temp_directory;
