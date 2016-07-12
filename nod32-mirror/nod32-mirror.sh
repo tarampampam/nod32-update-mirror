@@ -22,7 +22,7 @@
 
 # Declare important variables
 export NOD32MIRROR_VERSION="1.0.1.6";
-[[ -z $NOD32MIRROR_BASE_DIR ]]  && export NOD32MIRROR_BASE_DIR=$(dirname $(readlink -e $0));
+[[ -z $NOD32MIRROR_BASE_DIR ]] && export NOD32MIRROR_BASE_DIR=$(dirname $(readlink $0));
 
 # Execute bootstrap script
 source "$NOD32MIRROR_BASE_DIR/include/bootstrap.sh" || { echo "[FATAL ERROR] Bootstrap file not found or contains errors" && exit 1; };
@@ -34,7 +34,7 @@ ACTION_GET_KEY=0;
 ACTION_KEYS_UPDATE=0;
 ACTION_KEYS_CLEAN=0;
 ACTION_KEYS_SHOW=0;
-ACTION_DISABLE_NETWORK_LIMITS=1;
+ACTION_DISABLE_NETWORK_LIMITS=0;
 ACTION_SHOW_HELP=1;
 ACTION_SHOW_VERSION=0;
 
