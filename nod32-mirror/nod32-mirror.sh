@@ -21,7 +21,7 @@
 # THE SOFTWARE. 
 
 # Declare important variables
-export NOD32MIRROR_VERSION="1.0.1.7";
+export NOD32MIRROR_VERSION="1.0.1.8";
 [[ -z $NOD32MIRROR_BASE_DIR ]] && export NOD32MIRROR_BASE_DIR=$(dirname $(readlink -e $0));
 
 # Execute bootstrap script
@@ -42,7 +42,7 @@ ACTION_SHOW_VERSION=0;
 for arg in "$@"; do
   case $arg in
     '-u'|'--update')       ACTION_SHOW_HELP=0; ACTION_MAKE_UPDATE=1; ACTION_SHOW_STAT=1;;
-    '-f'|'--flush')        ACTION_SHOW_HELP=0; ACTION_MAKE_FLUSH=1;;
+    '-f'|'--flush')        ACTION_SHOW_HELP=0; ACTION_MAKE_FLUSH=1; ACTION_SHOW_STAT=1;;
     '-k'|'--get-key')      ACTION_SHOW_HELP=0; ACTION_GET_KEY=1;;
     '--keys-update')       ACTION_SHOW_HELP=0; ACTION_KEYS_UPDATE=1;;
     '--keys-clean')        ACTION_SHOW_HELP=0; ACTION_KEYS_CLEAN=1;;
@@ -231,7 +231,7 @@ This is free software. There is NO WARRANTY, to the extent permitted by law.
     };
     updates_files_size=$(find "$mirror_dir" -type f -name '*.nup' -ls | awk '{total += $7} END {printf("%.1fM", (total/1024/1024))}');
     [[ ! "$updates_files_size" == "" ]] && {
-      ui_message 'info' "Total updates files size: $(ui_style $updates_files_size 'yellow')";
+      ui_message 'info' "Total updates (*.nup) files size: $(ui_style $updates_files_size 'yellow')";
     };
     mirror_dir_size=$(fs_get_directory_size "$mirror_dir");
     [[ ! "$mirror_dir_size" == "0" ]] && {
