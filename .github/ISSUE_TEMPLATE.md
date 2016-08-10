@@ -1,18 +1,18 @@
-#### Шаги для воспроизведения проблемы *(steps to reproduce)*
+## Шаги для воспроизведения проблемы *(steps to reproduce)*
  1. 
  2. 
  3. 
 
-#### Какое действие ожидалось *(expected behaviour)*
+## Какое действие ожидалось *(expected behaviour)*
 Расскажите, какое поведение от скрипта вы ожидали *(tell us what should happen)*
 
 
-#### Что произошло на самом деле *(actual behaviour)*
+## Что произошло на самом деле *(actual behaviour)*
 Расскажите что произошло на самом деле *(tell us what happens instead)*
 
 ---------
 
-#### Данные системы *(system information)*
+### Данные системы *(system information)*
 **Операционная система (operating system)**:
 ```bash
 $ cat /proc/version
@@ -31,7 +31,7 @@ $ curl -V
 
 ---------
 
-#### Настройки (settings):
+### Настройки (settings):
 **Настройки скрипта (script settings)**:
 ```bash
 $ cat ./settings.conf ./conf.d/*.conf | grep -v -e '^#' -e '^$'
