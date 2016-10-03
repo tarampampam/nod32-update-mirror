@@ -167,6 +167,7 @@ function network_sync_remote_file() {
           *[Nn]ot\ retrieving*) return 101;;
           *[Oo]mitting\ download*) return 101;;
           *[Nn]ot\ modified\ on\ server*) return 101;;
+          *[Ss]erver\ ignored*)  return 101;;
           *[Ss]aved*) return 100;;
           *ERROR\ 404*) return 12;;
           *) return 10;;
