@@ -29,6 +29,7 @@
 [[ -z $NOD32MIRROR_TYPES ]]                   && export NOD32MIRROR_TYPES='__ALL__';
 [[ -z $NOD32MIRROR_LANGUAGES ]]               && export NOD32MIRROR_LANGUAGES='__ALL__';
 [[ -z $NOD32MIRROR_VERSIONS ]]                && export NOD32MIRROR_VERSIONS='pcu 4 5 6 7 8 9 10 11';
+[[ -z $NOD32MIRROR_W10UPGRADE_ENABLED ]]      && export NOD32MIRROR_W10UPGRADE_ENABLED=1;
 [[ -z $NOD32MIRROR_VERSION_FILE_NAME ]]       && export NOD32MIRROR_VERSION_FILE_NAME='';
 [[ -z $NOD32MIRROR_DB_VERSION_SECTION_NAME ]] && export NOD32MIRROR_DB_VERSION_SECTION_NAME='ENGINE2';
 [[ -z $NOD32MIRROR_VERSION_FILE_CRLF ]]       && export NOD32MIRROR_VERSION_FILE_CRLF=0;
@@ -191,6 +192,9 @@ function nod32_mirror_remote_directory() {
                 if [[ "$settings_platform" == "$section_platform" ]] || [[ "$NOD32MIRROR_PLATFORMS" == "__ALL__" ]]; then
                   if [[ ! -z "$section_type" ]]; then
                     for settings_type in $NOD32MIRROR_TYPES; do
+                      if [[ ! -z "$NOD32MIRROR_W10UPGRADE_ENABLED" ]] && [[ "$section_type" == "w10upgrade" ]]; then
+                        continue;
+                      fi;
                       if [[ "$settings_type" == "$section_type" ]] || [[ "$NOD32MIRROR_TYPES" == "__ALL__" ]]; then
                         #write_section=1 && break 3;
                         for settings_level in 0 1 2; do
