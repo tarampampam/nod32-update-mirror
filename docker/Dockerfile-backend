@@ -1,0 +1,10 @@
+FROM alpine:latest
+
+ADD ./nod32-mirror ./crontab.conf /opt/
+
+RUN apk --no-cache --update add bash unrar curl\
+# && touch crontab.tmp \
+# && echo '*/1 * * * * sh -c "echo /app/nod32_mirror.sh"' > crontab.tmp \
+ && crontab ./opt/crontab.conf
+
+CMD ["/usr/sbin/crond", "-f", "-d", "0"]
