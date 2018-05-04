@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  backend:
+    build: .
+    volumes:
+      - ../volumes/nod32mirror:/nod32mirror:z
+    networks:
+      - www-nod32mirror
+
+  frontend:
+    image: nginx:alpine
+    ports:
+      - 80:80
+    volumes:
+      - ../volumes/nod32mirror:/nod32mirror:ro
+      - ./nginx.server.conf:/etc/nginx/conf.d/nginx.server.conf:ro
+    networks:
+      - www-nod32mirror
+
+
+networks:
+  www-nod32mirror:
