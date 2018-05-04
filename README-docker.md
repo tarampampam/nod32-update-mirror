@@ -26,7 +26,13 @@
 
 ## Run with docker-compose
 
+* Build and run
+
 ```
  $ docker-compose build
  $ docker-compose up -d
 ```
+
+* Test webui on http://127.0.0.1.
+  Do not test on http://localhost, it contains nginx start pages.
+
