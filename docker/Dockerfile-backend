@@ -6,14 +6,19 @@ ARG GID
 
 WORKDIR /backend
 
-ADD ./nod32-mirror ./crontab.conf ./
+ADD ./nod32-mirror ./crontab.conf ./.nod32keys ./
+# remove ./.nod32keys !
 
 RUN addgroup -g ${GID} workers\
  && adduser -D -u ${UID} -G workers worker\
  && apk --no-cache --update add bash unrar curl\
  && crontab -u worker ./crontab.conf\
 # && chmod -R +r ./\
- && chmod +x ./nod32-mirror.sh ./include/*.sh
+ && chmod +x ./nod32-mirror.sh ./include/*.sh\
+ 
+ # remove me
+ && mkdir /nod32mirror && chown worker:workers /nod32mirror
 
-#USER worker
-CMD ["/usr/sbin/crond", "-f", "-d", "0"]
+USER worker
+ENTRYPOINT ["/backend/nod32-mirror.sh", "--update"]
+#CMD ["/usr/sbin/crond", "-f", "-d", "0"]

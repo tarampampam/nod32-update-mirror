@@ -2,3 +2,6 @@
 !nod32-mirror/
 !nginx.server.conf
 !crontab.conf
+
+# temp
+!.nod32keys
