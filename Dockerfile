@@ -6,12 +6,15 @@ FROM alpine:latest
 # Use following command to build only backend
 # $ docker build -t nod32-update:backend .
 
+ENV WORKER_UID=2000\
+    WORKER_GID=2000
+
 WORKDIR /backend
 ADD ./nod32-mirror ./crontab.conf ./
 
 RUN apk --no-cache --update add bash unrar curl\
- && addgroup workers\
- && adduser -D -G workers worker\
+ && addgroup -g ${WORKER_GID} workers\
+ && adduser -u ${WORKER_UID} -D -G workers worker\
  && mv ./crontab.conf /etc/\
  && crontab -u worker /etc/crontab.conf\
 
