@@ -10,8 +10,8 @@ ADD ./nod32-mirror ./crontab.conf ./
 
 RUN addgroup -g ${GID} workers\
  && adduser -D -u ${UID} -G workers worker\
- && apk --no-cache --update add bash unrar curl\
- && crontab ./crontab.conf\
+ && apk --no-cache --update add bash unrar curl sudo\
+ && crontab -u worker ./crontab.conf\
 # && chmod -R +r ./\
  && chmod +x ./nod32-mirror.sh ./include/*.sh
 
