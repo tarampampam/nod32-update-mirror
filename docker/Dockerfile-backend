@@ -1,9 +1,19 @@
 FROM alpine:latest
 
-ADD ./nod32-mirror ./crontab.conf /backend/
+# We are going to use common GID (+better UID) to share files on the volume.
+ARG UID
+ARG GID
 
-RUN apk --no-cache --update add bash unrar curl\
- && chmod +x /backend/nod32-mirror.sh /backend/include/*.sh\
- && crontab ./backend/crontab.conf
+WORKDIR /backend
 
+ADD ./nod32-mirror ./crontab.conf ./
+
+RUN addgroup -g ${GID} workers\
+ && adduser -D -u ${UID} -G workers worker\
+ && apk --no-cache --update add bash unrar curl\
+ && crontab ./crontab.conf\
+# && chmod -R +r ./\
+ && chmod +x ./nod32-mirror.sh ./include/*.sh
+
+#USER worker
 CMD ["/usr/sbin/crond", "-f", "-d", "0"]
