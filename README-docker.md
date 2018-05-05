@@ -1,6 +1,16 @@
 
 # Packing in docker
 
+## Notice
+
+Look into (and make changes?) in `./.dockerignore`
+ before add extra files in docker container:
+  - Legal keys;
+  - custom config;
+  - Etc.
+
+Any files will be ignored, but excluded ones.
+
 ## Run backend standalone
 
 * Build using the `Dockerfile`:
@@ -40,4 +50,3 @@
   - Do not test on http://localhost, it contains nginx start pages.
   - Look into the <target directory>, it contains the website files
     Maybe add there the files from `./webroot`
-
