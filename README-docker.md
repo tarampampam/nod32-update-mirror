@@ -26,6 +26,9 @@
 
 ## Run with docker-compose
 
+* Edit <target directory> in docker-compose.yml
+  - replace `../volumes/nod32mirror` with the directory path.
+
 * Build and run
 
 ```
@@ -34,5 +37,7 @@
 ```
 
 * Test webui on http://127.0.0.1.
-  Do not test on http://localhost, it contains nginx start pages.
+  - Do not test on http://localhost, it contains nginx start pages.
+  - Look into the <target directory>, it contains the website files
+    Maybe add there the files from `./webroot`
 
