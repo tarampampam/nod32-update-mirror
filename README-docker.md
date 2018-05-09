@@ -3,10 +3,9 @@
 
 ## Notice
 
-Look into (and make changes?) in `./.dockerignore`
- before add extra files in docker container:
+Edit `./.dockerignore` before add extra files in docker container:
   - Legal keys;
-  - custom config;
+  - Custom config;
   - Etc.
 
 Any files will be ignored, but excluded ones.
@@ -21,7 +20,8 @@ Any files will be ignored, but excluded ones.
 
 * Choose the `<target directory>`. Where to place downloaded files.
   - Use full path to the target tirectory: /home/user/nod32mirror
-  - Make user with uid=2000 and/or gid=2000 can write and enter this directory:
+  - Make sure user with uid=2000 and/or gid=2000
+    have permission to write and enter target directory:
 ```bash
  $ chown -R 2000:2000 <target directory> # EXAMLPE: chown -R 2000:2000 /home/user/nod32mirror
 ```
@@ -32,11 +32,11 @@ Any files will be ignored, but excluded ones.
 ```
 
 * After the cron job triggers,
-  your <target directory> will contain downloaded files
+  your `<target directory>` will contain downloaded files.
 
 ## Run with docker-compose
 
-* Edit <target directory> in docker-compose.yml
+* Edit `<target directory>` in docker-compose.yml
   - replace `../volumes/nod32mirror` with the directory path.
 
 * Build and run
@@ -48,5 +48,5 @@ Any files will be ignored, but excluded ones.
 
 * Test webui on http://127.0.0.1.
   - Do not test on http://localhost, it contains nginx start pages.
-  - Look into the <target directory>, it contains the website files
-    Maybe add there the files from `./webroot`
+  - `<target directory>` now contains update files.
+    You can add there files from `./webroot` distr directory.
