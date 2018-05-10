@@ -28,7 +28,9 @@ Any files will be ignored, but excluded ones.
 
 * Run docker container:
 ```bash
- $ docker run --rm -v <target directory>:/nod32mirror nod32-update:backend
+ $ docker run -d\
+     -v <target directory>:/worker/nod32mirror\
+     -v /optional/path/to/custom/settings.conf:/backend/settings.conf:ro nod32-update:backend
 ```
 
 * After the cron job triggers,
