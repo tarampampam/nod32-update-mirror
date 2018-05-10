@@ -7,20 +7,21 @@ FROM alpine:latest
 # $ docker build -t nod32-update:backend .
 
 ENV WORKER_UID=2000\
-    WORKER_GID=2000
+    WORKER_GID=2000\
+    WORKER_HOME=/worker
 
 WORKDIR /backend
 ADD ./nod32-mirror ./crontab.conf ./
 
 RUN apk --no-cache --update add bash unrar curl\
  && addgroup -g ${WORKER_GID} workers\
- && adduser -u ${WORKER_UID} -D -G workers worker\
+ && adduser -h ${WORKER_HOME} -u ${WORKER_UID} -D -G workers worker\
  && mv ./crontab.conf /etc/\
  && crontab -u worker /etc/crontab.conf\
 
  && chmod +x ./nod32-mirror.sh ./include/*.sh\
- && mkdir /nod32mirror\
- && chown worker:workers /nod32mirror
+ && mkdir ${WORKER_HOME}/nod32mirror\
+ && chown worker:workers ${WORKER_HOME}/nod32mirror
 
 # single-run mode, uncomment this two lines
 #USER worker
