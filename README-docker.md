@@ -39,7 +39,7 @@ Any files will be ignored, but excluded ones.
 ## Run with docker-compose
 
 * Edit `<target directory>` in docker-compose.yml
-  - replace `../volumes/nod32mirror` with the directory path.
+  - replace `/path/to/storage/nod32mirror` with the directory path.
 
 * Build and run
 

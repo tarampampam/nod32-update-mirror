@@ -4,12 +4,13 @@ services:
   backend:
     build: .
     volumes:
-      - ../volumes/nod32mirror:/worker/nod32mirror:z
+      - /path/to/storage/nod32mirror:/worker/nod32mirror:z
+      - /optional/path/to/custom/settings.conf:/backend/settings.conf:ro
 
   frontend:
     image: nginx:alpine
     ports:
       - 80:80
     volumes:
-      - ../volumes/nod32mirror:/worker/nod32mirror:ro
+      - /path/to/storage//nod32mirror:/worker/nod32mirror:ro
       - ./nginx.server.conf:/etc/nginx/conf.d/nginx.server.conf:ro
