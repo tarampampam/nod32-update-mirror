@@ -20,10 +20,10 @@ Any files will be ignored, but excluded ones.
 
 * Choose the `<target directory>`. Where to place downloaded files.
   - Use full path to the target tirectory: /home/user/nod32mirror
-  - Make sure user with uid=2000 and/or gid=2000
+  - Make sure user with uid=100 and/or gid=101
     have permission to write and enter target directory:
 ```bash
- $ chown -R 2000:2000 <target directory> # EXAMLPE: chown -R 2000:2000 /home/user/nod32mirror
+ $ chown -R 100:101 <target directory> # EXAMLPE: chown -R 100:101 /home/user/nod32mirror
 ```
 
 * Run docker container:
@@ -39,7 +39,7 @@ Any files will be ignored, but excluded ones.
 ## Run with docker-compose
 
 * Edit `<target directory>` in docker-compose.yml
-  - replace `/path/to/storage/nod32mirror` with the directory path.
+  - replace `/path/to/storage/nod32mirror` with the directory path (./webroot?).
 
 * Build and run
 
@@ -49,6 +49,9 @@ Any files will be ignored, but excluded ones.
 ```
 
 * Test webui on http://127.0.0.1.
-  - Do not test on http://localhost, it contains nginx start pages.
-  - `<target directory>` now contains update files.
-    You can add there files from `./webroot` distr directory.
+  - After bakend's cronjob triggers, `<target directory>` will fill up with update files.
+    You can add there files from `./webroot` distr directory
+  - Make sure frontend nginx process can read
+    from target directory uid=100, gid=101.
+  - Make sure backend cron job worker process can write
+    to target directory uid=100, gid=101.

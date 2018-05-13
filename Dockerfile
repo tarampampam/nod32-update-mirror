@@ -6,8 +6,8 @@ FROM alpine:latest
 # Use following command to build only backend
 # $ docker build -t nod32-update:backend .
 
-ENV WORKER_UID=2000\
-    WORKER_GID=2000\
+ENV WORKER_UID=100\
+    WORKER_GID=101\
     WORKER_HOME=/worker
 
 WORKDIR /backend
