@@ -1,57 +1,59 @@
+# Завернуть в докер
 
-# Packing in docker
+## Обратите внимение
 
-## Notice
+Многие файлы игнорируются в `./.dockerignore`. Чтобы пересобрать контейнер
+ со своими файлами, добавьте их в исключения:
+  - Ключи обновления;
+  - Кастомный конфиг;
+  - Прочее.
 
-Edit `./.dockerignore` before add extra files in docker container:
-  - Legal keys;
-  - Custom config;
-  - Etc.
+Иначе ваши файлы будут игнорироваться при сборке
 
-Any files will be ignored, but excluded ones.
+## Запуск контейнера обновлений отдельно
 
-## Run backend standalone
-
-* Build using the `Dockerfile`:
+* Сборка с использованием `Dockerfile`:
 ```bash
  $ docker build -t nod32-update:backend .
 ```
-  - Look into the Dockerfile ! Change the CMD options, tf you want.
+  - Обратите внимание, в Dockerfile  предусмотрен режим без cron. См внизу CMD.
 
-* Choose the `<target directory>`. Where to place downloaded files.
-  - Use full path to the target tirectory: /home/user/nod32mirror
-  - Make sure user with uid=100 and/or gid=101
-    have permission to write and enter target directory:
+* Выберите каталог `<target directory>`. Куда будут загружаться обновления.
+  - Используйте полный путь до каталога, например: /home/user/nod32mirror
+  - Убедитесь, что у пользователя с uid=100 и/или gid=101
+    есть право на запись и право входить в каталог:
 ```bash
- $ chown -R 100:101 <target directory> # EXAMLPE: chown -R 100:101 /home/user/nod32mirror
+ $ chown -R 100:101 <target directory> # Например: chown -R 100:101 /home/user/nod32mirror
+ $ chmod ug+rwx <target directory>     # Например: chmod ug+rwx /home/user/nod32mirror
 ```
 
-* Run docker container:
+* Запуск контейнера:
 ```bash
  $ docker run -d\
      -v <target directory>:/worker/nod32mirror\
      -v /optional/path/to/custom/settings.conf:/backend/settings.conf:ro nod32-update:backend
 ```
 
-* After the cron job triggers,
-  your `<target directory>` will contain downloaded files.
+* Дождитесь срабатывания задания cron,
+  и в `<target directory>` будут загружены файлы обновлений.
 
-## Run with docker-compose
+## Запуск с использованием docker-compose
 
-* Edit `<target directory>` in docker-compose.yml
-  - replace `/path/to/storage/nod32mirror` with the directory path (./webroot?).
+* Измените `<target directory>` в docker-compose.yml
+  - замените `/path/to/storage/nod32mirror` на путь до директория (./webroot?).
 
-* Build and run
+* Сборка и запуск
 
 ```
  $ docker-compose build
  $ docker-compose up -d
 ```
 
-* Test webui on http://127.0.0.1.
-  - After bakend's cronjob triggers, `<target directory>` will fill up with update files.
-    You can add there files from `./webroot` distr directory
-  - Make sure frontend nginx process can read
-    from target directory uid=100, gid=101.
-  - Make sure backend cron job worker process can write
-    to target directory uid=100, gid=101.
+* Проверьте webui на http://127.0.0.1.
+  - Дождитесь срабатывания задания cron,
+    и в `<target directory>` будут загружены файлы обновлений.
+    Туда же можно добавить файлы из `./webroot`
+  - Убедитесь, что процесс nginx может читать
+    из целевого каталога uid=100, gid=101.
+  - Убедитесь, что скрипт обновлений может писать
+    в целевой каталог uid=100, gid=101.
