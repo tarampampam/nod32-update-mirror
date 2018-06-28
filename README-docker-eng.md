@@ -9,13 +9,31 @@ Edit `./.dockerignore` before add extra files in docker container:
 
 Any files will be ignored, but excluded ones.
 
+## Simply run without any building
+
+You can use pre-built [kran0/nod32-update-mirror:latest](https://hub.docker.com/r/kran0/nod32-update-mirror/tags/) docker container.
+
+- Make some directory lile nod-32-mirror. Make sure you have docker and docker-compose installed;
+- Get files `docker-compose.run.yaml`, `nginx.server.conf` from the project and optionally settings.conf;
+- If you have no settings.conf, delete the line with ./settings.conf volume from backend service in `docker-compose.run.yaml`;
+- Run `docker-compoe --file docker-compose.run.yaml up -d`. Done.
+Put it in some directory
+
+## Simply Run backend standalone without any building
+
+```bash
+ $ docker run -d\
+     -v $PWD/nod32mirror:/worker/nod32mirror\
+     -v /optional/path/to/custom/settings.conf:/backend/settings.conf:ro kran0/nod32-update-mirror:latest
+```
+
 ## Run backend standalone
 
 * Build using the `Dockerfile`:
 ```bash
  $ docker build -t nod32-update:backend .
 ```
-  - Look into the Dockerfile ! Change the CMD options, tf you want.
+  - Look into the Dockerfile ! Change the CMD options, if you want.
 
 * Choose the `<target directory>`. Where to place downloaded files.
   - Use full path to the target tirectory: /home/user/nod32mirror

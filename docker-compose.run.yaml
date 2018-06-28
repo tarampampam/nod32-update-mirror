@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  backend:
+    image: kran0/nod32-update-mirror:latest
+    volumes:
+      - ./volumes/nod32mirror:/worker/nod32mirror:z
+      - ./settings.conf:/backend/settings.conf:ro
+
+  frontend:
+    image: nginx:alpine
+    ports:
+      - 80:80
+    volumes:
+      - ./volumes/nod32mirror:/nod32mirror:ro
+      - ./nginx.server.conf:/etc/nginx/conf.d/default.conf:ro
