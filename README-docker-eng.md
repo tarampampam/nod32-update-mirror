@@ -13,11 +13,10 @@ Any files will be ignored, but excluded ones.
 
 You can use pre-built [kran0/nod32-update-mirror:latest](https://hub.docker.com/r/kran0/nod32-update-mirror/tags/) docker container.
 
-- Make some directory lile nod-32-mirror. Make sure you have docker and docker-compose installed;
+- Create work directory like `$HOME/nod-32-mirror`. Make sure you have docker and docker-compose installed;
 - Get files `docker-compose.run.yaml`, `nginx.server.conf` from the project and optionally settings.conf;
 - If you have no settings.conf, delete the line with ./settings.conf volume from backend service in `docker-compose.run.yaml`;
 - Run `docker-compoe --file docker-compose.run.yaml up -d`. Done.
-Put it in some directory
 
 ## Simply Run backend standalone without any building
 
