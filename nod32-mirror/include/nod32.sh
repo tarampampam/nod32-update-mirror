@@ -271,6 +271,8 @@ function nod32_mirror_remote_directory() {
         case $? in
           101) echo -e "$(ui_style 'Skipped' 'gray')"; download_skipped_counter=$((download_skipped_counter+1));;
           100) echo -e "$(ui_style 'Success' 'green')"; download_successful_counter=$((download_successful_counter+1));;
+          #10 stands for okay in alpine's curl  # Todo: check other codes
+          10)  echo -e "$(ui_style 'Success' 'green')"; download_successful_counter=$((download_successful_counter+1));;
           12)  echo -e "$(ui_style 'File not found' 'red')"; download_errors_counter=$((download_errors_counter+1));;
           *)   echo -e "$(ui_style 'Downloading file error' 'red')"; download_errors_counter=$((download_errors_counter+1));;
         esac;
