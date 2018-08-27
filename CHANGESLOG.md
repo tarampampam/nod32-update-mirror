@@ -8,7 +8,9 @@ The format is based on [Keep a Changelog][keepachangelog] and this project adher
 
 ### Changed
 
-- Application now docker-based (yahoo!)
+- Application now docker-based (thx for idea to [kran0][kran0])
+
+[kran0]:https://github.com/kran0
 
 ## v1.0.1.8 - Jul 13, 2016
 

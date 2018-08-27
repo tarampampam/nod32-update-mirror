@@ -7,7 +7,7 @@ volumes:
 
 services:
   nod32-nginx:
-    build: .
+    image: tarampampam/nod32-update-mirror
     restart: on-failure
     environment:
       NGINX_USER: 'nginx'
@@ -39,12 +39,12 @@ services:
      - '8080:80'
 
   scheduler:
-    build: .
+    image: tarampampam/nod32-update-mirror
     restart: on-failure
     stop_grace_period: 3s
     environment:
       FIRST_START_DELAY: '2' # In SECONDS
-      SCHEDULE_PERIOD: '900' # In SECONDS
+      SCHEDULE_PERIOD: '43200' # In SECONDS, 43200 = 12 hours
       START_BEFORE_LOOP: 'true'
       NOD32MIRROR_DEBUG_MODE: '0'
       NOD32MIRROR_USE_FREE_KEY: '1'
