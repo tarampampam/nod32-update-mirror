@@ -16,3 +16,6 @@ RUN \
   && chmod +x /*.sh \
   && apk --update add bash curl wget grep sed apache2-utils unrar findutils \
   && rm -rf /var/cache/apk/*
+
+WORKDIR /src
+VOLUME ["/data"]
