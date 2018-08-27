@@ -38,25 +38,26 @@ services:
     ports:
      - '8080:80'
 
-#  scheduler:
-#    build: .
-#    restart: on-failure
-#    stop_grace_period: 3s
-#    environment:
-#      FIRST_START_DELAY: '2' # In SECONDS
-#      SCHEDULE_PERIOD: '900' # In SECONDS
-#      START_BEFORE_LOOP: 'true'
-#      NOD32MIRROR_DEBUG_MODE: '1'
-#      NOD32MIRROR_USE_FREE_KEY: '1'
-#      NOD32MIRROR_MIRROR_DIR: '/data'
-#      NOD32MIRROR_LOG_PATH: '/var/log/nod32/nod32mirror.log'
-#      NOD32MIRROR_KEYS_DIRECTORY: '/opt/nod32keys'
-#      NOD32MIRROR_VERSIONS: 'pcu 4 5 6 7 8 9'
-#      NOD32MIRROR_LANGUAGES: '1033 1049'
-#      NOD32MIRROR_DOWNLOAD_SPEED_LIMIT: '20480'
-#    entrypoint: /scheduler-entrypoint.sh
-#    command: /src/nod32-mirror.sh --force-yes --keys-update; /src/nod32-mirror.sh --force-yes --update
-#    volumes:
-#    - nod32-data:/data:rw
-#    - nod32-logs:/var/log/nod32:rw
-#    - nod32-keys:/opt/nod32keys:rw
+  scheduler:
+    build: .
+    restart: on-failure
+    stop_grace_period: 3s
+    environment:
+      FIRST_START_DELAY: '2' # In SECONDS
+      SCHEDULE_PERIOD: '900' # In SECONDS
+      START_BEFORE_LOOP: 'true'
+      NOD32MIRROR_DEBUG_MODE: '1'
+      NOD32MIRROR_USE_FREE_KEY: '1'
+      NOD32MIRROR_MIRROR_DIR: '/data'
+      NOD32MIRROR_LOG_PATH: '/var/log/nod32/nod32mirror.log'
+      NOD32MIRROR_KEYS_DIRECTORY: '/opt/nod32keys'
+      NOD32MIRROR_VERSIONS: 'pcu 4 5 6 7 8 9'
+      NOD32MIRROR_LANGUAGES: '1033 1049'
+      NOD32MIRROR_DOWNLOAD_MAX_TIME: '60'
+      NOD32MIRROR_DOWNLOAD_SPEED_LIMIT: '20480'
+    entrypoint: /scheduler-entrypoint.sh
+    command: /src/nod32-mirror.sh --force-yes --keys-update; /src/nod32-mirror.sh --force-yes --update
+    volumes:
+    - nod32-data:/data:rw
+    - nod32-logs:/var/log/nod32:rw
+    - nod32-keys:/opt/nod32keys:rw
