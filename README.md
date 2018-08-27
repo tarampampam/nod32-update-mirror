@@ -1,5 +1,7 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/tarampampam/nod32-update-mirror/master/LICENSE) ![Language](https://img.shields.io/badge/language-bash-yellowgreen.svg)
 
+> ## This version is no longer supported. Use v2.x and upper
+
 # ESET Nod32 Update Mirror
 
 > English version [available here](https://github.com/tarampampam/nod32-update-mirror/blob/master/README.eng.md).
