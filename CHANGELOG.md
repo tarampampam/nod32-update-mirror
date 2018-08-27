@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog][keepachangelog] and this project adheres to [Semantic Versioning][semver].
 
+## v2.2.0 - Aug 27, 2018
+
+### Changed
+
+- Option `NGINX_AUTH_USERS_AND_PASSWORDS` instead `NGINX_USE_AUTH` + `NGINX_AUTH_USER` + `NGINX_AUTH_PASSWORD`
+
 ## v2.1.0 - Aug 27, 2018
 
 ### Added

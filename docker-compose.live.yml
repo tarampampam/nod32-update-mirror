@@ -15,9 +15,7 @@ services:
       NGINX_SERVER_ACCESS_LOG_PATH: '/dev/stdout'
       NGINX_SERVER_SCHEME: 'http'
       NGINX_SERVER_NAME: '127.0.0.1'
-      NGINX_USE_AUTH: 'false' # or "true"
-      NGINX_AUTH_USER: 'some_login' # only if "NGINX_USE_AUTH" is "true"
-      NGINX_AUTH_PASSWORD: 'some_password' # only if "NGINX_USE_AUTH" is "true"
+      NGINX_AUTH_USERS_AND_PASSWORDS: 'user1:password1 user2:password2' # Comment this line or set "" to disable
     entrypoint: /nginx-extrypoint.sh
     command: nginx
     volumes:

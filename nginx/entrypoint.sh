@@ -5,10 +5,8 @@ set -e
 NGINX_CONFIG_FILE_PATH="${NGINX_CONFIG_FILE_PATH:-/etc/nginx/nginx.conf}";
 
 # Nginx basic auth settings
-NGINX_USE_AUTH="${NGINX_USE_AUTH:-true}";
 NGINX_AUTH_FILE_PATH="${NGINX_AUTH_FILE_PATH:-/etc/nginx/.htpasswd}";
-NGINX_AUTH_USER="${NGINX_AUTH_USER:-login}";
-NGINX_AUTH_PASSWORD="${NGINX_AUTH_PASSWORD:-password}";
+NGINX_AUTH_USERS_AND_PASSWORDS="${NGINX_AUTH_USERS_AND_PASSWORDS:-}";
 
 # Make replaces using pattern in a file. Pattern must looks like: '%ENV_VAR_NAME|default value%', where:
 # - 'ENV_VAR_NAME' - Environment variable name for replacing
@@ -43,13 +41,24 @@ function make_replaces() {
 }
 
 # Setup nginx basic auth settings
-if [ "$NGINX_USE_AUTH" == "true" ]; then
-  echo "Generate nginx basic auth file: $NGINX_AUTH_FILE_PATH ($NGINX_AUTH_USER : $NGINX_AUTH_PASSWORD)";
-  # Generate file
-  htpasswd -cb "$NGINX_AUTH_FILE_PATH" "$NGINX_AUTH_USER" "$NGINX_AUTH_PASSWORD";
+if [ "$NGINX_AUTH_USERS_AND_PASSWORDS" != "" ]; then
+  # Create empty file for passwords
+  [ ! -f "$NGINX_AUTH_FILE_PATH" ] && touch "$NGINX_AUTH_FILE_PATH";
+
+  for single_entry in $(echo "$NGINX_AUTH_USERS_AND_PASSWORDS" | tr [:space:] ' '); do
+    username=$(echo "${single_entry}" | cut -d ':' -f 1);
+    password=$(echo "${single_entry}" | cut -d ':' -f 2);
+
+    echo "Generate nginx basic auth file: $NGINX_AUTH_FILE_PATH ($username : $password)";
+    # Generate entry
+    htpasswd -b "$NGINX_AUTH_FILE_PATH" "$username" "$password";
+    # Make verification
+    htpasswd -vb "$NGINX_AUTH_FILE_PATH" "$username" "$password";
+  done;
+
+  echo 'Passwords file content:';
   cat "$NGINX_AUTH_FILE_PATH";
-  # Make verification
-  htpasswd -vb "$NGINX_AUTH_FILE_PATH" "$NGINX_AUTH_USER" "$NGINX_AUTH_PASSWORD";
+
   # Export environment value with nginx settings (function "make_replaces" works with it)
   # Also - you need to escape "^" char for passing into sed
   export NGINX_AUTH_SETTINGS='location ~* \^.+\.nup$ {
