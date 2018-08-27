@@ -5,6 +5,8 @@
 # ESET Nod32 Update Mirror
 
 [![Build][badge_build]][link_build]
+[![Size][badge_image_size]][link_build]
+[![Layers][badge_image_layers]][link_build]
 [![Stars][badge_pulls]][link_pulls]
 [![License][badge_license]][link_license]
 [![Issues][badge_issues]][link_issues]
@@ -74,10 +76,12 @@ $ docker-compose down -v
 
 MIT. Use anywhere for your pleasure.
 
-[badge_build]:https://img.shields.io/docker/build/tarampampam/nod32-update-mirror.svg?style=flat&maxAge=30
-[badge_pulls]:https://img.shields.io/docker/pulls/tarampampam/nod32-update-mirror.svg?style=flat&maxAge=30
-[badge_license]:https://img.shields.io/github/license/tarampampam/nod32-update-mirror.svg?style=flat&maxAge=30
-[badge_issues]:https://img.shields.io/github/issues/tarampampam/nod32-update-mirror.svg?style=flat&maxAge=30
+[badge_build]:https://img.shields.io/docker/build/tarampampam/nod32-update-mirror.svg?style=flat-square&maxAge=30
+[badge_image_size]:https://img.shields.io/microbadger/image-size/tarampampam/nod32-update-mirror.svg?style=flat-square&maxAge=30
+[badge_image_layers]:https://img.shields.io/microbadger/layers/tarampampam/nod32-update-mirror.svg?style=flat-square&maxAge=30
+[badge_pulls]:https://img.shields.io/docker/pulls/tarampampam/nod32-update-mirror.svg?style=flat-square&maxAge=30
+[badge_license]:https://img.shields.io/github/license/tarampampam/nod32-update-mirror.svg?style=flat-square&maxAge=30
+[badge_issues]:https://img.shields.io/github/issues/tarampampam/nod32-update-mirror.svg?style=flat-square&maxAge=30
 [link_build]:https://hub.docker.com/r/tarampampam/nod32-update-mirror/builds/
 [link_pulls]:https://hub.docker.com/r/tarampampam/nod32-update-mirror/
 [link_license]:https://github.com/tarampampam/nod32-update-mirror/blob/master/LICENSE
