@@ -8,17 +8,17 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE. 
+# THE SOFTWARE.
 
 [[ -z $NOD32MIRROR_SERVER_URI ]]              && export NOD32MIRROR_SERVER_URI='';
 [[ -z $NOD32MIRROR_SERVER_USERNAME ]]         && export NOD32MIRROR_SERVER_USERNAME='';
@@ -271,6 +271,8 @@ function nod32_mirror_remote_directory() {
         case $? in
           101) echo -e "$(ui_style 'Skipped' 'gray')"; download_skipped_counter=$((download_skipped_counter+1));;
           100) echo -e "$(ui_style 'Success' 'green')"; download_successful_counter=$((download_successful_counter+1));;
+          #10 stands for okay in alpine's curl  # Todo: check other codes
+          10)  echo -e "$(ui_style 'Success' 'green')"; download_successful_counter=$((download_successful_counter+1));;
           12)  echo -e "$(ui_style 'File not found' 'red')"; download_errors_counter=$((download_errors_counter+1));;
           *)   echo -e "$(ui_style 'Downloading file error' 'red')"; download_errors_counter=$((download_errors_counter+1));;
         esac;
