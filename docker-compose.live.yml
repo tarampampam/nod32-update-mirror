@@ -10,27 +10,14 @@ services:
     image: tarampampam/nod32-update-mirror
     restart: on-failure
     environment:
-      NGINX_USER: 'nginx'
-      NGINX_PID_FILE: '/var/run/nginx.pid'
-      NGINX_WORKER_PROCESSES: 'auto'
-      NGINX_RLIMIT_NOFILE: '2048'
-      NGINX_WORKER_CONNECTIONS: '1024'
-      NGINX_MULTI_ACCEPT: 'on'
       NGINX_ERROR_LOG_PATH: '/dev/stderr'
-      NGINX_ERROR_LOG_LEVEL: 'warn'
-      NGINX_EXTRA: '# No extra nginx config'
-      NGINX_SERVER_TOKENS: 'off'
-      NGINX_CLIENT_MAX_BODY_SIZE: '64m'
-      NGINX_SEND_TIMEOUT: '20s'
-      NGINX_CLIENT_BODY_TIMEOUT: '20s'
-      NGINX_HTTP_EXTRA: '# No extra nginx HTTP config'
-      NGINX_SERVER_LISTEN_PORT: '80'
       NGINX_SERVER_ROOT_DIRECTORY: '/data'
       NGINX_SERVER_ACCESS_LOG_PATH: '/dev/stdout'
-      NGINX_USE_AUTH: 'true' # or "false"
+      NGINX_SERVER_SCHEME: 'http'
+      NGINX_SERVER_NAME: '127.0.0.1'
+      NGINX_USE_AUTH: 'false' # or "true"
       NGINX_AUTH_USER: 'some_login' # only if "NGINX_USE_AUTH" is "true"
       NGINX_AUTH_PASSWORD: 'some_password' # only if "NGINX_USE_AUTH" is "true"
-      NGINX_SERVER_EXTRA: '# No extra SERVER config'
     entrypoint: /nginx-extrypoint.sh
     command: nginx
     volumes:

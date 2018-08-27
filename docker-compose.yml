@@ -25,6 +25,8 @@ services:
       NGINX_CLIENT_BODY_TIMEOUT: '20s'
       NGINX_HTTP_EXTRA: '# No extra nginx HTTP config'
       NGINX_SERVER_LISTEN_PORT: '80'
+      NGINX_SERVER_SCHEME: 'http'
+      NGINX_SERVER_NAME: '127.0.0.1'
       NGINX_SERVER_ROOT_DIRECTORY: '/data'
       NGINX_SERVER_ACCESS_LOG_PATH: '/dev/stdout'
       NGINX_USE_AUTH: 'true' # or "false"
@@ -46,7 +48,7 @@ services:
       FIRST_START_DELAY: '2' # In SECONDS
       SCHEDULE_PERIOD: '900' # In SECONDS
       START_BEFORE_LOOP: 'true'
-      NOD32MIRROR_DEBUG_MODE: '0'
+      NOD32MIRROR_DEBUG_MODE: '1'
       NOD32MIRROR_USE_FREE_KEY: '1'
       NOD32MIRROR_MIRROR_DIR: '/data'
       NOD32MIRROR_LOG_PATH: '/var/log/nod32/nod32mirror.log'
