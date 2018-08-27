@@ -1,6 +1,0 @@
-*.msi
-*.exe
-*.zip
-*.rar
-._*
-!.gitignore

@@ -8,17 +8,17 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE. 
+# THE SOFTWARE.
 
 export LC_ALL=C;
 [[ -z $NOD32MIRROR_FORCE_YES ]]         && export NOD32MIRROR_FORCE_YES=0;
@@ -58,16 +58,16 @@ for arg in "$@"; do
 done;
 
 # Check user id
-if [[ "$(id -u)" -eq 0 ]]; then
-  if [[ "$NOD32MIRROR_FORCE_YES" -ne 1 ]]; then
-    ui_message 'error' "$(ui_style 'Please do not run this script as root' 'red reverse')";
-    while true; do
-      echo -en "[Question] "; read -e -p "Do you want to continue? [y|n] " -i "n" yn;
-      case $yn in
-        [Nn]*) exit 1;;
-        [Yy]*) break;;
-        *)     ui_message 'error' 'Please answer (y)es or (n)o';;
-      esac;
-    done;
-  fi;
-fi;
+#if [[ "$(id -u)" -eq 0 ]]; then
+#  if [[ "$NOD32MIRROR_FORCE_YES" -ne 1 ]]; then
+#    ui_message 'error' "$(ui_style 'Please do not run this script as root' 'red reverse')";
+#    while true; do
+#      echo -en "[Question] "; read -e -p "Do you want to continue? [y|n] " -i "n" yn;
+#      case $yn in
+#        [Nn]*) exit 1;;
+#        [Yy]*) break;;
+#        *)     ui_message 'error' 'Please answer (y)es or (n)o';;
+#      esac;
+#    done;
+#  fi;
+#fi;

@@ -8,21 +8,21 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE. 
+# THE SOFTWARE.
 
 # Declare important variables
 export NOD32MIRROR_VERSION="1.0.1.8";
-[[ -z $NOD32MIRROR_BASE_DIR ]] && export NOD32MIRROR_BASE_DIR=$(dirname $(readlink -e $0));
+[[ -z $NOD32MIRROR_BASE_DIR ]] && export NOD32MIRROR_BASE_DIR=$(realpath $(dirname $0));
 
 # Execute bootstrap script
 source "$NOD32MIRROR_BASE_DIR/include/bootstrap.sh" || { echo "[FATAL ERROR] Bootstrap file not found or contains errors" && exit 1; };

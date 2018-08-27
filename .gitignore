@@ -1,23 +1,12 @@
-/.nod32keys
-/nod32mirror
-*.log
-/tmp
-/temp
+# Environment deps.
+/.env
 
-# OS trash files
-*.lnk
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
+# IDEs
+/nbproject
+/.idea
+
+# Temp dirs & trash
+/build
+/.build
 .DS_Store
-.AppleDouble
-.LSOverride
-._*
-.Spotlight-V100
-.Trashes
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
+*.cache
