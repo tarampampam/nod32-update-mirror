@@ -37,6 +37,12 @@ Docker-образ со скриптом для создания зеркала �
 Для запуска приложения достаточно выполнить:
 
 ```bash
+$ docker run --rm tarampampam/nod32-update-mirror:latest --help
+```
+
+Или для запуска контейнера авто-обновления с `nginx` для "раздачи" фалов обновления:
+
+```bash
 $ curl https://raw.githubusercontent.com/tarampampam/nod32-update-mirror/master/docker-compose.live.yml --output ./docker-compose.yml
 $ docker-compose up -d
 ```
