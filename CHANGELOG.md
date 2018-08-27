@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog][keepachangelog] and this project adheres to [Semantic Versioning][semver].
 
+## v2.1.0 - Aug 27, 2018
+
+### Added
+
+- Option `NOD32MIRROR_DOWNLOAD_MAX_TIME` (try to fix issue [#66])
+
+[#66]:https://github.com/tarampampam/nod32-update-mirror/issues/66
+
 ## v2.0.0 - Aug 27, 2018
 
 ### Changed
