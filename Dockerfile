@@ -1,17 +1,18 @@
 FROM nginx:1.15.2-alpine
 LABEL Description="Nod32 updates mirror"
 
-COPY ./nginx/html /usr/share/nginx/html-docker
-COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
-COPY ./nginx/entrypoint.sh /nginx-extrypoint.sh
-COPY ./scheduler/entrypoint.sh /scheduler-entrypoint.sh
-COPY ./src /src
+COPY . /docker
 
 RUN \
-  apk --update add bash curl wget grep sed apache2-utils unrar findutils \
-  && rm -Rfv /usr/share/nginx/html \
-  && mv /usr/share/nginx/html-docker /usr/share/nginx/html \
+  rm -Rfv /usr/share/nginx/html && mv -v /docker/nginx/html /usr/share/nginx/html \
   && chown -R 'nginx:nginx' /usr/share/nginx/html \
+  && mv -vf /docker/nginx/nginx.conf /etc/nginx/nginx.conf \
+  && mv -vf /docker/nginx/entrypoint.sh /nginx-extrypoint.sh \
+  && mv -vf /docker/scheduler/entrypoint.sh /scheduler-entrypoint.sh \
+  && rm -Rfv /src && mv -v /docker/src /src \
+  && rm -Rfv /docker \
   && mkdir -pv /data \
   && find /src -type f -name '*.sh' -exec chmod +x {} \; \
-  && chmod +x /*.sh
+  && chmod +x /*.sh \
+  && apk --update add bash curl wget grep sed apache2-utils unrar findutils \
+  && rm -rf /var/cache/apk/*
