@@ -19,3 +19,4 @@ RUN \
 
 WORKDIR /src
 VOLUME ["/data"]
+ENTRYPOINT ["/src/nod32-mirror.sh"]
