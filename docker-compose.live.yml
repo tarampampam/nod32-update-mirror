@@ -14,8 +14,8 @@ services:
       NGINX_SERVER_ROOT_DIRECTORY: '/data'
       NGINX_SERVER_ACCESS_LOG_PATH: '/dev/stdout'
       NGINX_SERVER_SCHEME: 'http'
-      NGINX_SERVER_NAME: '127.0.0.1'
-      NGINX_AUTH_USERS_AND_PASSWORDS: 'user1:password1 user2:password2' # Comment this line or set "" to disable
+      NGINX_SERVER_NAME: '192.168.1.80'
+      NGINX_AUTH_USERS_AND_PASSWORDS: # 'user1:password1 user2:password2' # Comment this line or set "" to disable
     entrypoint: /nginx-extrypoint.sh
     command: nginx
     volumes:
