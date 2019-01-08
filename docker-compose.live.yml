@@ -7,7 +7,7 @@ volumes:
 
 services:
   nod32-nginx:
-    image: tarampampam/nod32-update-mirror
+    image: virtuezo/nod32-update-mirror
     restart: on-failure
     environment:
       NGINX_ERROR_LOG_PATH: '/dev/stderr'
@@ -24,7 +24,7 @@ services:
      - '80'
 
   scheduler:
-    image: tarampampam/nod32-update-mirror
+    image: virtuezo/nod32-update-mirror
     restart: on-failure
     stop_grace_period: 3s
     environment:
@@ -36,8 +36,8 @@ services:
       NOD32MIRROR_MIRROR_DIR: '/data'
       NOD32MIRROR_LOG_PATH: '/var/log/nod32/nod32mirror.log'
       NOD32MIRROR_KEYS_DIRECTORY: '/opt/nod32keys'
-      NOD32MIRROR_VERSIONS: 'pcu 4 5 6 7 8 9'
-      NOD32MIRROR_LANGUAGES: '1033 1049'
+      NOD32MIRROR_VERSIONS: '4 5 6 7 8'
+      NOD32MIRROR_LANGUAGES: '1049'
       NOD32MIRROR_DOWNLOAD_SPEED_LIMIT: '20480'
     entrypoint: /scheduler-entrypoint.sh
     command: /src/nod32-mirror.sh --force-yes --keys-update; /src/nod32-mirror.sh --force-yes --update
