@@ -21,7 +21,7 @@ services:
     volumes:
     - nod32-data:/data:ro
     ports:
-     - '8080:80'
+     - '80'
 
   scheduler:
     image: tarampampam/nod32-update-mirror
