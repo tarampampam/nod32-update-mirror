@@ -43,6 +43,8 @@ services:
     restart: on-failure
     stop_grace_period: 3s
     environment:
+      #http_proxy: http://user:password@127.0.0.1:3128/ #если нужен прокси
+      #https_proxy: http://user:password@127.0.0.1:3128/ #если нужен прокси
       FIRST_START_DELAY: '2' # In SECONDS
       SCHEDULE_PERIOD: '900' # In SECONDS
       START_BEFORE_LOOP: 'true'
