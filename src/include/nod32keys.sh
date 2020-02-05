@@ -33,6 +33,20 @@ function nod32keys_get_new_free_keys() {
   #   ...
   local page_content='';
   local keys_list='';
+  page_content="$(network_get_content 'https://8fornod.net/keys-nod-32-4/')";
+  [[ ! -z "$page_content" ]] && {
+    keys_list+=$(sed -e 's/<[^>]*>//g' <<< "$page_content" |\
+                 sed -e 's/ //g' | tr -d "\r" |\
+                 awk -F: '/((TRIAL|EAV)-[0-9]+)/ {getline b;printf("%s:%s\n",$0,b)}');
+    keys_list+=$'\n';
+  };
+  page_content="$(network_get_content 'https://android-club.ws/')";
+  [[ ! -z "$page_content" ]] && {
+    keys_list+=$(sed -e 's/<[^>]*>//g' <<< "$page_content" |\
+                 sed -e 's/ //g' | tr -d "\r" |\
+                 awk -F: '/((TRIAL|EAV)-[0-9]+)/ {getline b;printf("%s:%s\n",$0,b)}');
+    keys_list+=$'\n';
+  };
   # thx 2 @cryol <https://github.com/cryol> for this:
   page_content="$(network_get_content 'http://tnoduse2.blogspot.ru/')";
   [[ ! -z "$page_content" ]] && {
