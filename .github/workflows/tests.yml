@@ -29,7 +29,7 @@ jobs:
         run: test -z "$(gofmt -l .)"
 
   lint:
-    name: Run linters
+    name: Run golangci-lint
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -39,7 +39,7 @@ jobs:
         run: docker run --rm -t -v $(pwd):/app -w /app golangci/golangci-lint:v1.31-alpine golangci-lint run -v
 
   test:
-    name: Unit tests
+    name: Run tests
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go
