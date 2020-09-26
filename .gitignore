@@ -11,4 +11,4 @@
 *.cache
 *.out
 /cover*.*
-/nod32-mirror
+/nod32-mirror*
