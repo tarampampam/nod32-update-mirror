@@ -4,6 +4,8 @@
 
 # ESET Nod32 Update Mirror
 
+## !!! Bash-version is abandoned !!!
+
 [![Build][badge_build]][link_build]
 [![Size][badge_image_size]][link_build]
 [![Layers][badge_image_layers]][link_build]
