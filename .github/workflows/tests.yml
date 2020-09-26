@@ -62,7 +62,7 @@ jobs:
           fail_ci_if_error: false
 
   build:
-    name: Build for ${{ matrix.os }} and execute
+    name: Build for ${{ matrix.os }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -96,7 +96,7 @@ jobs:
           path: nod32-mirror
 
   image:
-    name: Build and use docker image
+    name: Build docker image
     runs-on: ubuntu-latest
     needs: [gofmt, lint, test]
     steps:
