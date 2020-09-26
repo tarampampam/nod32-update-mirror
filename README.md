@@ -2,14 +2,16 @@
   <img alt="logo" src="https://hsto.org/webt/vm/1f/uo/vm1fuoyexrm8zylbtdfbm_hyi4m.png" width="180" />
 </p>
 
-# ESET Nod32 Update Mirror
+# ESET Nod32 Updates Mirror
 
 [![Release version][badge_release_version]][link_releases]
 ![Project language][badge_language]
 [![Build Status][badge_build]][link_build]
 [![Coverage][badge_coverage]][link_coverage]
-[![Docker pulls][badge_pulls]][link_docker_hub]
+[![Docker pulls][badge_docker_pulls]][link_docker_hub]
 [![License][badge_license]][link_license]
+
+> Previous (`bash`) version abandoned, but still available [here](https://github.com/tarampampam/nod32-update-mirror/tree/bash-version). Docker image tag (for `bash` version) changed from `latest` to `bash-version`.
 
 _WIP_
 
@@ -22,8 +24,8 @@ Changes log can be [found here][link_changes_log].
 
 ## Links
 
-- [Post on habr.com](https://blog.hook.sh/dev/make-nod32-mirror-updated/)
-- [Post in my blog](https://habr.com/post/232163/)
+- [Post on habr.com](https://habr.com/post/232163/)
+- [Post in my blog](https://blog.hook.sh/dev/make-nod32-mirror-updated/)
 
 ## Support
 
@@ -46,6 +48,7 @@ This is open-sourced software licensed under the [MIT License][link_license].
 [badge_commits_since_release]:https://img.shields.io/github/commits-since/tarampampam/nod32-update-mirror/latest.svg?maxAge=45
 [badge_issues]:https://img.shields.io/github/issues/tarampampam/nod32-update-mirror.svg?maxAge=45
 [badge_pulls]:https://img.shields.io/github/issues-pr/tarampampam/nod32-update-mirror.svg?maxAge=45
+[badge_docker_pulls]:https://img.shields.io/docker/pulls/tarampampam/nod32-update-mirror?maxAge=45
 
 [link_coverage]:https://codecov.io/gh/tarampampam/nod32-update-mirror
 [link_build]:https://github.com/tarampampam/nod32-update-mirror/actions
