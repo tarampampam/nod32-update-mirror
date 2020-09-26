@@ -92,7 +92,7 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: webhook-tester-${{ matrix.os }}
+          name: nod32-mirror-${{ matrix.os }}
           path: nod32-mirror
 
   image:
