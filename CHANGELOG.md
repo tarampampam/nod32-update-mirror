@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog][keepachangelog] and this project adheres to [Semantic Versioning][semver].
 
+## UNRELEASED
+
+### Changed
+
+- Application rewritten to golang
+
 ## v2.2.0 - Aug 27, 2018
 
 ### Changed
@@ -130,9 +136,9 @@ The format is based on [Keep a Changelog][keepachangelog] and this project adher
 - Убрано лишнее из `.htaccess` файла
 - Добавлены свои страницы ошибок (401,403,404,500,502,503)
 - Вебмордочка сейчас простая и минималистичная няшка
- 
+
 ### Added
- 
+
 - Добавлен параметр `--delete` к файлу `getkey.sh`, который удаляет все рабочие ключи
 
 ## v0.4.2 - Feb 6, 2015
@@ -236,7 +242,7 @@ The format is based on [Keep a Changelog][keepachangelog] and this project adher
 - Полностью переписан **bash** скрипт, иной алгоритм работы
 
 ## v0.2.5-sh - Jul 22, 2014
- 
+
 ### Changed
 
 - **PHP** версия более не поддерживается, скрипт переписан на **bash**
@@ -248,7 +254,7 @@ The format is based on [Keep a Changelog][keepachangelog] and this project adher
 - Масса мелких исправлений в .htaccess и верстке
 
 ## v0.2.4 - Jul 19, 2014
- 
+
 ### Changed
 
 - Релиз на гитхабе

@@ -1,63 +1,26 @@
 version: '3.4'
 
 volumes:
-  nod32-data:
-  nod32-logs:
-  nod32-keys:
+  tmp-data:
+
+x-app: &app-service
+  image: golang:1.15 # Image page: <https://hub.docker.com/_/golang>
+  working_dir: /src
+  environment:
+    HOME: /tmp
+    GOPATH: /tmp
+  volumes:
+    - /etc/passwd:/etc/passwd:ro
+    - /etc/group:/etc/group:ro
+    - .:/src:cached
+    - tmp-data:/tmp:cached
 
 services:
-  nod32-nginx:
-    build: .
-    restart: on-failure
-    environment:
-      NGINX_USER: 'nginx'
-      NGINX_PID_FILE: '/var/run/nginx.pid'
-      NGINX_WORKER_PROCESSES: 'auto'
-      NGINX_RLIMIT_NOFILE: '2048'
-      NGINX_WORKER_CONNECTIONS: '1024'
-      NGINX_MULTI_ACCEPT: 'on'
-      NGINX_ERROR_LOG_PATH: '/dev/stderr'
-      NGINX_ERROR_LOG_LEVEL: 'warn'
-      NGINX_EXTRA: '# No extra nginx config'
-      NGINX_SERVER_TOKENS: 'off'
-      NGINX_CLIENT_MAX_BODY_SIZE: '64m'
-      NGINX_SEND_TIMEOUT: '20s'
-      NGINX_CLIENT_BODY_TIMEOUT: '20s'
-      NGINX_HTTP_EXTRA: '# No extra nginx HTTP config'
-      NGINX_SERVER_LISTEN_PORT: '80'
-      NGINX_SERVER_SCHEME: 'http'
-      NGINX_SERVER_NAME: '127.0.0.1'
-      NGINX_SERVER_ROOT_DIRECTORY: '/data'
-      NGINX_SERVER_ACCESS_LOG_PATH: '/dev/stdout'
-      NGINX_AUTH_USERS_AND_PASSWORDS: 'user1:password1 user2:password2' # Comment this line or set "" to disable
-      NGINX_SERVER_EXTRA: '# No extra SERVER config'
-    entrypoint: /nginx-extrypoint.sh
-    command: nginx
-    volumes:
-    - nod32-data:/data:ro
-    ports:
-     - '8080:80'
+  app:
+    <<: *app-service
 
-  scheduler:
-    build: .
-    restart: on-failure
-    stop_grace_period: 3s
-    environment:
-      FIRST_START_DELAY: '2' # In SECONDS
-      SCHEDULE_PERIOD: '900' # In SECONDS
-      START_BEFORE_LOOP: 'true'
-      NOD32MIRROR_DEBUG_MODE: '1'
-      NOD32MIRROR_USE_FREE_KEY: '1'
-      NOD32MIRROR_MIRROR_DIR: '/data'
-      NOD32MIRROR_LOG_PATH: '/var/log/nod32/nod32mirror.log'
-      NOD32MIRROR_KEYS_DIRECTORY: '/opt/nod32keys'
-      NOD32MIRROR_VERSIONS: 'pcu 4 5 6 7 8 9'
-      NOD32MIRROR_LANGUAGES: '1033 1049'
-      NOD32MIRROR_DOWNLOAD_MAX_TIME: '60'
-      NOD32MIRROR_DOWNLOAD_SPEED_LIMIT: '20480'
-    entrypoint: /scheduler-entrypoint.sh
-    command: /src/nod32-mirror.sh --force-yes --keys-update; /src/nod32-mirror.sh --force-yes --update
-    volumes:
-    - nod32-data:/data:rw
-    - nod32-logs:/var/log/nod32:rw
-    - nod32-keys:/opt/nod32keys:rw
+  #web:
+  #  <<: *app-service
+  #  ports:
+  #    - '8082:8080/tcp' # Open <http://127.0.0.1:8082>
+  #  command: go run ./cmd/nod32-mirror serve --port 8080

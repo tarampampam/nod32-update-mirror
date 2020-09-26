@@ -1,0 +1,110 @@
+name: tests
+
+on:
+  push:
+    branches:
+      - master
+    tags-ignore:
+      - '**'
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  gofmt:
+    name: Run gofmt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Run Gofmt
+        run: test -z "$(gofmt -l .)"
+
+  lint:
+    name: Run golangci-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Run GolangCI-Lint # https://github.com/golangci/golangci-lint
+        run: docker run --rm -t -v $(pwd):/app -w /app golangci/golangci-lint:v1.31-alpine golangci-lint run -v
+
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Run Unit tests
+        run: go test -race -covermode=atomic -coverprofile /tmp/coverage.txt ./...
+
+      - name: Upload Coverage report to CodeCov
+        continue-on-error: true
+        uses: codecov/codecov-action@v1 # https://github.com/codecov/codecov-action
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: /tmp/coverage.txt
+          fail_ci_if_error: false
+
+  build:
+    name: Build for ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [linux, windows, darwin]
+    needs: [gofmt, lint, test]
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Generate version value
+        run: echo "::set-env name=APP_VERSION::${GITHUB_REF##*/}@`echo ${GITHUB_SHA} | cut -c1-8`"
+
+      - name: Build application
+        env:
+          GOOS: ${{ matrix.os }}
+        run: go build -ldflags="-s -w -X internal/version/version.version=${APP_VERSION}" -o ./nod32-mirror ./cmd/nod32-mirror
+
+      #- name: Try to execute
+      #  if: matrix.os == 'linux'
+      #  run: /tmp/nod32-mirror version
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: nod32-mirror-${{ matrix.os }}
+          path: nod32-mirror
+
+  image:
+    name: Build docker image
+    runs-on: ubuntu-latest
+    needs: [gofmt, lint, test]
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Build image
+        run: docker build -t image:local --build-arg "APP_VERSION=${GITHUB_SHA}" -f ./Dockerfile .
+
+      #- name: Run image
+      #  run: docker run --rm -d -p "8080:8080/tcp" image:local version
