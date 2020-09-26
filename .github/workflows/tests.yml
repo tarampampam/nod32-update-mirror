@@ -93,7 +93,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: webhook-tester-${{ matrix.os }}
-          path: /tmp/nod32-mirror
+          path: nod32-mirror
 
   image:
     name: Build and use docker image
