@@ -1,12 +1,14 @@
-# Environment deps.
-/.env
-
 # IDEs
 /nbproject
 /.idea
+/.vscode
 
 # Temp dirs & trash
-/build
-/.build
+/temp
+/tmp
+*.env
 .DS_Store
 *.cache
+*.out
+/cover*.*
+/nod32-mirror

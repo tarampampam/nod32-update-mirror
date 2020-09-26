@@ -1,22 +1,61 @@
-FROM nginx:1.15.2-alpine
-LABEL Description="Nod32 updates mirror"
+# Image page: <https://hub.docker.com/_/golang>
+FROM golang:1.15-alpine as builder
 
-COPY . /docker
-
-RUN \
-  rm -Rfv /usr/share/nginx/html && mv -v /docker/nginx/html /usr/share/nginx/html \
-  && chown -R 'nginx:nginx' /usr/share/nginx/html \
-  && mv -vf /docker/nginx/nginx.conf /etc/nginx/nginx.conf \
-  && mv -vf /docker/nginx/entrypoint.sh /nginx-extrypoint.sh \
-  && mv -vf /docker/scheduler/entrypoint.sh /scheduler-entrypoint.sh \
-  && rm -Rfv /src && mv -v /docker/src /src \
-  && rm -Rfv /docker \
-  && mkdir -pv /data \
-  && find /src -type f -name '*.sh' -exec chmod +x {} \; \
-  && chmod +x /*.sh \
-  && apk --update add bash curl wget grep sed apache2-utils unrar findutils \
-  && rm -rf /var/cache/apk/*
+# can be passed with any prefix (like `v1.2.3@GITHASH`)
+# e.g.: `docker build --build-arg "APP_VERSION=v1.2.3@GITHASH" .`
+ARG APP_VERSION="undefined@docker"
 
 WORKDIR /src
-VOLUME ["/data"]
-ENTRYPOINT ["/src/nod32-mirror.sh"]
+
+COPY ./go.mod ./go.sum ./
+
+# Burn modules cache
+RUN set -x \
+    && go version \
+    && go mod download \
+    && go mod verify
+
+COPY . /src
+
+RUN set -x \
+    && go version \
+    && GOOS=linux GOARCH=amd64 go build \
+        -ldflags="-s -w -X internal/version/version.version=${APP_VERSION}" ./cmd/...
+    #&& /tmp/nod32-mirror version
+
+# Image page: <https://hub.docker.com/_/alpine>
+FROM alpine:latest as runtime
+
+ARG APP_VERSION="undefined@docker"
+
+LABEL \
+    # Docs: <https://github.com/opencontainers/image-spec/blob/master/annotations.md>
+    org.opencontainers.image.title="nod32-update-mirror" \
+    org.opencontainers.image.description="Eset Nod32 updates mirror" \
+    org.opencontainers.image.url="https://github.com/tarampampam/nod32-update-mirror" \
+    org.opencontainers.image.source="https://github.com/tarampampam/nod32-update-mirror" \
+    org.opencontainers.image.vendor="tarampampam" \
+    org.opencontainers.version="$APP_VERSION" \
+    org.opencontainers.image.licenses="MIT"
+
+RUN set -x \
+    # Unprivileged user creation <https://stackoverflow.com/a/55757473/12429735RUN>
+    && adduser \
+        --disabled-password \
+        --gecos "" \
+        --home /nonexistent \
+        --shell /sbin/nologin \
+        --no-create-home \
+        --uid 10001 \
+        appuser
+
+# Use an unprivileged user
+USER appuser:appuser
+
+# Import from builder
+COPY --from=builder --chown=appuser /src/nod32-mirror /app/nod32-mirror
+COPY --from=builder --chown=appuser /src/configs /app/configs
+
+WORKDIR /app
+
+ENTRYPOINT ["/app/nod32-mirror"]
