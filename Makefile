@@ -27,7 +27,7 @@ image: ## Build docker image with app
 
 build: ## Build app binary file
 	docker-compose run $(DC_RUN_ARGS) --no-deps app go build \
-		-ldflags="-s -w -X internal/version/version.version=$(shell git rev-parse HEAD)" \
+		-ldflags="-s -w -X nod32-update-mirror/internal/version.version=$(shell git rev-parse HEAD)" \
 		./cmd/...
 
 fmt: ## Run source code formatter tools

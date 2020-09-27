@@ -84,7 +84,7 @@ jobs:
       - name: Build application
         env:
           GOOS: ${{ matrix.os }}
-        run: go build -ldflags="-s -w -X internal/version/version.version=${APP_VERSION}" -o ./nod32-mirror ./cmd/nod32-mirror
+        run: go build -ldflags="-s -w -X nod32-update-mirror/internal/version.version=${APP_VERSION}" -o ./nod32-mirror ./cmd/nod32-mirror
 
       #- name: Try to execute
       #  if: matrix.os == 'linux'
