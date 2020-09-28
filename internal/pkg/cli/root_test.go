@@ -1,4 +1,4 @@
-package nod32_mirror //nolint:golint,stylecheck
+package cli
 
 import (
 	"testing"

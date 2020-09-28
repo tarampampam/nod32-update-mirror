@@ -1,9 +1,9 @@
 package key
 
 import (
-	"nod32-update-mirror/internal/pkg/cmd/cli/key/get"
-	"nod32-update-mirror/internal/pkg/cmd/cli/key/list"
-	"nod32-update-mirror/internal/pkg/cmd/cli/key/update"
+	"nod32-update-mirror/internal/pkg/cli/key/get"
+	"nod32-update-mirror/internal/pkg/cli/key/list"
+	"nod32-update-mirror/internal/pkg/cli/key/update"
 
 	"github.com/spf13/cobra"
 )

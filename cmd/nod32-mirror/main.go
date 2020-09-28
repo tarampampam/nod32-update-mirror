@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	mainCmd "nod32-update-mirror/internal/pkg/cmd/nod32-mirror"
+	"nod32-update-mirror/internal/pkg/cli"
 	"os"
 	"path/filepath"
 )
 
 func main() {
-	cmd := mainCmd.NewCommand(filepath.Base(os.Args[0]))
+	cmd := cli.NewCommand(filepath.Base(os.Args[0]))
 
 	if err := cmd.Execute(); err != nil {
 		if _, outErr := fmt.Fprintf(os.Stderr, "An error occurred: %v\n", err); outErr != nil {

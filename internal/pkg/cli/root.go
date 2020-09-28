@@ -1,12 +1,13 @@
-package nod32_mirror //nolint:golint,stylecheck
+package cli
 
 import (
-	"nod32-update-mirror/internal/pkg/cmd/cli/flush"
-	"nod32-update-mirror/internal/pkg/cmd/cli/key"
-	"nod32-update-mirror/internal/pkg/cmd/cli/serve"
-	"nod32-update-mirror/internal/pkg/cmd/cli/stat"
-	"nod32-update-mirror/internal/pkg/cmd/cli/update"
-	"nod32-update-mirror/internal/pkg/cmd/cli/version"
+	"github.com/sirupsen/logrus"
+	"nod32-update-mirror/internal/pkg/cli/flush"
+	"nod32-update-mirror/internal/pkg/cli/key"
+	"nod32-update-mirror/internal/pkg/cli/serve"
+	"nod32-update-mirror/internal/pkg/cli/stat"
+	"nod32-update-mirror/internal/pkg/cli/update"
+	"nod32-update-mirror/internal/pkg/cli/version"
 
 	"github.com/spf13/cobra"
 )
@@ -26,14 +27,23 @@ func NewCommand(name string) *cobra.Command {
 		Long:  banner,
 	}
 
+	cmd.PersistentFlags().StringP("config", "c", "./configs/config.yaml", "Config file")
+	cmd.PersistentFlags().BoolP("verbose", "v", false, "Verbose output")
+
+	logger := newLogger()
+
 	cmd.AddCommand(
 		version.NewCommand(),
 		update.NewCommand(),
 		flush.NewCommand(),
-		serve.NewCommand(),
+		serve.NewCommand(logger),
 		key.NewCommand(),
 		stat.NewCommand(),
 	)
 
 	return cmd
+}
+
+func newLogger() *logrus.Logger {
+	return logrus.New()
 }
