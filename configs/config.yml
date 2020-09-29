@@ -8,8 +8,18 @@ mirror:
       username: EAV-1122334455
       password: aabbccddee
 
+  free-keys:
+    # Try to get and use free licence key (USE FOR DEBUG PURPOSES ONLY!)
+    enabled: false
+
+    # Path to the file for keys storing
+    file-path: /tmp/nod32-free.keys
+
   # Try to get and use free licence key (USE FOR DEBUG PURPOSES ONLY!)
   use-free-key: false
+
+  # Path to the file for keys storing
+  keys-file: /tmp/nod32-free.keys
 
   filtering:
     # Platforms list (set `any` for all)

@@ -16,11 +16,16 @@ type Config struct {
 
 type (
 	mirror struct {
-		Path       string          `yaml:"path"`
-		Servers    []mirrorServer  `yaml:"servers"`
-		UseFreeKey bool            `yaml:"use-free-key"`
-		Filtering  mirrorFiltering `yaml:"filtering"`
-		Checking   mirrorChecking  `yaml:"checking"`
+		Path      string          `yaml:"path"`
+		Servers   []mirrorServer  `yaml:"servers"`
+		FreeKeys  mirrorFreeKeys  `yaml:"free-keys"`
+		Filtering mirrorFiltering `yaml:"filtering"`
+		Checking  mirrorChecking  `yaml:"checking"`
+	}
+
+	mirrorFreeKeys struct {
+		Enabled  bool   `yaml:"enabled"`
+		FilePath string `yaml:"file-path"`
 	}
 
 	mirrorServer struct {
