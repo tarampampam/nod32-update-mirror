@@ -1,6 +1,6 @@
 mirror:
   # Path to the local directory with updating files (directory must exists)
-  dir: /tmp/mirror
+  path: /tmp/mirror
 
   # Servers for mirroring (license settings will be ignored, if `free-key` is enabled)
   servers:
@@ -9,43 +9,42 @@ mirror:
       password: aabbccddee
 
   # Try to get and use free licence key (USE FOR DEBUG PURPOSES ONLY!)
-  free-key: false
+  use-free-key: false
 
-  # Platforms list (set `any` for all)
-  platforms:
-    - any
+  filtering:
+    # Platforms list (set `any` for all)
+    platforms: [any]
 
-  # Types of updates (set `any` for all; examples: `loader loader64 perseus engine archives ...`)
-  types:
-    - any
+    # Types of updates (set `any` for all; examples: `loader loader64 perseus engine archives ...`)
+    types: [any]
 
-  # Language codes of updates (TODO: where list with all languages located?)
-  languages:
-    - 1033 # English
-    - 1049 # Russian
+    # Language codes of updates (TODO: where list with all languages located?)
+    languages:
+      - 1033 # English
+      - 1049 # Russian
 
-  # Nod32 versions
-  versions:
-    - pcu # Program Component Update
-    - 4
-    - 5
-    - 6
-    - 7
-    - 8
-    - 9
-    - 10
-    - 11
+    # Nod32 versions
+    versions:
+      - pcu # Program Component Update
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+      - 10
+      - 11
 
-  download:
-    # How many concurrently (parallel) downloads are allowed
-    threads: 5
+  checking:
+    # URI to file on the official NOD32 server for a keys testing
+    url: 'http://update.eset.com:80/v8-rel-sta/mod_010_smon_1036/em010_32_l0.nup'
 
-    # Downloading speed limit (KiB/Sec)
-    max-speed-kb: 128
+downloading:
+  # How many concurrently (parallel) downloads are allowed
+  threads: 5
 
-testing:
-  # URI to file on the official NOD32 server for a keys testing
-  url: 'http://update.eset.com:80/v8-rel-sta/mod_010_smon_1036/em010_32_l0.nup'
+  # Downloading speed limit (KiB/Sec)
+  max-speed-kb: 128
 
 http:
   # IP and port to listen on
