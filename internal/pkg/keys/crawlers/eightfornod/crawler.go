@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-// EightForNodDotNetCrawler is a `https://8fornod.net/keys-nod-32-4/` page crawler
+// Crawler is a `https://8fornod.net/keys-nod-32-4/` page crawler
 type Crawler struct {
 	HTTPClient *http.Client
 	UserAgent  string
