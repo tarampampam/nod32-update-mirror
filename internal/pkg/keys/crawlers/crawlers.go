@@ -6,7 +6,8 @@ import (
 )
 
 type Crawler interface {
+	// Fetch extracts keys from some resource.
 	Fetch() (*keys.Keys, error)
 }
 
-const defaultHttpRequestTimeout = time.Second * 20
+const DefaultHTTPRequestTimeout = time.Second * 20

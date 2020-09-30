@@ -162,8 +162,8 @@ func (k *FileKeeper) save() error {
 		return err
 	}
 
-	var j []byte
-	if j, err = json.Marshal(data); err != nil {
+	j, err := json.Marshal(data)
+	if err != nil {
 		return err
 	}
 

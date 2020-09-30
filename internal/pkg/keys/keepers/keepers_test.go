@@ -1,13 +1,14 @@
 package keepers
 
 import (
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"nod32-update-mirror/internal/pkg/keys"
 	"os"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestInMemoryKeeper_Add(t *testing.T) {

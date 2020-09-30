@@ -35,7 +35,7 @@ fmt: ## Run source code formatter tools
 	docker-compose run $(DC_RUN_ARGS) --no-deps app gofmt -s -w -d .
 
 lint: ## Run app linters
-	docker run --rm -t -v "$(cwd):/app" -w /app golangci/golangci-lint:v1.31-alpine golangci-lint run
+	docker-compose run --rm --no-deps golint golangci-lint run
 
 gotest: ## Run app tests
 	docker-compose run $(DC_RUN_ARGS) --no-deps app go test -v -race -timeout 5s ./...
