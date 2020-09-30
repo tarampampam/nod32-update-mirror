@@ -15,12 +15,6 @@ mirror:
     # Path to the file for keys storing
     file-path: /tmp/nod32-free.keys
 
-  # Try to get and use free licence key (USE FOR DEBUG PURPOSES ONLY!)
-  use-free-key: false
-
-  # Path to the file for keys storing
-  keys-file: /tmp/nod32-free.keys
-
   filtering:
     # Platforms list (set `any` for all)
     platforms: [any]
@@ -44,10 +38,6 @@ mirror:
       - 9
       - 10
       - 11
-
-  checking:
-    # URI to file on the official NOD32 server for a keys testing
-    url: 'http://update.eset.com:80/v8-rel-sta/mod_010_smon_1036/em010_32_l0.nup'
 
 downloading:
   # How many concurrently (parallel) downloads are allowed

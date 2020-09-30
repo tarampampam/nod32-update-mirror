@@ -20,7 +20,6 @@ type (
 		Servers   []mirrorServer  `yaml:"servers"`
 		FreeKeys  mirrorFreeKeys  `yaml:"free-keys"`
 		Filtering mirrorFiltering `yaml:"filtering"`
-		Checking  mirrorChecking  `yaml:"checking"`
 	}
 
 	mirrorFreeKeys struct {
@@ -39,10 +38,6 @@ type (
 		Types     []string `yaml:"types"`
 		Languages []string `yaml:"languages"`
 		Versions  []string `yaml:"versions"`
-	}
-
-	mirrorChecking struct {
-		URL string `yaml:"url"`
 	}
 )
 

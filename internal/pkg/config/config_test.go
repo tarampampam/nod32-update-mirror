@@ -36,8 +36,6 @@ mirror:
     types: [any, bar]
     languages: [1033, 9999]
     versions: [foo, 1, 999]
-  checking:
-    url: 'http://example.com/foo?bar'
 downloading:
   threads: 5
   max-speed-kb: 223344
@@ -64,8 +62,6 @@ http:
 				assert.Equal(t, []string{"any", "bar"}, config.Mirror.Filtering.Types)
 				assert.Equal(t, []string{"1033", "9999"}, config.Mirror.Filtering.Languages)
 				assert.Equal(t, []string{"foo", "1", "999"}, config.Mirror.Filtering.Versions)
-
-				assert.Equal(t, "http://example.com/foo?bar", config.Mirror.Checking.URL)
 
 				assert.Equal(t, uint16(5), config.Downloading.Threads)
 				assert.Equal(t, uint32(223344), config.Downloading.MaxSpeedKB)

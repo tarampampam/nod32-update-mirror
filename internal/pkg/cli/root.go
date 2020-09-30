@@ -3,7 +3,7 @@ package cli
 import (
 	"errors"
 	"nod32-update-mirror/internal/pkg/cli/flush"
-	"nod32-update-mirror/internal/pkg/cli/key"
+	"nod32-update-mirror/internal/pkg/cli/keys"
 	"nod32-update-mirror/internal/pkg/cli/serve"
 	"nod32-update-mirror/internal/pkg/cli/stat"
 	"nod32-update-mirror/internal/pkg/cli/update"
@@ -23,12 +23,14 @@ const banner = `    _   __          __________      __  ____
 /_/ |_/\____/\__,_//____/____/  /_/  /_/_/_/  /_/   \____/_/`
 
 const flagConfigName = "config"
+const flagVerboseName = "verbose"
 
 // NewCommand creates `nod32-mirror` command.
 func NewCommand(name string) *cobra.Command {
 	var (
-		cfg    *config.Config = &config.Config{}
-		logger *logrus.Logger = newLogger()
+		cfg     *config.Config = &config.Config{}
+		logger  *logrus.Logger = newLogger()
+		verbose bool
 	)
 
 	cmd := &cobra.Command{
@@ -37,6 +39,10 @@ func NewCommand(name string) *cobra.Command {
 		Long:  banner,
 
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+			if verbose {
+				logger.SetLevel(logrus.DebugLevel)
+			}
+
 			flagConfig := cmd.Flag(flagConfigName)
 			if flagConfig == nil {
 				return errors.New("config flag was not provided")
@@ -55,7 +61,7 @@ func NewCommand(name string) *cobra.Command {
 	}
 
 	cmd.PersistentFlags().String(flagConfigName, "./configs/config.yml", "Config file")
-	cmd.PersistentFlags().BoolP("verbose", "v", false, "Verbose output")
+	cmd.PersistentFlags().BoolVarP(&verbose, flagVerboseName, "v", false, "Verbose output")
 
 	cmd.SilenceErrors = true
 	cmd.SilenceUsage = true
@@ -65,7 +71,7 @@ func NewCommand(name string) *cobra.Command {
 		update.NewCommand(logger, cfg),
 		flush.NewCommand(logger, cfg),
 		serve.NewCommand(logger, cfg),
-		key.NewCommand(logger, cfg),
+		keys.NewCommand(logger, cfg),
 		stat.NewCommand(cfg),
 	)
 
@@ -73,5 +79,13 @@ func NewCommand(name string) *cobra.Command {
 }
 
 func newLogger() *logrus.Logger {
-	return logrus.New()
+	l := logrus.New()
+
+	l.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp:          true,
+		TimestampFormat:        "2006-01-02 15:04:05.000",
+		DisableLevelTruncation: true,
+	})
+
+	return l
 }

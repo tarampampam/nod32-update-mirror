@@ -21,7 +21,7 @@ type Keeper interface {
 	Remove(keyID string) error
 
 	// Add appends passed key in storage
-	Add(key keys.Key) error
+	Add(key ...keys.Key) error
 
 	// Clear removes all keys
 	Clear() error
@@ -82,11 +82,13 @@ func (k *InMemoryKeeper) Remove(keyID string) error {
 }
 
 // Add appends passed key in storage.
-func (k *InMemoryKeeper) Add(key keys.Key) error {
+func (k *InMemoryKeeper) Add(key ...keys.Key) error {
 	k.mutex.Lock()
 	defer k.mutex.Unlock()
 
-	k.items[key.ID] = key
+	for _, passed := range key {
+		k.items[passed.ID] = passed
+	}
 
 	return nil
 }
@@ -213,12 +215,12 @@ func (k *FileKeeper) Remove(keyID string) error {
 }
 
 // Add appends passed key in storage (data will be loaded from filesystem at first and written back at the end).
-func (k *FileKeeper) Add(key keys.Key) error {
+func (k *FileKeeper) Add(key ...keys.Key) error {
 	if err := k.load(); err != nil {
 		return err
 	}
 
-	if err := k.memoryKeeper.Add(key); err != nil {
+	if err := k.memoryKeeper.Add(key...); err != nil {
 		return err
 	}
 

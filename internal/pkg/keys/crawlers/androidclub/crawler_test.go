@@ -1,4 +1,4 @@
-package eightfornod
+package androidclub
 
 import (
 	"net/http"
@@ -26,13 +26,13 @@ func TestCrawler_Fetch(t *testing.T) {
 	crawler := NewCrawler()
 
 	crawler.HTTPClient = newTestClient(func(req *http.Request) (*http.Response, error) {
-		assert.Equal(t, "https://8fornod.net/keys-nod-32-4/", req.URL.String())
+		assert.Equal(t, "https://android-club.ws/", req.URL.String())
 		assert.Equal(t, crawler.UserAgent, req.Header.Get("User-Agent"))
 
 		cwd, err := os.Getwd()
 		assert.NoError(t, err)
 
-		file, err := os.Open(cwd + "/testdata/8fornod_net_snapshot.html")
+		file, err := os.Open(cwd + "/testdata/android-club_ws_snapshot.html")
 		assert.NoError(t, err)
 
 		return &http.Response{
@@ -45,26 +45,26 @@ func TestCrawler_Fetch(t *testing.T) {
 	res, err := crawler.Fetch()
 	assert.NoError(t, err)
 
-	assert.Len(t, *res, 32)
+	assert.Len(t, *res, 34)
 
 	assert.Contains(t, *res, keys.Key{
-		ID:             "EAV-0264051918",
-		Password:       "fuk6c2t7v2",
+		ID:             "BE78-XARD-A2GH-AXEN-NRMF",
+		Password:       "",
+		Types:          []keys.KeyType{keys.KeyTypeEISv10, keys.KeyTypeEISv11, keys.KeyTypeEISv12},
+		ExpiringAtUnix: 1604361600,
+	})
+
+	assert.Contains(t, *res, keys.Key{
+		ID:             "EAV-08927705",
+		Password:       "ut7rpv8mdp",
 		Types:          []keys.KeyType{keys.KeyTypeESSv4, keys.KeyTypeESSv5, keys.KeyTypeESSv6, keys.KeyTypeESSv7, keys.KeyTypeESSv8}, //nolint:lll
-		ExpiringAtUnix: 1572480000,
+		ExpiringAtUnix: 1604361600,
 	})
 
 	assert.Contains(t, *res, keys.Key{
-		ID:             "CC66-XA55-MBCM-N9NE-PAA8",
+		ID:             "HVSP-XUV7-8PB7-TWE6-BXRF",
 		Password:       "",
-		Types:          []keys.KeyType{keys.KeyTypeESSv9, keys.KeyTypeESSv10, keys.KeyTypeESSv11, keys.KeyTypeESSv12},
-		ExpiringAtUnix: 1576368000,
-	})
-
-	assert.Contains(t, *res, keys.Key{
-		ID:             "CWSW-XDVT-XMG9-WBR4-RJTV",
-		Password:       "",
-		Types:          []keys.KeyType{keys.KeyTypeEISPv10, keys.KeyTypeEISPv11, keys.KeyTypeEISPv12},
-		ExpiringAtUnix: 1571875200,
+		Types:          []keys.KeyType{keys.KeyTypeEAVv9, keys.KeyTypeEAVv10, keys.KeyTypeEAVv11, keys.KeyTypeEAVv12},
+		ExpiringAtUnix: 1604361600,
 	})
 }
