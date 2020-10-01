@@ -19,7 +19,7 @@ func NewCommand(l *logrus.Logger, cfg *config.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:   "list",
 		Short: "Show all keys",
-		Run: func(c *cobra.Command, args []string) {
+		Run: func(c *cobra.Command, _ []string) {
 			keeper := keepers.NewFileKeeper(cfg.Mirror.FreeKeys.FilePath)
 
 			keys, err := keeper.All()

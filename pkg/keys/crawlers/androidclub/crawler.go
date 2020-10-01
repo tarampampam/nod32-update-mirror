@@ -9,6 +9,7 @@ import (
 	"nod32-update-mirror/pkg/keys"
 	"nod32-update-mirror/pkg/keys/crawlers"
 	"nod32-update-mirror/pkg/keys/crawlers/utils"
+	"nod32-update-mirror/pkg/useragents"
 	"regexp"
 	"strings"
 	"time"
@@ -31,7 +32,7 @@ func NewCrawler() Crawler {
 			},
 			Timeout: crawlers.DefaultHTTPRequestTimeout,
 		},
-		UserAgent: "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3880.4 Safari/537.36", //nolint:lll
+		UserAgent: useragents.GoogleChrome(),
 	}
 }
 
