@@ -20,8 +20,8 @@ COPY . /src
 RUN set -x \
     && go version \
     && GOOS=linux GOARCH=amd64 go build \
-        -ldflags="-s -w -X nod32-update-mirror/internal/pkg/version.version=${APP_VERSION}" ./cmd/...
-    #&& /tmp/nod32-mirror version
+        -ldflags="-s -w -X nod32-update-mirror/internal/pkg/version.version=${APP_VERSION}" ./cmd/... \
+    && ./nod32-mirror --version
 
 # Image page: <https://hub.docker.com/_/alpine>
 FROM alpine:latest as runtime

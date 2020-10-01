@@ -28,14 +28,14 @@ mirror:
     - url: 'https://example.com:445/bar'
       username: EAV-1122334455
       password: aabbccddee
-  use-free-key: true
+  free-keys:
+    enabled: true
+    file-path: '/tmp/keys.dat'
   filtering:
     platforms: [any, foo]
     types: [any, bar]
     languages: [1033, 9999]
     versions: [foo, 1, 999]
-  checking:
-    url: 'http://example.com/foo?bar'
 downloading:
   threads: 5
   max-speed-kb: 223344
@@ -55,14 +55,13 @@ http:
 				assert.Equal(t, "EAV-1122334455", config.Mirror.Servers[0].Username)
 				assert.Equal(t, "aabbccddee", config.Mirror.Servers[0].Password)
 
-				assert.True(t, config.Mirror.UseFreeKey)
+				assert.True(t, config.Mirror.FreeKeys.Enabled)
+				assert.Equal(t, "/tmp/keys.dat", config.Mirror.FreeKeys.FilePath)
 
 				assert.Equal(t, []string{"any", "foo"}, config.Mirror.Filtering.Platforms)
 				assert.Equal(t, []string{"any", "bar"}, config.Mirror.Filtering.Types)
 				assert.Equal(t, []string{"1033", "9999"}, config.Mirror.Filtering.Languages)
 				assert.Equal(t, []string{"foo", "1", "999"}, config.Mirror.Filtering.Versions)
-
-				assert.Equal(t, "http://example.com/foo?bar", config.Mirror.Checking.URL)
 
 				assert.Equal(t, uint16(5), config.Downloading.Threads)
 				assert.Equal(t, uint32(223344), config.Downloading.MaxSpeedKB)
@@ -80,12 +79,13 @@ http:
 			giveYaml: []byte(`
 mirror:
   path: ${__TEST_MIRROR_PATH}
-  use-free-key: ${__TEST_MIRROR_USE_FREE_KEY}
+  free-keys:
+    enabled: ${__TEST_MIRROR_USE_FREE_KEY}
 `),
 			wantErr: false,
 			checkResultFn: func(t *testing.T, config *Config) {
 				assert.Equal(t, "/tmp/bar", config.Mirror.Path)
-				assert.True(t, config.Mirror.UseFreeKey)
+				assert.True(t, config.Mirror.FreeKeys.Enabled)
 			},
 		},
 		{
@@ -106,12 +106,13 @@ mirror:
 			giveYaml: []byte(`
 mirror:
   path: ${__TEST_MIRROR_PATH:-/tmp/baz}
-  use-free-key: ${__TEST_MIRROR_USE_FREE_KEY:-true}
+  free-keys:
+    enabled: ${__TEST_MIRROR_USE_FREE_KEY:-true}
 `),
 			wantErr: false,
 			checkResultFn: func(t *testing.T, config *Config) {
 				assert.Equal(t, "/tmp/baz", config.Mirror.Path)
-				assert.True(t, config.Mirror.UseFreeKey)
+				assert.True(t, config.Mirror.FreeKeys.Enabled)
 			},
 		},
 		{
@@ -131,11 +132,17 @@ mirror:
 
 			conf, err := FromYaml(tt.giveYaml, tt.giveExpandEnv)
 
+			conf2 := Config{}
+			err2 := conf2.FromYaml(tt.giveYaml, tt.giveExpandEnv)
+
 			if tt.wantErr {
 				assert.Error(t, err)
+				assert.Error(t, err2)
 			} else {
 				assert.Nil(t, err)
+				assert.Nil(t, err2)
 				tt.checkResultFn(t, conf)
+				tt.checkResultFn(t, &conf2)
 			}
 
 			if tt.giveEnv != nil {
@@ -161,11 +168,12 @@ func TestFromYamlFile(t *testing.T) {
 			giveYaml: []byte(`
 mirror:
   path: '/tmp/foobar'
-  use-free-key: false
+  free-keys:
+    enabled: false
 `),
 			checkResultFn: func(t *testing.T, config *Config) {
 				assert.Equal(t, "/tmp/foobar", config.Mirror.Path)
-				assert.False(t, config.Mirror.UseFreeKey)
+				assert.False(t, config.Mirror.FreeKeys.Enabled)
 			},
 		},
 		{

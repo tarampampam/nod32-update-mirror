@@ -24,3 +24,10 @@ services:
   #  ports:
   #    - '8082:8080/tcp' # Open <http://127.0.0.1:8082>
   #  command: go run ./cmd/nod32-mirror serve --port 8080
+
+  golint: # This is NOT application service, sources: <https://github.com/golangci/golangci-lint>
+    image: golangci/golangci-lint:v1.31-alpine # Image page: <https://hub.docker.com/r/golangci/golangci-lint>
+    volumes:
+      - .:/app:ro
+    working_dir: /app
+    command: /bin/true
