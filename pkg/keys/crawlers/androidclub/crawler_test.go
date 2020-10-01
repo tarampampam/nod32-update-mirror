@@ -2,7 +2,7 @@ package androidclub
 
 import (
 	"net/http"
-	"nod32-update-mirror/internal/pkg/keys"
+	"nod32-update-mirror/pkg/keys"
 	"os"
 	"testing"
 

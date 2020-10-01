@@ -2,7 +2,7 @@ package list
 
 import (
 	"nod32-update-mirror/internal/pkg/config"
-	"nod32-update-mirror/internal/pkg/keys/keepers"
+	"nod32-update-mirror/pkg/keys/keepers"
 	"sort"
 	"strings"
 	"time"
@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewCommand creates key `list` command.
+// NewCommand creates keys `list` command.
 func NewCommand(l *logrus.Logger, cfg *config.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:   "list",

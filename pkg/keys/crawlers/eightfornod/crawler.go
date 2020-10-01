@@ -4,9 +4,9 @@ import (
 	"crypto/tls"
 	"io/ioutil"
 	"net/http"
-	"nod32-update-mirror/internal/pkg/keys"
-	"nod32-update-mirror/internal/pkg/keys/crawlers"
-	"nod32-update-mirror/internal/pkg/keys/crawlers/utils"
+	"nod32-update-mirror/pkg/keys"
+	"nod32-update-mirror/pkg/keys/crawlers"
+	"nod32-update-mirror/pkg/keys/crawlers/utils"
 )
 
 // Crawler is a `https://8fornod.net/keys-nod-32-4/` page crawler

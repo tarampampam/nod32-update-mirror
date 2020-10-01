@@ -2,7 +2,7 @@ package keepers
 
 import (
 	"io/ioutil"
-	"nod32-update-mirror/internal/pkg/keys"
+	"nod32-update-mirror/pkg/keys"
 	"os"
 	"strings"
 	"testing"

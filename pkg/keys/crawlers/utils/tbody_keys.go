@@ -3,7 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
-	"nod32-update-mirror/internal/pkg/keys"
+	"nod32-update-mirror/pkg/keys"
 	"regexp"
 	"strings"
 	"time"

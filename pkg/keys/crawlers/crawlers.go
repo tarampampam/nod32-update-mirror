@@ -1,7 +1,7 @@
 package crawlers
 
 import (
-	"nod32-update-mirror/internal/pkg/keys"
+	"nod32-update-mirror/pkg/keys"
 	"time"
 )
 
