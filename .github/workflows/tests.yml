@@ -88,7 +88,7 @@ jobs:
 
       - name: Try to execute
         if: matrix.os == 'linux'
-        run: /tmp/nod32-mirror --version
+        run: ./nod32-mirror --version
 
       - uses: actions/upload-artifact@v2
         with:
