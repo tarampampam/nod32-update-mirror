@@ -2,16 +2,16 @@ package cli
 
 import (
 	"errors"
+	"io/ioutil"
 	"nod32-update-mirror/internal/pkg/cli/flush"
 	"nod32-update-mirror/internal/pkg/cli/keys"
 	"nod32-update-mirror/internal/pkg/cli/serve"
 	"nod32-update-mirror/internal/pkg/cli/stat"
 	"nod32-update-mirror/internal/pkg/cli/update"
-	"nod32-update-mirror/internal/pkg/cli/version"
 	"nod32-update-mirror/internal/pkg/config"
+	"nod32-update-mirror/internal/pkg/version"
 
 	"github.com/sirupsen/logrus"
-
 	"github.com/spf13/cobra"
 )
 
@@ -22,52 +22,51 @@ const banner = `    _   __          __________      __  ____
  / /|  / /_/ / /_/ /___/ / __/   / /  / / / /  / /  / /_/ / /
 /_/ |_/\____/\__,_//____/____/  /_/  /_/_/_/  /_/   \____/_/`
 
-const flagConfigName = "config"
-const flagVerboseName = "verbose"
-
 // NewCommand creates `nod32-mirror` command.
 func NewCommand(name string) *cobra.Command {
 	var (
-		cfg     *config.Config = &config.Config{}
-		logger  *logrus.Logger = newLogger()
-		verbose bool
+		cfg              *config.Config = &config.Config{}
+		logger           *logrus.Logger = newLogger()
+		cfgFilePath      string
+		verbose, logJSON bool
 	)
 
 	cmd := &cobra.Command{
-		Use:   name,
-		Short: "ESET Nod32 Updates Mirror",
-		Long:  banner,
+		Use:     name,
+		Short:   "ESET Nod32 Updates Mirror",
+		Long:    banner,
+		Version: version.Version(),
 
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if verbose {
-				logger.SetLevel(logrus.DebugLevel)
+				logger.SetLevel(logrus.TraceLevel)
 			}
 
-			flagConfig := cmd.Flag(flagConfigName)
-			if flagConfig == nil {
-				return errors.New("config flag was not provided")
+			if logJSON {
+				logger.SetFormatter(&logrus.JSONFormatter{})
 			}
 
-			loadedCfg, err := config.FromYamlFile(flagConfig.Value.String(), true)
+			cfgBytes, err := ioutil.ReadFile(cfgFilePath)
 			if err != nil {
-				return errors.New("config file: " + err.Error())
+				return errors.New("could not open config file: " + err.Error())
 			}
 
-			// change "global" config reference with loaded
-			*cfg = *loadedCfg
+			if err := cfg.FromYaml(cfgBytes, true); err != nil {
+				return errors.New("could not parse config file: " + err.Error())
+			}
 
 			return nil
 		},
 	}
 
-	cmd.PersistentFlags().String(flagConfigName, "./configs/config.yml", "Config file")
-	cmd.PersistentFlags().BoolVarP(&verbose, flagVerboseName, "v", false, "Verbose output")
+	cmd.PersistentFlags().StringVarP(&cfgFilePath, "config", "c", "./configs/config.yml", "config file")
+	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
+	cmd.PersistentFlags().BoolVar(&logJSON, "log-json", false, "logs in JSON format")
 
 	cmd.SilenceErrors = true
 	cmd.SilenceUsage = true
 
 	cmd.AddCommand(
-		version.NewCommand(),
 		update.NewCommand(logger, cfg),
 		flush.NewCommand(logger, cfg),
 		serve.NewCommand(logger, cfg),

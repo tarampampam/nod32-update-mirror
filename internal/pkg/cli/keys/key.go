@@ -14,7 +14,7 @@ import (
 func NewCommand(l *logrus.Logger, cfg *config.Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "keys",
-		Short: "Free license keys (USE FOR EDUCATIONAL OR INFORMATIONAL PURPOSES ONLY!)",
+		Short: "License keys",
 	}
 
 	cmd.AddCommand(

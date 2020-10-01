@@ -19,7 +19,7 @@ import (
 func NewCommand(l *logrus.Logger, cfg *config.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:   "update",
-		Short: "Update keys",
+		Short: "Get fresh free keys (USE FOR DEBUG PURPOSES ONLY!)",
 		RunE: func(c *cobra.Command, args []string) error {
 			keeper := keepers.NewFileKeeper(cfg.Mirror.FreeKeys.FilePath)
 

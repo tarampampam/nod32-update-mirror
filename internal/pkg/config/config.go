@@ -65,20 +65,29 @@ type (
 	}
 )
 
-// FromYaml creates new config instance using YAML-structured content.
-func FromYaml(in []byte, expandEnv bool) (*Config, error) {
-	config := &Config{}
-
+// FromYaml loads YAML-structured content and configure itself.
+func (config *Config) FromYaml(in []byte, expandEnv bool) error {
 	if expandEnv {
 		parsed, err := envsubst.Bytes(in)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		in = parsed
 	}
 
 	if err := yaml.UnmarshalStrict(in, config); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// FromYaml creates new config instance using YAML-structured content.
+func FromYaml(in []byte, expandEnv bool) (*Config, error) {
+	config := &Config{}
+
+	if err := config.FromYaml(in, expandEnv); err != nil {
 		return nil, err
 	}
 

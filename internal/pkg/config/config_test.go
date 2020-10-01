@@ -132,11 +132,17 @@ mirror:
 
 			conf, err := FromYaml(tt.giveYaml, tt.giveExpandEnv)
 
+			conf2 := Config{}
+			err2 := conf2.FromYaml(tt.giveYaml, tt.giveExpandEnv)
+
 			if tt.wantErr {
 				assert.Error(t, err)
+				assert.Error(t, err2)
 			} else {
 				assert.Nil(t, err)
+				assert.Nil(t, err2)
 				tt.checkResultFn(t, conf)
+				tt.checkResultFn(t, &conf2)
 			}
 
 			if tt.giveEnv != nil {
