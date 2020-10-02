@@ -1,18 +1,22 @@
 package update
 
 import (
-	"nod32-update-mirror/internal/pkg/config"
-	"nod32-update-mirror/pkg/nod32mirror"
-	"strings"
-
-	"github.com/pkg/errors"
+	"errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"nod32-update-mirror/internal/pkg/config"
+	"nod32-update-mirror/internal/pkg/fs"
+	"nod32-update-mirror/pkg/nod32mirror"
+	"os"
+	"path"
+	"strings"
 )
 
 type remoteServerProps struct {
 	url, username, password string
 }
+
+const tempUpdateDirName = ".last_update"
 
 // NewCommand creates `update` command.
 func NewCommand(log *logrus.Logger, cfg *config.Config) *cobra.Command {
@@ -51,7 +55,34 @@ func NewCommand(log *logrus.Logger, cfg *config.Config) *cobra.Command {
 				return errors.New("no one server can be used for mirroring")
 			}
 
-			log.Info(remoteServer)
+			// at first of all - we must create directory for updating files, if needed
+			if _, err := os.Stat(cfg.Mirror.Path); os.IsNotExist(err) {
+				log.WithField("path", cfg.Mirror.Path).Info("Create directory for updating files")
+				if err := os.MkdirAll(cfg.Mirror.Path, 0775); err != nil {
+					return err
+				}
+			}
+
+			tempUpdateDir := path.Join(cfg.Mirror.Path, tempUpdateDirName)
+
+			// if temporary mirror directory does NOT exist - this is a "fresh" update run
+			if _, err := os.Stat(tempUpdateDir); os.IsNotExist(err) {
+				log.
+					WithFields(logrus.Fields{"from": cfg.Mirror.Path, "to": tempUpdateDir}).
+					Info("Making a copy of directory with existing updating files")
+				if err := fs.CopyDirectoryRecursive(cfg.Mirror.Path, tempUpdateDir, func(relativeFilePath string) bool {
+					return strings.HasSuffix(relativeFilePath, "update.ver")
+				}); err != nil {
+					return err
+				}
+			} else {
+				log.WithField("directory", tempUpdateDir).Info("Resume mirroring")
+			}
+
+			// start remote mirror sync
+			for _, target := range versionFile.Sections {
+				log.Info(target.File)
+			}
 
 			return nil
 		},

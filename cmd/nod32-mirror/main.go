@@ -19,8 +19,6 @@ func main() {
 	cmd := cli.NewCommand(logger, filepath.Base(os.Args[0]))
 
 	if err := cmd.Execute(); err != nil {
-		logger.Fatal(err.Error())
-
-		os.Exit(1)
+		logger.Fatal(err)
 	}
 }
