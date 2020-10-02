@@ -89,6 +89,19 @@ mirror:
 			},
 		},
 		{
+			name:          "ENV inside ENV with fallback",
+			giveExpandEnv: true,
+			giveEnv:       map[string]string{"__TEST_VALUE": "foo"},
+			giveYaml: []byte(`
+mirror:
+  path: "${SOME_NOT_EXISTS_VAR:-$__TEST_VALUE}"
+`),
+			wantErr: false,
+			checkResultFn: func(t *testing.T, config *Config) {
+				assert.Equal(t, "foo", config.Mirror.Path)
+			},
+		},
+		{
 			name:          "ENV variables NOT expanded",
 			giveExpandEnv: false,
 			giveYaml: []byte(`

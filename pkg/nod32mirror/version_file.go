@@ -8,36 +8,44 @@ import (
 )
 
 type (
-	UpdateFile struct {
-		Hosts    updateFileHosts
-		Sections map[string]updateFileSection
+	VersionFile struct {
+		Hosts    versionFileHosts
+		Sections map[string]versionFileSection
 	}
 
-	updateFileHosts struct {
-		Other           []string
-		PrereleaseOther []string
-		DeferredOther   []string
+	versionFileHosts struct {
+		Other           []string `ini:"Other"`
+		PrereleaseOther []string `ini:"Prerelease-other"`
+		DeferredOther   []string `ini:"Deferred-other"`
 	}
 
-	updateFileSection struct {
-		Version      string
-		VersionID    uint64
-		Build        uint64
-		Type         string
-		Category     string
-		Level        uint64
-		Base         uint64
-		Date         time.Time
-		Platform     string
-		Group        []string
-		BuildRegName string
-		File         string
-		Size         uint64
+	versionFileSection struct {
+		Version      string    `ini:"version"`
+		VersionID    uint64    `ini:"versionid"`
+		Build        uint64    `ini:"build"`
+		Type         string    `ini:"type"`
+		Category     string    `ini:"category"`
+		Level        uint64    `ini:"level"`
+		Base         uint64    `ini:"base"`
+		Date         time.Time `ini:"date"`
+		Platform     string    `ini:"platform"`
+		Group        []string  `ini:"group"`
+		BuildRegName string    `ini:"buildregname"`
+		File         string    `ini:"file"`
+		Size         uint64    `ini:"size"`
 	}
 )
 
-// FromINI configure itself using INI file content (file `update.ver`, usually).
-func (f *UpdateFile) FromINI(content []byte) (err error) {
+// NewVersionFile creates new version file struct.
+func NewVersionFile() VersionFile {
+	return VersionFile{
+		Sections: make(map[string]versionFileSection),
+	}
+}
+
+// FromINI configure itself using INI file content (file `update.ver`, usually). Content can be string, []byte,
+// io.ReadCloser or io.Reader.
+func (f *VersionFile) FromINI(content interface{}) (err error) {
 	var iniFile *ini.File
 
 	if iniFile, err = ini.Load(content); err != nil {
@@ -64,15 +72,15 @@ func (f *UpdateFile) FromINI(content []byte) (err error) {
 				continue
 			}
 
-			f.Sections[iniSectionName] = f.parseIniSection(iniSection)
+			f.Sections[iniSectionName] = f.parseINISection(iniSection)
 		}
 	}
 
 	return nil
 }
 
-func (f *UpdateFile) parseIniSection(iniSection *ini.Section) updateFileSection { //nolint:gocyclo
-	section := updateFileSection{}
+func (f *VersionFile) parseINISection(iniSection *ini.Section) versionFileSection { //nolint:gocyclo
+	section := versionFileSection{}
 
 	for _, iniKey := range iniSection.Keys() {
 		switch iniKey.Name() {

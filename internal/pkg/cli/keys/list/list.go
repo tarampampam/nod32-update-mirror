@@ -1,7 +1,9 @@
 package list
 
 import (
+	"errors"
 	"nod32-update-mirror/internal/pkg/config"
+	"nod32-update-mirror/internal/pkg/fs"
 	"nod32-update-mirror/pkg/keys/keepers"
 	"sort"
 	"strings"
@@ -19,14 +21,16 @@ func NewCommand(l *logrus.Logger, cfg *config.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:   "list",
 		Short: "Show all keys",
-		Run: func(c *cobra.Command, _ []string) {
+		RunE: func(c *cobra.Command, _ []string) error {
+			if err := fs.MkdirAllForFile(cfg.Mirror.FreeKeys.FilePath, 0775); err != nil {
+				return err
+			}
+
 			keeper := keepers.NewFileKeeper(cfg.Mirror.FreeKeys.FilePath)
 
 			keys, err := keeper.All()
 			if err != nil {
-				l.WithError(err).Error("Cannot read keys from storage")
-
-				return
+				return errors.New("cannot read keys from storage: " + err.Error())
 			}
 
 			if keys != nil && len(*keys) > 0 {
@@ -69,6 +73,8 @@ func NewCommand(l *logrus.Logger, cfg *config.Config) *cobra.Command {
 			} else {
 				l.Warn("Keys storage is empty")
 			}
+
+			return nil
 		},
 	}
 }

@@ -19,9 +19,7 @@ type Checker struct {
 const (
 	keyValidationURL     = "http://update.eset.com:80/v8-rel-sta/mod_010_smon_1036/em010_32_l0.nup"
 	licenseValidationURL = "https://www.esetnod32.ru/buy/renew/"
-)
 
-const (
 	defaultHTTPClientTimeout = time.Second * 10
 )
 

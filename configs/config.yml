@@ -1,6 +1,6 @@
 mirror:
   # Path to the local directory with updating files (directory must exists)
-  path: /tmp/mirror
+  path: "${MIRROR_PATH:-/tmp/nod32mirror/upd_files}"
 
   # Servers for mirroring (license settings will be ignored, if `free-key` is enabled; <https://support.eset.com/en/kb332>)
   servers:
@@ -8,17 +8,16 @@ mirror:
       username: EAV-1122334455
       password: aabbccddee
     - url: 'https://um01.eset.com/eset_upd/'
-    - url: 'https://um01.eset.com/eset_upd/'
     - url: 'https://um02.eset.com/eset_upd/'
     - url: 'https://um01.ru.eset.com/eset_upd/'
     - url: 'https://update.eset.com/eset_upd/'
 
   free-keys:
     # Try to get and use free licence key (USE FOR DEBUG PURPOSES ONLY!)
-    enabled: false
+    enabled: ${MIRROR_FREE_KEYS_ENABLED:-false}
 
     # Path to the file for keys storing
-    file-path: /tmp/nod32-free.keys
+    file-path: "${MIRROR_FREE_KEYS_FILE_PATH:-/tmp/nod32mirror/keys.json}"
 
   filtering:
     # Platforms list (set `any` for all)

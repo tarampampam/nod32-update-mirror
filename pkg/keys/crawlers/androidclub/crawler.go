@@ -95,7 +95,7 @@ func (c Crawler) Fetch() (*keys.Keys, error) {
 }
 
 func (c *Crawler) prepareRequest() (*http.Request, error) {
-	request, err := http.NewRequest(http.MethodGet, "https://android-club.ws/", nil)
+	request, err := http.NewRequest(http.MethodGet, c.Target(), nil)
 	if err != nil {
 		return nil, err
 	}

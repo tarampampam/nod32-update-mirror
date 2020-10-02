@@ -86,13 +86,13 @@ func (c Crawler) Fetch() (*keys.Keys, error) {
 }
 
 func (c *Crawler) prepareRequest() (*http.Request, error) {
-	request, err := http.NewRequest(http.MethodGet, "https://8fornod.net/keys-nod-32-4/", nil)
+	request, err := http.NewRequest(http.MethodGet, c.Target(), nil)
 	if err != nil {
 		return nil, err
 	}
 
 	request.Header.Set("User-Agent", c.UserAgent)
-	request.Header.Set("Referer", "https://8fornod.net/")
+	request.Header.Set("Referer", c.Target())
 	request.Header.Set("Accept", "ext/html,application/xhtml+xml,application/xml;v=b3;q=0.9")
 
 	return request, nil

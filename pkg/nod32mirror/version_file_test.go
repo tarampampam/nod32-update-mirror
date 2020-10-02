@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUpdateFile_FromINI(t *testing.T) {
+func TestVersionFile_FromINI(t *testing.T) {
 	file, err := os.Open("./testdata/update.ver.ini")
 	assert.NoError(t, err)
 
@@ -17,9 +17,7 @@ func TestUpdateFile_FromINI(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NoError(t, file.Close())
 
-	u := UpdateFile{
-		Sections: make(map[string]updateFileSection),
-	}
+	u := NewVersionFile()
 
 	assert.Error(t, u.FromINI([]byte("!foobar")))
 	assert.NoError(t, u.FromINI(body))
@@ -51,7 +49,7 @@ func TestUpdateFile_FromINI(t *testing.T) {
 	assert.Equal(t, uint64(1075), s.Build)
 	assert.Equal(t, "iris", s.Type)
 	assert.Equal(t, "engine", s.Category)
-	assert.Equal(t, uint64(1), s.Level) // empty
+	assert.Equal(t, uint64(1), s.Level)
 	assert.Equal(t, uint64(1066), s.Base)
 	assert.Equal(t, time.Date(2020, 9, 29, 0, 0, 0, 0, time.UTC), s.Date)
 	assert.Equal(t, "x86", s.Platform)

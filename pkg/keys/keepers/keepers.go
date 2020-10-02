@@ -123,11 +123,14 @@ func NewFileKeeper(filePath string) FileKeeper {
 	}
 }
 
+// Keeper file permissions
+const filePerm os.FileMode = 0664
+
 func (k *FileKeeper) load() error {
 	k.mutex.Lock()
 	defer k.mutex.Unlock()
 
-	file, err := os.OpenFile(k.filePath, os.O_RDONLY|os.O_CREATE, 0664)
+	file, err := os.OpenFile(k.filePath, os.O_RDONLY|os.O_CREATE, filePerm)
 	if err != nil {
 		return err
 	}
@@ -169,7 +172,7 @@ func (k *FileKeeper) save() error {
 		return err
 	}
 
-	file, err := os.OpenFile(k.filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0664)
+	file, err := os.OpenFile(k.filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, filePerm)
 	if err != nil {
 		return err
 	}

@@ -1,7 +1,9 @@
 package update
 
 import (
+	"errors"
 	"nod32-update-mirror/internal/pkg/config"
+	"nod32-update-mirror/internal/pkg/fs"
 	"nod32-update-mirror/pkg/keys"
 	"nod32-update-mirror/pkg/keys/checker"
 	"nod32-update-mirror/pkg/keys/crawlers"
@@ -21,6 +23,10 @@ func NewCommand(l *logrus.Logger, cfg *config.Config) *cobra.Command {
 		Use:   "update",
 		Short: "Get fresh free keys (USE FOR DEBUG PURPOSES ONLY!)",
 		RunE: func(c *cobra.Command, _ []string) error {
+			if err := fs.MkdirAllForFile(cfg.Mirror.FreeKeys.FilePath, 0775); err != nil {
+				return err
+			}
+
 			keeper := keepers.NewFileKeeper(cfg.Mirror.FreeKeys.FilePath)
 
 			l.Info("Fresh keys fetching started")
@@ -36,9 +42,7 @@ func NewCommand(l *logrus.Logger, cfg *config.Config) *cobra.Command {
 				}
 
 				if err := keeper.Add(freshKeys...); err != nil {
-					l.WithError(err).Error("Cannot append keys into storage")
-
-					return err
+					return errors.New("cannot append keys into storage: " + err.Error())
 				}
 			} else {
 				l.Warn("No one fresh key fetched :(")
@@ -46,9 +50,7 @@ func NewCommand(l *logrus.Logger, cfg *config.Config) *cobra.Command {
 
 			storedKeys, err := keeper.All()
 			if err != nil {
-				l.WithError(err).Error("Keys reading from storage has been failed")
-
-				return err
+				return errors.New("keys reading from storage has been failed: " + err.Error())
 			}
 
 			l.WithField("keys in storage", len(*storedKeys)).Info("Keys checking started")
