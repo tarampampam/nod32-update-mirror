@@ -4,12 +4,14 @@ mirror:
 
   # Servers for mirroring (license settings will be ignored, if `free-key` is enabled; <https://support.eset.com/en/kb332>)
   servers:
-    - url: 'https://update.eset.com/eset_upd/'
+    - url: 'https://eu-update.eset.com/eset_upd/'
       username: EAV-1122334455
       password: aabbccddee
     - url: 'https://um01.eset.com/eset_upd/'
+    - url: 'https://um01.eset.com/eset_upd/'
     - url: 'https://um02.eset.com/eset_upd/'
     - url: 'https://um01.ru.eset.com/eset_upd/'
+    - url: 'https://update.eset.com/eset_upd/'
 
   free-keys:
     # Try to get and use free licence key (USE FOR DEBUG PURPOSES ONLY!)
