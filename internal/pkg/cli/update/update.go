@@ -2,14 +2,15 @@ package update
 
 import (
 	"errors"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	"nod32-update-mirror/internal/pkg/config"
 	"nod32-update-mirror/internal/pkg/fs"
 	"nod32-update-mirror/pkg/nod32mirror"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 type remoteServerProps struct {
@@ -19,7 +20,7 @@ type remoteServerProps struct {
 const tempUpdateDirName = ".last_update"
 
 // NewCommand creates `update` command.
-func NewCommand(log *logrus.Logger, cfg *config.Config) *cobra.Command {
+func NewCommand(log *logrus.Logger, cfg *config.Config) *cobra.Command { //nolint:funlen
 	return &cobra.Command{
 		Use:   "update",
 		Short: "Update mirror",

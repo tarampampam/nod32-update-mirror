@@ -26,7 +26,7 @@ func MkdirAllForFile(filePath string, perm os.FileMode) error {
 
 // CopyDirectoryRecursive a recursive directory copy in a 2 steps - firstly directories will br created, and after that
 // all files will be copied asynchronously.
-func CopyDirectoryRecursive(src, dest string, skipFileFn func(relativeFilePath string) bool) error {
+func CopyDirectoryRecursive(src, dest string, skipFileFn func(relativeFilePath string) bool) error { //nolint:funlen
 	if info, err := os.Stat(src); os.IsNotExist(err) {
 		return errors.New("not exists: " + src)
 	} else if !info.IsDir() {
@@ -119,4 +119,3 @@ func CopyDirectoryRecursive(src, dest string, skipFileFn func(relativeFilePath s
 
 	return nil
 }
-

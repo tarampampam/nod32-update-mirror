@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/sirupsen/logrus"
 	"nod32-update-mirror/internal/pkg/cli"
 	"os"
 	"path/filepath"
+
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
