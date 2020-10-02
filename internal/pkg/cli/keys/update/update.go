@@ -1,7 +1,6 @@
 package update
 
 import (
-	"errors"
 	"nod32-update-mirror/internal/pkg/config"
 	"nod32-update-mirror/internal/pkg/fs"
 	"nod32-update-mirror/pkg/keys"
@@ -13,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -42,7 +42,7 @@ func NewCommand(l *logrus.Logger, cfg *config.Config) *cobra.Command {
 				}
 
 				if err := keeper.Add(freshKeys...); err != nil {
-					return errors.New("cannot append keys into storage: " + err.Error())
+					return errors.Wrap(err, "cannot append keys into storage")
 				}
 			} else {
 				l.Warn("No one fresh key fetched :(")
@@ -50,7 +50,7 @@ func NewCommand(l *logrus.Logger, cfg *config.Config) *cobra.Command {
 
 			storedKeys, err := keeper.All()
 			if err != nil {
-				return errors.New("keys reading from storage has been failed: " + err.Error())
+				return errors.Wrap(err, "keys reading from storage has been failed")
 			}
 
 			l.WithField("keys in storage", len(*storedKeys)).Info("Keys checking started")

@@ -23,10 +23,9 @@ const banner = `    _   __          __________      __  ____
 /_/ |_/\____/\__,_//____/____/  /_/  /_/_/_/  /_/   \____/_/`
 
 // NewCommand creates `nod32-mirror` command.
-func NewCommand(name string) *cobra.Command {
+func NewCommand(logger *logrus.Logger, name string) *cobra.Command {
 	var (
 		cfg              *config.Config = &config.Config{}
-		logger           *logrus.Logger = newLogger()
 		cfgFilePath      string
 		verbose, logJSON bool
 	)
@@ -75,16 +74,4 @@ func NewCommand(name string) *cobra.Command {
 	)
 
 	return cmd
-}
-
-func newLogger() *logrus.Logger {
-	l := logrus.New()
-
-	l.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp:          true,
-		TimestampFormat:        "2006-01-02 15:04:05.000",
-		DisableLevelTruncation: true,
-	})
-
-	return l
 }

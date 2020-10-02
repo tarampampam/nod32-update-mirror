@@ -1,7 +1,6 @@
 package list
 
 import (
-	"errors"
 	"nod32-update-mirror/internal/pkg/config"
 	"nod32-update-mirror/internal/pkg/fs"
 	"nod32-update-mirror/pkg/keys/keepers"
@@ -10,9 +9,8 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
-
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-
 	"github.com/spf13/cobra"
 )
 
@@ -30,7 +28,7 @@ func NewCommand(l *logrus.Logger, cfg *config.Config) *cobra.Command {
 
 			keys, err := keeper.All()
 			if err != nil {
-				return errors.New("cannot read keys from storage: " + err.Error())
+				return errors.Wrap(err, "cannot read keys from storage")
 			}
 
 			if keys != nil && len(*keys) > 0 {

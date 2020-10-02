@@ -1,13 +1,12 @@
 package update
 
 import (
-	"errors"
 	"nod32-update-mirror/internal/pkg/config"
 	"nod32-update-mirror/pkg/nod32mirror"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-
 	"github.com/spf13/cobra"
 )
 

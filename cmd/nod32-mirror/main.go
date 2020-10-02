@@ -1,19 +1,25 @@
 package main
 
 import (
-	"fmt"
+	"github.com/sirupsen/logrus"
 	"nod32-update-mirror/internal/pkg/cli"
 	"os"
 	"path/filepath"
 )
 
 func main() {
-	cmd := cli.NewCommand(filepath.Base(os.Args[0]))
+	logger := logrus.New()
+
+	logger.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp:          true,
+		TimestampFormat:        "2006-01-02 15:04:05.000",
+		DisableLevelTruncation: true,
+	})
+
+	cmd := cli.NewCommand(logger, filepath.Base(os.Args[0]))
 
 	if err := cmd.Execute(); err != nil {
-		if _, outErr := fmt.Fprintf(os.Stderr, "An error occurred: %v\n", err); outErr != nil {
-			panic(outErr)
-		}
+		logger.Fatal(err.Error())
 
 		os.Exit(1)
 	}
